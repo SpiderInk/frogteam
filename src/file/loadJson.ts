@@ -4,7 +4,12 @@ export function loadJsonFromFileSync(filePath: string): any[] {
     try {
         if (fs.existsSync(filePath)) {
             const data = fs.readFileSync(filePath, 'utf8');
-            return JSON.parse(data);
+            try {
+                return JSON.parse(data);
+            } catch (jsonErr) {
+                console.error(`Error parsing JSON file: ${jsonErr}`);
+                return [];
+            }
         } else {
             return [];
         }

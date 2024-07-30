@@ -228,7 +228,8 @@ export async function openSetupPanel(context: vscode.ExtensionContext, data: Set
         switch (message.command) {
             case 'saveSetup':
 				saveSetup(context, message.setup);
-				promptCollectionViewProvider?.refresh();
+				load_setups(context); //timing hack
+				setupCollectionViewProvider?.refresh();
                 break;
         }
     });

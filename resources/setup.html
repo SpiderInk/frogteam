@@ -48,6 +48,7 @@
     <div id="TeamSetup">
         <form id="team-setup-form" oninput="autoSaveSetup()">
             <label for="name">Name</label>
+            <input type="hidden" id="id" />
             <input type="text" id="name" placeholder="Name">
 
             <label for="purpose">Purpose</label>
@@ -68,8 +69,6 @@
                 <option value="anthropic.claude-3-haiku-20240307-v1:0">anthropic.claude-3-haiku-20240307-v1:0 (bedrock)</option>
             </select>
 
-            <input type="text" id="model" placeholder="Model">
-
             <label for="model-endpoint">Model Endpoint</label>
             <input type="text" id="model-endpoint" placeholder="Model Endpoint">
 
@@ -89,18 +88,18 @@
         });
 
         document.getElementById('team-setup-form').oninput = function () {
-            if (currentSetupIndex !== null) {
-                setup = {
-                    name: document.getElementById('name').value,
-                    purpose: document.getElementById('purpose').value,
-                    model: document.getElementById('model').value,
-                    endpoint: document.getElementById('model-endpoint').value,
-                    apiKey: document.getElementById('api-key').value,
-                    color: document.getElementById('color').value
-                };
-                saveState(); // before we post the message!
-                vscode.postMessage({ command: 'saveSetup', setup });
-            }
+            setup = {
+                id: document.getElementById('id').value,
+                name: document.getElementById('name').value,
+                purpose: document.getElementById('purpose').value,
+                model: document.getElementById('model').value,
+                endpoint: document.getElementById('model-endpoint').value,
+                apiKey: document.getElementById('api-key').value,
+                color: document.getElementById('color').value,
+                icon: setup.icon
+            };
+            saveState(); // before we post the message!
+            vscode.postMessage({ command: 'saveSetup', setup });
         };
 
         window.addEventListener('message', event => {
@@ -111,12 +110,13 @@
                     break;
                 case 'load':
                     setup = message.setup;
-                    document.getElementById('name').value = setup.name
-                    document.getElementById('purpose').value = setup.purpose
-                    document.getElementById('model').value = setup.model
-                    document.getElementById('model-endpoint').value = setup.endpoint
-                    document.getElementById('api-key').value = setup.apiKey
-                    document.getElementById('color').value = setup.color
+                    document.getElementById('id').value = setup.id;
+                    document.getElementById('name').value = setup.name;
+                    document.getElementById('purpose').value = setup.purpose;
+                    document.getElementById('model').value = setup.model;
+                    document.getElementById('model-endpoint').value = setup.endpoint;
+                    document.getElementById('api-key').value = setup.apiKey;
+                    document.getElementById('color').value = setup.color;
                     saveState();
                     break;
                 }
@@ -124,6 +124,8 @@
 
         function restoreState() {
             const state = vscode.getState();
+            setup = state;
+            document.getElementById('id').value = state.id;
             document.getElementById('name').value = state.name;
             document.getElementById('purpose').value = state.purpose;
             document.getElementById('model').value = state.model;
@@ -134,12 +136,14 @@
 
         function saveState() {
             const state = {
+                id: setup.id,
                 name: setup.name,
                 purpose: setup.purpose,
                 model: setup.model,
                 endpoint: setup.endpoint,
                 apiKey: setup.apiKey,
-                color: setup.color
+                color: setup.color,
+                icon: setup.icon
             };
             vscode.setState(state);
         }
@@ -170,14 +174,10 @@
         }
 
         function addSetup() {
-            const name = "", purpose = "", model = "", endpoint = "", apiKey = "", color = "#CCAA99"
-            setup = { name, purpose, model, endpoint, apiKey, color };
+            const id = generateUniqueId(), name = "", purpose = "", model = "", endpoint = "", apiKey = "", color = "#CCAA99", icon = ""
+            setup = { id, name, purpose, model, endpoint, apiKey, color, icon };
         };
 
-        function autoSaveSetup() {
-            // needs to collect the data from the open item and update it in the "setups" global
-            vscode.postMessage({ command: 'saveSetups', setups });
-        };
     </script>
 </body>
 

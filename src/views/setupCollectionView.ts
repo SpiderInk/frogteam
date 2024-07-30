@@ -20,7 +20,8 @@ export class SetupCollectionViewProvider implements vscode.TreeDataProvider<Setu
         if (element) {
             return Promise.resolve([]);
         } else {
-            const setups = load_setups(this.context);
+            //const setups = load_setups(this.context);
+            const setups:Setup[] = this.context.globalState.get('setups', []);
             const setupItems = setups.map(setup => new SetupItem(setup));
             return Promise.resolve(setupItems);
         }

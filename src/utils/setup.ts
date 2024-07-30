@@ -7,6 +7,7 @@ import { SETUPS_FILE } from '../extension';
 import { saveJsonToFile } from '../file/fileOperations';
 
 export interface Setup {
+    id: string;
     name: string;
     purpose: string;
     model: string;
@@ -75,12 +76,10 @@ export function extractMemberFromPrompt(prompt: string, setups: Setup[]): string
     throw new Error('No valid member name found in the prompt');
 }
 
-
-
 export async function saveSetup(context: any, setup: Setup) {
     let setups = load_setups(context);
-    const index = setups.findIndex(element => element.name === setup.name);
-    if (index === -1 && setup.name.length > 0) {
+    const index = setups.findIndex(element => element.id === setup.id);
+    if (index === -1 && setup.id.length > 0) {
         setups.push(setup);
     } else {
         setups[index] = setup;
