@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${data.category}-${data.role}-${data.models}</title>
+    <style>
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        textarea,
+        input[type="text"],
+        input[type="password"],
+        input[type="color"],
+        select {
+            padding: 5px;
+            margin-bottom: 5px;
+            width: 95%;
+            background-color: #D3D3D3;
+            color: black;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 8px; /* Adjust this value to control spacing between checkbox and label */
+            margin-bottom: 5px;
+        }
+
+        input[type="checkbox"] {
+            background-color: #D3D3D3;
+            color: black;
+            margin: 0;
+            float: left;
+            clear: none;
+        }
+
+        .checklabel {
+            color: #D3D3D3;
+            float: left;
+            clear: none;
+        }
+
+        .editable-dark-theme {
+            background-color: #D3D3D3; /* Dark background color */
+            color: black; /* Light text color */
+            border: 1px solid #3c3c3c; /* Border to distinguish the editable area */
+            padding: 10px; /* Padding for better readability */
+            border-radius: 4px; /* Rounded corners */
+            outline: none; /* Remove default outline on focus */
+            font-family: Arial, sans-serif; /* Consistent font */
+            font-size: 14px; /* Font size */
+        }
+
+        .editable-dark-theme:focus {
+            background-color: #D3D3D3; /* Slightly lighter background on focus */
+            border-color: #5c5c5c; /* Change border color on focus */
+        }
+
+        .editable-dark-theme:empty:before {
+            content: attr(data-placeholder); /* Placeholder text */
+            color: #666; /* Placeholder color */
+        }            
+    </style>
+    <script nonce="${nonce}">
+        const vscode = acquireVsCodeApi();
+    </script>
+</head>
+<body>
+    <h3>Edit Prompt</h3>
+    You need a minimum of three prompts: lead-architect, lead-engineer, and developer. There must be a team member with a "purpose" to match the "category" and "model" of each prompt. The project editor will show you the team roster and status telling what purposes and categories are missing or displaying healthy.
+    <br><br>
+    In your prompt using ${ name } will be the current prompts team member name. It is important to say something like "Your name is ${ name }" This way the LLM will recognize its assignment if they are reading from a more general plan that came from a lead.
+    <br><br>
+    <form id="edit-prompt">
+        <div class="checkbox-container">
+            <input type="checkbox" id="active">
+            <label for="active" class="checklabel">Active</label>
+        </div>
+
+        <label for="category">Purpose Category</label>
+        <input type="hidden" id="id">
+
+        <!-- <input type="text" id="category" placeholder="Category"> -->
+        <select id="category">
+            <option value="lead-architect">lead-architect</option>
+            <option value="lead-engineer">lead-engineer</option>
+            <option value="developer">developer</option>
+        </select>
+
+        <label for="role">Role</label>
+        <input type="text" id="role" value="system" value="system" readonly>
+
+        <label for="models">Model</label>
+        <select id="models">
+            <option value="gpt-4o">gpt-4o (openai)</option>
+            <option value="gpt-4-turbo">gpt-4-turbo (openai)</option>
+            <option value="gpt-3.5-turbo">gpt-3.5-turbo (openai)</option>
+            <option value="meta.llama3-8b-instruct-v1:0">meta.llama3-8b-instruct-v1:0 (bedrock)</option>
+            <option value="meta.llama3-70b-instruct-v1:0">meta.llama3-70b-instruct-v1:0 (bedrock)</option>
+            <option value="anthropic.claude-3-5-sonnet-20240620-v1:0">anthropic.claude-3-5-sonnet-20240620-v1:0 (bedrock)</option>
+            <option value="anthropic.claude-3-haiku-20240307-v1:0">anthropic.claude-3-haiku-20240307-v1:0 (bedrock)</option>
+        </select>
+
+        <label for="tag">Tag</label>
+        <input type="text" id="tag" placeholder="tags...">
+
+        <label for="content">Prompt</label>
+        <div id="content" class="editable-dark-theme" contenteditable="true"></div>
+    </form>
+
+    <script nonce="${nonce}">
+        let prompt = {};
+
+        document.addEventListener('DOMContentLoaded', () => {
+            restoreState();
+        });
+
+        document.getElementById('edit-prompt').oninput = function () {
+            prompt.content = document.getElementById('content').innerText;
+            prompt.category = document.getElementById('category').value;
+            prompt.role = document.getElementById('role').value;
+            prompt.models = document.getElementById('models').value;
+            prompt.active = document.getElementById('active').checked;
+            prompt.tag = document.getElementById('tag').value;
+            prompt.id = document.getElementById('id').value;
+            saveState(); // before we post the message!
+            vscode.postMessage({ command: 'savePrompt', prompt });
+        };
+
+        window.addEventListener('message', event => {
+            const message = event.data;
+            switch (message.command) {
+                case 'load':
+                    prompt = message.prompt;
+                    document.getElementById('id').value = prompt.id;
+                    document.getElementById('content').innerText = prompt.content;
+                    document.getElementById('category').value = prompt.category;
+                    document.getElementById('role').value = prompt.role;
+                    document.getElementById('models').value = prompt.models;
+                    document.getElementById('active').checked = prompt.active;
+                    document.getElementById('tag').value = prompt.tag;
+                    saveState();
+                    break;
+            }
+        });
+
+        function restoreState() {
+            const state = vscode.getState();
+            if (state) {
+                document.getElementById('id').value = state.id;
+                document.getElementById('content').innerText = state.content;
+                document.getElementById('category').value = state.category;
+                document.getElementById('role').value = state.role;
+                document.getElementById('models').value = state.models;
+                document.getElementById('active').checked = state.active;
+                document.getElementById('tag').value = state.tag;
+            }
+        };
+
+        function saveState() {
+            const state = {
+                content: prompt.content,
+                category: prompt.category,
+                role: prompt.role,
+                models: prompt.models,
+                id: prompt.id,
+                active: prompt.active,
+                tag: prompt.tag
+            };
+            vscode.setState(state);
+        };
+
+    </script>
+</body>
+</html>

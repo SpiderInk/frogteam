@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Team</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 10px;
+            background-color: var(--vscode-editor-background); /* Use VS Code's background color */
+            color: var(--vscode-editor-foreground);
+        }
+
+        h1 {
+            font-size: 1.5em;
+        }
+
+        .tab {
+            overflow: hidden;
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            clear: both;
+        }
+
+        .tab button {
+            background-color: inherit;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 16px;
+            color: #D3D3D3;
+        }
+
+        .tab button:hover {
+            background-color: #ddd;
+        }
+
+        .tab button.active {
+            background-color: #ccc;
+            color: black;
+        }
+
+        .tabcontent {
+            display: none;
+            padding: 20px 0;
+            border-top: none;
+        }
+
+        .tabcontent.active {
+            display: block;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        textarea,
+        input[type="text"],
+        input[type="password"],
+        input[type="color"],
+        select {
+            padding: 5px;
+            margin-bottom: 5px;
+            width: 95%;
+            background-color: #D3D3D3;
+            color: black;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 8px; /* Adjust this value to control spacing between checkbox and label */
+            margin-bottom: 5px;
+        }
+
+        input[type="checkbox"] {
+            background-color: #D3D3D3;
+            color: black;
+            margin: 0;
+            float: left;
+            clear: none;
+        }
+
+        .checklabel {
+            color: #D3D3D3;
+            float: left;
+            clear: none;
+        }
+
+        button {
+            padding: 10px;
+            width: 100px;
+        }
+
+        #response {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+
+        .prompt-list,
+        .setup-list {
+            margin-top: 10px;
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .prompt-item,
+        .setup-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .button_delete {
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            background-color: transparent;
+        }
+
+        .prompt-item button,
+        .setup-item button {
+            padding: 5px 10px;
+            color: #D3D3D3;
+            border: none;
+            cursor: pointer;
+        }
+
+        .listitem {
+            background-color: transparent;
+            min-width: 200px;
+            text-align: left;
+        }
+
+        .add-button {
+            margin-top: 10px;
+            background-color: #4CAF50;
+            border: none;
+            cursor: pointer;
+        }
+
+        .add-button:hover {
+            background-color: #45a049;
+        }
+
+        .project-button {
+            margin-top: 0px;
+            background-color: transparent;
+            color: #D3D3D3;
+            border: none;
+            cursor: pointer;
+            float: right;
+            width: 48px;
+            height: 48px;
+        }
+
+        .icon {
+            color: #D3D3D3;
+            fill: #D3D3D3;
+        }
+
+        .fulldiv {
+            width: 100%;
+            clear: both;
+        }
+
+        #confirm-dialog {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background: #D3D3D3;
+            border: 1px solid #ccc;
+            z-index: 1000;
+            color: black;
+        }
+
+        .history-item {
+            margin-bottom: 0px;
+            /* border: 1px solid #ccc; */
+            padding: 2px;
+            /* border-radius: 5px; */
+        }
+
+        .history-item-header {
+            cursor: pointer;
+        }
+
+        .history-item-body {
+            display: none;
+            margin-top: 5px;
+        }
+        
+        .history-item-body-response {
+            text-align: right;
+        }
+
+        .subscript {
+            font-size: x-small;
+            vertical-align: bottom;
+            color: #D3D3D3;
+        }
+
+        #prompt-text {
+            color: var(--vscode-foreground);
+            opacity: 0.5;
+        }
+
+        .editpromptlabel {
+            float: left;
+            break-after: avoid;
+        }
+
+        .editpromptbutton {
+            margin-top: 10px;
+            background-color: transparent;
+            color: #D3D3D3;
+            border: none;
+            cursor: pointer;
+            float: right;
+        }
+
+        .issues {
+            color: red;
+            float: left;
+        }
+
+        .hasmarkdown {
+            color: orange;
+            font-size: x-small;
+        }
+    </style>
+    <script nonce="${nonce}">
+        const vscode = acquireVsCodeApi();
+</script>
+</head>
+
+<body>
+    <div id="issues" class="issues">
+        <!-- dynamic content -->
+    </div>
+    <div id="projetinterface" class="fulldiv">
+        <button class="project-button" onclick="openProjectPanel()" title="Project"><img class="icon" src="${local_resources}/resources/browser.svg" /></button>
+        <button class="project-button" onclick="openRosterPanel()" title="Team Roster"><img class="icon" src="${local_resources}/resources/human-queue.svg" /></button>
+    </div>
+    <div class="tab">
+        <button class="tablinks" onclick="openTab(event, 'History')">history</button>
+        <button class="tablinks" onclick="openTab(event, 'TeamSetup')">setup</button>
+        <button class="tablinks" onclick="openTab(event, 'Prompting')">prompts</button>
+    </div>
+
+    <div id="TeamSetup" class="tabcontent">
+        <button class="add-button" onclick="addSetup()">New Setup</button>
+        <ul class="setup-list" id="setup-list">
+            <!-- Setup items will be added here dynamically -->
+        </ul>
+        <form id="team-setup-form" oninput="autoSaveSetup()">
+            <label for="name">Name</label>
+            <input type="text" id="name" placeholder="Name">
+
+            <label for="purpose">Purpose</label>
+            <select id="purpose">
+                <option value="lead-architect">lead-architect</option>
+                <option value="lead-engineer">lead-engineer</option>
+                <option value="developer">developer</option>
+            </select>
+
+            <label for="model">Model</label>
+            <select id="model">
+                <option value="gpt-4o">gpt-4o (openai)</option>
+                <option value="gpt-4-turbo">gpt-4-turbo (openai)</option>
+                <option value="gpt-35-turbo">gpt-35-turbo (openai)</option>
+                <option value="meta.llama3-8b-instruct-v1:0">meta.llama3-8b-instruct-v1:0 (bedrock)</option>
+                <option value="meta.llama3-70b-instruct-v1:0">meta.llama3-70b-instruct-v1:0 (bedrock)</option>
+                <option value="anthropic.claude-3-5-sonnet-20240620-v1:0">anthropic.claude-3-5-sonnet-20240620-v1:0 (bedrock)</option>
+                <option value="anthropic.claude-3-haiku-20240307-v1:0">anthropic.claude-3-haiku-20240307-v1:0 (bedrock)</option>
+            </select>
+
+            <input type="text" id="model" placeholder="Model">
+
+            <label for="model-endpoint">Model Endpoint</label>
+            <input type="text" id="model-endpoint" placeholder="Model Endpoint">
+
+            <label for="api-key">API Key</label>
+            <input type="password" id="api-key" placeholder="API Key">
+
+            <label for="color">Color</label>
+            <input type="color" id="color" name="color">
+        </form>
+    </div>
+
+    <div id="Prompting" class="tabcontent">
+        <button class="add-button" onclick="addPrompt()">New Prompt</button>
+        <ul class="prompt-list" id="prompt-list">
+            <!-- Prompt items will be added here dynamically -->
+        </ul>
+        <form id="prompting-form" oninput="autoSavePrompt()">
+            <input type="hidden" id="id">
+            <div class="checkbox-container">
+                <input type="checkbox" id="active">
+                <label for="active" class="checklabel">Active</label>
+            </div>
+            <label for="category">Purpose Category</label>
+            <select id="category">
+                <option value="lead-architect">lead-architect</option>
+                <option value="lead-engineer">lead-engineer</option>
+                <option value="developer">developer</option>
+            </select>
+
+            <label for="role">Role</label>
+            <input type="text" id="role" value="system" readonly>
+
+            <label for="models">Model</label>
+            <select id="models">
+                <option value="gpt-4o">gpt-4o (openai)</option>
+                <option value="gpt-4-turbo">gpt-4-turbo (openai)</option>
+                <option value="gpt-35-turbo">gpt-35-turbo (openai)</option>
+                <option value="meta.llama3-8b-instruct-v1:0">meta.llama3-8b-instruct-v1:0 (bedrock)</option>
+                <option value="meta.llama3-70b-instruct-v1:0">meta.llama3-70b-instruct-v1:0 (bedrock)</option>
+                <option value="anthropic.claude-3-5-sonnet-20240620-v1:0">anthropic.claude-3-5-sonnet-20240620-v1:0 (bedrock)</option>
+                <option value="anthropic.claude-3-haiku-20240307-v1:0">anthropic.claude-3-haiku-20240307-v1:0 (bedrock)</option>
+            </select>
+
+            <label for="tag">Tag</label>
+            <input type="text" id="tag" placeholder="tags...">
+            <div>
+                <label class="editpromptlabel" for="prompt-text">Prompt Text</label>
+                <img src="${local_resources}/resources/pencil.svg" width="16" height="16" class="editpromptbutton" onclick="editPrompt()" />
+            </div>
+            <div id="prompt-text">&nbsp;</div>
+        </form>
+    </div>
+
+    <div id="History" class="tabcontent">
+        <!-- dynamic content -->
+    </div>
+
+    <div id="confirm-dialog">
+        <p id="confirmation-meg"></p>
+        <button id="confirm-yes">Yes</button>
+        <button id="confirm-no">No</button>
+    </div>
+
+    <script nonce="${nonce}">
+        let prompts = [];
+        let setups = [];
+        let history = [];
+        let deleteIndex = null;
+        let deleteFunction = null;
+        let currentSetupIndex = null;
+        let currentPromptIndex = null;
+
+        document.getElementById('confirm-no').addEventListener('click', hideConfirmDialog);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            vscode.postMessage({ command: 'loadPrompts' });
+            vscode.postMessage({ command: 'loadSetups' });
+        });
+
+        document.addEventListener('visibilitychange', () => {
+            vscode.postMessage({ command: 'loadPrompts' });
+            vscode.postMessage({ command: 'loadSetups' });
+        });
+
+        document.getElementById('team-setup-form').oninput = function () {
+            if (currentSetupIndex !== null) {
+                setups[currentSetupIndex] = {
+                    name: document.getElementById('name').value,
+                    purpose: document.getElementById('purpose').value,
+                    model: document.getElementById('model').value,
+                    endpoint: document.getElementById('model-endpoint').value,
+                    apiKey: document.getElementById('api-key').value,
+                    color: document.getElementById('color').value
+                };
+                autoSaveSetup();
+                displaySetups();
+                displayHistory();
+            }
+        };
+
+        document.getElementById('prompting-form').oninput = function () {
+            if (currentPromptIndex !== null) {
+                prompts[currentPromptIndex] = {
+                    id: document.getElementById('id').value,
+                    content: document.getElementById('prompt-text').innerText,
+                    category: document.getElementById('category').value,
+                    role: document.getElementById('role').value,
+                    models: document.getElementById('models').value,
+                    active: document.getElementById('active').checked,
+                    tag: document.getElementById('tag').value
+                };
+                autoSavePrompt();
+                displayPrompts();
+                displayHistory();
+            }
+        };
+
+        window.addEventListener('message', event => {
+            const message = event.data;
+            switch (message.command) {
+                case 'answer':
+                    document.getElementById('response').innerText = message.text;
+                    break;
+                case 'loadPrompts':
+                    prompts = message.prompts;
+                    displayPrompts();
+                    break;
+                case 'loadSetups':
+                    setups = message.setups;
+                    displaySetups();
+                    break;
+                case 'loadHistory':
+                    history = message.history;
+                    displayHistory();
+                    break;
+                case 'showIssues':
+                    displayIssues(message.issues);
+                    break;
+            }
+        });
+
+        function showMsg(msg) {
+            document.getElementById('confirmation-meg').innerText = msg;
+            document.getElementById('confirm-dialog').style.display = 'block';
+        };
+
+        function showConfirmDialog(index, msg) {
+            try {
+                document.getElementById('confirm-yes').removeEventListener('click', deleteFunction);
+            } catch(error) {}
+            deleteIndex = index;
+            document.getElementById('confirm-yes').onclick = deleteFunction;
+            document.getElementById('confirmation-meg').innerText = msg;
+            document.getElementById('confirm-dialog').style.display = 'block';
+        };
+
+        function hideConfirmDialog() {
+            document.getElementById('confirm-dialog').style.display = 'none';
+            deleteIndex = null;
+        };
+
+        function confirmDeleteSetup() {
+            if (deleteIndex !== null) {
+                setups.splice(deleteIndex, 1);
+                displaySetups();
+                autoSaveSetup();
+                hideConfirmDialog();
+            }
+        };
+
+        function deleteSetup(index) {
+            let member = setups[index].name;
+            let msg = `Are you sure you want to delete team member ${member}?`;
+            deleteFunction = confirmDeleteSetup;
+            document.getElementById('confirm-yes').onclick = deleteFunction;
+            showConfirmDialog(index, msg);
+        };
+
+        function confirmDeletePrompt() {
+            if (deleteIndex !== null) {
+                prompts.splice(deleteIndex, 1);
+                displayPrompts();
+                autoSavePrompt();
+                hideConfirmDialog();
+            }
+        };
+
+        function deletePrompt(index) {
+            let prompt = prompts[index];
+            let msg = `Are you sure you want to delete prompt for ${prompt.models} with category ${prompt.category}?`;
+            deleteFunction = confirmDeletePrompt;
+            showConfirmDialog(index, msg);
+        };
+
+        function openProjectPanel() {
+            vscode.postMessage({ command: 'openProjectPanel' });
+        };
+
+        function openRosterPanel() {
+            vscode.postMessage({ command: 'openRosterPanel' });
+        };
+
+        function editPrompt() {
+            // currentPromptIndex
+            vscode.postMessage({ command: 'editPrompt', data: prompts[currentPromptIndex] });
+        };
+
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+
+            if (tabName === 'Prompting') {
+                displayPrompts();
+            } else if (tabName === 'TeamSetup') {
+                displaySetups();
+            }
+            vscode.postMessage({ command: 'load' });
+        };
+
+        document.querySelector('.tablinks').click();
+
+        function loadPrompt(index) {
+            currentPromptIndex = index;
+            document.getElementById('id').value = prompts[currentPromptIndex].id
+            document.getElementById('prompt-text').innerHTML = prompts[currentPromptIndex].content;
+            document.getElementById('category').value = prompts[currentPromptIndex].category;
+            document.getElementById('role').value = prompts[currentPromptIndex].role;
+            document.getElementById('models').value = prompts[currentPromptIndex].models;
+            document.getElementById('active').checked = prompts[currentPromptIndex].active;
+            document.getElementById('tag').value = prompts[currentPromptIndex].tag
+        };
+
+        function loadSetup(index) {
+            currentSetupIndex = index;
+            document.getElementById('name').value = setups[currentSetupIndex].name;
+            document.getElementById('purpose').value = setups[currentSetupIndex].purpose;
+            document.getElementById('model').value = setups[currentSetupIndex].model;
+            document.getElementById('model-endpoint').value = setups[currentSetupIndex].endpoint;
+            document.getElementById('api-key').value = setups[currentSetupIndex].apiKey;
+            document.getElementById('color').value = setups[currentSetupIndex].color;
+        };
+
+        function displayIssues(issues) {
+            const issueList = document.getElementById('issues');
+            issueList.innerHTML = '';
+            if(issues.length > 0) {
+                const header = document.createElement('span');
+                header.innerText = "Missing Prompts"
+                issueList.appendChild(header)
+                issues.forEach((issue, index) => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'issue-item';
+                    listItem.innerHTML = "category: " + issue.category + " role: " + issue.role;
+                    issueList.appendChild(listItem);
+                });
+            }
+        };
+
+        function displayPrompts() {
+            const promptList = document.getElementById('prompt-list');
+            promptList.innerHTML = '';
+            prompts.forEach((prompt, index) => {
+                const listItem = document.createElement('li');
+                listItem.className = 'prompt-item';
+                listItem.innerHTML = `
+            <button class="listitem" onclick="loadPrompt(${index})">${prompt.category}-${prompt.role}-${prompt.models}</button>
+            <button class="button_delete" onclick="deletePrompt(${index})"><img class="icon" src="${local_resources}/resources/trash.svg" width="16" height="16" /></button>
+            `;
+            promptList.appendChild(listItem);
+            });
+        };
+
+        function displaySetups() {
+            const setupList = document.getElementById('setup-list');
+            setupList.innerHTML = '';
+            setups.forEach((setup, index) => {
+                const listItem = document.createElement('li');
+                listItem.className = 'setup-item';
+                listItem.innerHTML = `
+            <button class="listitem" onclick="loadSetup(${index})"><span style="color:${setup.color}">${setup.name} (${setup.model})</span></button>
+            <button class="button_delete" onclick="deleteSetup(${index})"><img class="icon" src="${local_resources}/resources/trash.svg" width="16" height="16" /></button>
+            `; 
+            setupList.appendChild(listItem);
+            });
+
+            document.addEventListener('DOMContentLoaded', function() {
+                const tooltipButton = document.querySelector('.tooltip');
+                if (tooltipButton) {
+                    const tooltipText = tooltipButton.getAttribute('data-tooltip');
+                    const tooltipSpan = tooltipButton.querySelector('.tooltiptext');
+                    tooltipSpan.innerText = tooltipText;
+                }
+            });
+        };
+
+        function getSetupColor(name) {
+            for (let setup of setups) {
+                if (setup.name === name) {
+                    return setup.color;
+                }
+            }
+            return '#D3D3D3'
+        };
+
+        function displayHistory() {
+            const container = document.getElementById('History');
+            container.innerHTML = '';
+            history.forEach((entry, index) => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                const date = new Date(entry.timestamp);
+                const formattedDate = date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+                const formattedTime = date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+                const entry_color = getSetupColor(entry.response_by);
+                let markdown = "";
+                if(entry.markdown) {
+                    markdown = `<span class="hasmarkdown">M</span>`;
+                }
+                item.innerHTML = `
+                     <div class="history-item-header">
+                        <img src="${local_resources}/resources/chevron-right.svg" class="chevron-icon" />
+                        <span style="color:${entry_color};">${formattedDate} ${formattedTime} - <strong>${entry.response_by}</strong> ${markdown} </span>
+                    </div>
+                    <div class="history-item-body" style="display:none;">
+                        <p><strong>${entry.ask_by}:</strong> ${entry.ask}</p>
+                        <p class="history-item-body-response"><strong>${entry.model}, ${entry.response_by}:</strong> ${entry.answer}</p>
+                    </div>
+                `;
+                item.querySelector('.history-item-header').addEventListener('click', () => {
+                    const body = item.querySelector('.history-item-body');
+                    const chevron = item.querySelector('.chevron-icon');
+                    if (body.style.display === 'none') {
+                        body.style.display = 'block';
+                        chevron.src = `${local_resources}/resources/chevron-bottom.svg`;
+                    } else {
+                        body.style.display = 'none';
+                        chevron.src = `${local_resources}/resources/chevron-right.svg`;
+                    }
+                });
+                item.querySelector('.history-item-body-response').addEventListener('click', () => {
+                    vscode.postMessage({ command: 'renderMarkdown', data: entry });
+                });
+                container.appendChild(item);
+            });
+        };
+
+        function generateUniqueId() {
+            return 'xxxx-xxxx-4xxx-yxxx-xxxx-xxxx-xxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        function addPrompt() {
+            const id = generateUniqueId();
+            const content = "", category = "", role = "system", models = "", active = false, tag = ""
+            const idx = prompts.push({ id, content, category, role, models, active, tag }) - 1;
+            displayPrompts();
+            autoSavePrompt();
+            loadPrompt(idx);
+        };
+
+        function addSetup() {
+            const name = "", purpose = "", model = "", endpoint = "", apiKey = "", color = "#CCAA99"
+            const idx = setups.push({ name, purpose, model, endpoint, apiKey, color }) - 1;
+            displaySetups();
+            autoSaveSetup();
+            loadSetup(idx);
+        };
+
+        function autoSavePrompt() {
+            // needs to collect the data from the open item and update it in the "prompts" global
+            vscode.postMessage({ command: 'savePrompts', prompts });
+        };
+
+        function autoSaveSetup() {
+            // needs to collect the data from the open item and update it in the "setups" global
+            vscode.postMessage({ command: 'saveSetups', setups });
+        };
+    </script>
+</body>
+
+</html>           

@@ -1,0 +1,113 @@
+{
+  "name": "frogteam",
+  "displayName": "FrogTeam",
+  "description": "Your Generative AI Team Workspace",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.91.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "frogteam.openProjectView",
+        "title": "Open Project View"
+      },
+      {
+        "command": "frogteam.openTeamLineupView",
+        "title": "Open Team Lineup View"
+      },
+      {
+        "command": "frogteam.openView",
+        "title": "Open View"
+      },
+      {
+        "command": "frogteam.refreshSetupView",
+        "title": "Refresh Setup View"
+      },
+      {
+        "command": "frogteam.openSetupView",
+        "title": "Open Setup View"
+      },
+      {
+        "command": "frogteam.refreshPromptView",
+        "title": "Refresh Prompt View"
+      },
+      {
+          "command": "frogteam.openPromptPanel",
+          "title": "Open Prompt Panel"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "frogteam",
+          "title": "FrogTeam",
+          "icon": "resources/icon.png"
+        }
+      ]
+    },
+    "views": {
+      "frogteam": [
+        {
+          "id": "projectView",
+          "name": "Project"
+        },
+        {
+          "id": "setupCollectionView",
+          "name": "Team Configuration"
+        },
+        {
+          "id": "promptCollectionView",
+          "name": "Prompt Library"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "vscode-test",
+    "postinstall": "npm install"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.6",
+    "@types/node": "20.x",
+    "@types/vscode": "^1.90.0",
+    "@typescript-eslint/eslint-plugin": "^7.11.0",
+    "@typescript-eslint/parser": "^7.11.0",
+    "@vscode/test-cli": "^0.0.9",
+    "@vscode/test-electron": "^2.4.0",
+    "eslint": "^8.57.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.4.5",
+    "webpack": "^5.92.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "@aws-crypto/sha256-js": "^5.2.0",
+    "@aws-sdk/credential-provider-node": "^3.616.0",
+    "@aws-sdk/types": "^3.609.0",
+    "@langchain/community": "^0.2.20",
+    "@smithy/protocol-http": "^4.1.0",
+    "@smithy/signature-v4": "^4.1.0",
+    "@smithy/util-utf8": "^3.0.0",
+    "axios": "^1.7.2",
+    "langchain": "^0.2.11",
+    "marked": "^13.0.2",
+    "openai": "^4.52.2"
+  },
+  "resolutions": {
+    "@smithy/eventstream-codec": "^2.0.5"
+  }
+}
