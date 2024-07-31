@@ -10,7 +10,11 @@ Hi there - Thanks for stopping by. I decided to put this out there now. I am at 
 
     - Save Team Configs
         - Need to add an ID that will not change
-    - Display Issues
+    
+    - Display Issues (Validate the required prompts and team members are created)
+        - Just Display on Builder Panel
+        - Show Status indicator in Project View on Builder link
+
     - Add New Prompt
     - Delete Prompt
     - Add New Team Member
@@ -22,7 +26,8 @@ Hi there - Thanks for stopping by. I decided to put this out there now. I am at 
     - There needs to be a status bar/activity bar/Project Panel indicator that tasks are running
 
 - BUG: paste into prompt breaks HTML view until close/re-open (of that view) (data is saved correctly)
-
+- MESS: generateUniqueId() in WebView HTML files needs consolidation
+- MESS: CSS in WebView HTML files needs consolidation
 
 - how to implement other vendors
 - start by only abstracting queueMemberAssignment this means that the lead-architect will only work with openai models

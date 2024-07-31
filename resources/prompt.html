@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${data.category}-${data.role}-${data.models}</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 10px;
+            background-color: var(--vscode-editor-background); /* Use VS Code's background color */
+            color: var(--vscode-editor-foreground);
+        }
+
         form {
             display: flex;
             flex-direction: column;
@@ -62,14 +69,38 @@
         .editable-dark-theme:empty:before {
             content: attr(data-placeholder); /* Placeholder text */
             color: #666; /* Placeholder color */
-        }            
+        }
+    
+        .cmd {
+            width: 100%;
+            height: 20px;
+            padding: 10px;
+        }
+        
+        button {
+            background-color: transparent;
+            border-color: #D3D3D3;
+            border-width: 2px;
+            border-radius: 4px;
+            padding: 6px;
+            float: right;
+        }
+
+        .icon {
+            color: #D3D3D3;
+            fill: #D3D3D3;
+        }
     </style>
     <script nonce="${nonce}">
         const vscode = acquireVsCodeApi();
     </script>
 </head>
 <body>
-    <h3>Edit Prompt</h3>
+    <span class="cmd">
+        <button id="Delete" onclick="delete_prompt();" title="Delete"><img class="icon" src="${local_resources}/resources/trash.svg" width="16" height="16" /></button>
+        <button id="duplicate" onclick="duplicate_prompt();" title="Duplicate"><img class="icon" src="${local_resources}/resources/clone.svg" width="16" height="16" /></button>
+    </span>
+    <h3>Prompt Editor</h3>
     You need a minimum of three prompts: lead-architect, lead-engineer, and developer. There must be a team member with a "purpose" to match the "category" and "model" of each prompt. The project editor will show you the team roster and status telling what purposes and categories are missing or displaying healthy.
     <br><br>
     In your prompt using ${ name } will be the current prompts team member name. It is important to say something like "Your name is ${ name }" This way the LLM will recognize its assignment if they are reading from a more general plan that came from a lead.
@@ -135,6 +166,7 @@
             switch (message.command) {
                 case 'load':
                     prompt = message.prompt;
+                    saveState();
                     document.getElementById('id').value = prompt.id;
                     document.getElementById('content').innerText = prompt.content;
                     document.getElementById('category').value = prompt.category;
@@ -142,13 +174,13 @@
                     document.getElementById('models').value = prompt.models;
                     document.getElementById('active').checked = prompt.active;
                     document.getElementById('tag').value = prompt.tag;
-                    saveState();
                     break;
             }
         });
 
         function restoreState() {
             const state = vscode.getState();
+            prompt = state;
             if (state) {
                 document.getElementById('id').value = state.id;
                 document.getElementById('content').innerText = state.content;
@@ -173,6 +205,23 @@
             vscode.setState(state);
         };
 
+        function delete_prompt() {
+            vscode.postMessage({ command: 'deletePrompt', prompt });
+        };
+
+        function duplicate_prompt() {
+            prompt.id = generateUniqueId();
+            saveState();
+            vscode.postMessage({ command: 'savePrompt', prompt });
+        };
+
+        function generateUniqueId() {
+            return 'xxxx-xxxx-4xxx-yxxx-xxxx-xxxx-xxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        };
     </script>
 </body>
 </html>

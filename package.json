@@ -40,6 +40,22 @@
       {
           "command": "frogteam.openPromptPanel",
           "title": "Open Prompt Panel"
+      },
+      {
+        "command": "frogteam.addPrompt",
+        "title": "Add Prompt"
+      },
+      {
+          "command": "frogteam.deletePrompt",
+          "title": "Delete Prompt"
+      },
+      {
+          "command": "frogteam.addSetup",
+          "title": "Add Setup"
+      },
+      {
+          "command": "frogteam.deleteSetup",
+          "title": "Delete Setup"
       }
     ],
     "viewsContainers": {

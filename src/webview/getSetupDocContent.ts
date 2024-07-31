@@ -3,12 +3,13 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { getNonce } from './getNonce';
 
-export function getSetupDocContent(extensionUri: vscode.Uri): string {
+export function getSetupDocContent(extensionUri: vscode.Uri, local_resources: string): string {
     const htmlFilePath = path.join(extensionUri.fsPath, 'resources', 'setup.html');
     try {
         let html = fs.readFileSync(htmlFilePath, 'utf8');
         const nonce = getNonce();
-        html = html.replace(/\${nonce}/g, nonce);  
+        html = html.replace(/\${nonce}/g, nonce);
+        html = html.replace(/\${local_resources}/g, local_resources);
         return html;
     } catch (error) {
         console.error(`Error reading HTML file: ${error}`);

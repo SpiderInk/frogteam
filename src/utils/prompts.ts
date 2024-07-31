@@ -75,3 +75,11 @@ export function savePrompt(prompt: Prompt) {
     }
     savePrompts(PROMPTS);
 }
+
+export function deletePrompt(id: string) {
+    if (PROMPTS.length === 0) {
+        loadPrompts();
+    }
+    const updatedPrompts = PROMPTS.filter(prompt => prompt.id !== id);
+    savePrompts(updatedPrompts);
+}

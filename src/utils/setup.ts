@@ -87,3 +87,10 @@ export async function saveSetup(context: any, setup: Setup) {
     await saveJsonToFile(SETUPS_FILE, setups);
     context.globalState.update('setups', setups);
 }
+
+export async function deleteSetup(context: any, id: string) {
+    let setups = load_setups(context);
+    setups = setups.filter(setup => setup.id !== id);
+    await saveJsonToFile(SETUPS_FILE, setups);
+    context.globalState.update('setups', setups);
+}

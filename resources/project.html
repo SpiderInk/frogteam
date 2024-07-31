@@ -57,19 +57,19 @@
     <h1>Project Description</h1>
     <form id="chat-form" onsubmit="handleSubmit(event)">
         <textarea rows="10" id="question" placeholder="Describe your project to get started..." oninput="handleInput(event)"></textarea>
-        <button id="go" type="submit">Go</button>
+        <button id="go" type="submit">Project Go</button>
         <ul>
-            <li>Pressing "Go" the first time will get your project started.</li>
-            <li>Pressing "Go" additional times will make refinements and you can adjust the main project prompt as needed.</li>
+            <li>Pressing "Project Go" the first time will get your project started.</li>
+            <li>Pressing "Project Go" additional times will make refinements and you can adjust the main project prompt as needed.</li>
             <li>If existing files are found they will be treated as input.</li>
             <li>Individual prompts will also receive a file roster.</li>
             <li>Scroll down to the see the latest "primary" response.</li>
-            <li>Use the "Directed" request feature to request a specific team member perform a specific project task.</li>
+            <li>Use the "Directed" request feature to request a specific team member (@member) perform a specific project task.</li>
         </ul>
     </form>
     <form id="directed-chat-form" onsubmit="handleDirected(event)">
         <textarea rows="10" id="directed-question" placeholder="@teammember please do xyz task on zyx file." oninput="handleDirectedInput(event)"></textarea>        
-        <button id="directed-go" type="submit">Go</button>
+        <button id="directed-go" type="submit">Directed Go</button>
     </form>
     <h3>Latest Summary Response</h3>
     <hr>
