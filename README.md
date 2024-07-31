@@ -4,23 +4,28 @@ Hi there - Thanks for stopping by. I decided to put this out there now. I am at 
 
 ## Tasks 07-07-2024
 - Massive Migration from POC Project Task left
-    - Change the entire UI to use three tree view tabs
-    - items in the tree view will just open in the editor
-    - make standard commands to start a project and save the project file as a state file for the User Prompt
+    - Change the entire UI to use three tree view tabs **done**
+    - items in the tree view will just open in the editor **done**
 
-    - Save Team Configs
-        - Need to add an ID that will not change
+    - Save Team Configs **done**
+        - Need to add an ID that will not change **done**
+
+    - Delete Prompt **done**
+    - Delete Team Member **done**
+    - Duplicate Prompt **done**
+    - Duplicate Team Member **done**
     
     - Display Issues (Validate the required prompts and team members are created)
         - Just Display on Builder Panel
         - Show Status indicator in Project View on Builder link
 
     - Add New Prompt
-    - Delete Prompt
     - Add New Team Member
-    - Delete Team Member
     - History needs to auto refresh as new items are added
 
+- new icon
+
+- make standard commands to start a project and save the project file as a state file for the User Prompt
  - Add a Status Bar indicator
     - add an indicator that something is happening/running
     - There needs to be a status bar/activity bar/Project Panel indicator that tasks are running
