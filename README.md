@@ -30,6 +30,7 @@ Hi there - Thanks for stopping by. I decided to put this out there now. I am at 
     - add an indicator that something is happening/running
     - There needs to be a status bar/activity bar/Project Panel indicator that tasks are running
 
+- BUG: sometimes toolCall definitions or results are bad and the process errors out
 - BUG: paste into prompt breaks HTML view until close/re-open (of that view) (data is saved correctly)
 - MESS: generateUniqueId() in WebView HTML files needs consolidation
 - MESS: CSS in WebView HTML files needs consolidation
@@ -247,6 +248,8 @@ Write me a simple web page that uses a canvas to draw a ball a start it bouncing
 Write me a simple web page that uses a canvas to draw a small bird with flapping wings that flies the boundaries of the canvas.
 
 Write me a simple web page that uses a small canvas say 100x100 pixels to draw a small bird with flapping wings. It needs to look like a bird. Make a special assignment about drawing the bird on the canvas and making the wings move.
+
+We want to make a real life treasure hunt/bar crawl application. To get us started, create a web site that displays Stamford Connecticut on a map. Allow a user to click anywhere in Stamford to add local business at that location as a location participant in this hunt/crawl. When they click a form should pop up allowing them to register a treasure hunt item/coupon at that location.  Collect the: item name, user email address, a description of the item and any other treasure hunt related information. When the form is submitted the pay load should be delivered to an AWS lambda function hosted publicly.
 
 # Some saved code
 
