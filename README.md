@@ -109,7 +109,7 @@ You can directly request that a team member perform a task. This is nice if you 
 This is the first version give it try. The following has is what you can do.
 - Add Team Members and make sure they align with a prompt
     - You can use openai with API Keys
-    - You can use Amazon Bedrock if your environment is logged in (we use Boto3)
+    - You can use Amazon Bedrock if your environment is logged in
 - You will get validation error messages if you don't have the minimum members/prompts
 - You can use the Team Lineup to validate Member/Prompt alignment
 - You can use the Builder to kick off the initial project creation
