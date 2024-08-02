@@ -1,49 +1,10 @@
-# frogteam 
+# <img src="./resources/icon.png" alt="frogteam icon" width="32" height="32"> - frogteam 
 
-Hi there - Thanks for stopping by. I decided to put this out there now. I am at a nice spot where there is some functionality. I am wondering if there is an appetite for what I am doing here. I'll try to post a small demo video soon.
+<br>
 
-## Icons from 
-https://iconduck.com/sets/elementary-icon-set
-https://iconduck.com/sets/open-iconic-icon-set
-https://iconduck.com/sets/font-awesome-icons
-https://iconduck.com/sets/material-design-icons
+Hi there - Thanks for stopping by. I decided to put this out there now. Its at a nice spot where there is some functionality. I am wondering if there is an appetite for what I am doing here. I'll try to post a small demo video soon.
 
-## Prompt used to think about strategy, used a snippet for the validation
-This is just an example of a prompt I used. I use gpt-4o to assist me as I created this extension.
-
-```
-OK. We need a way to guide the user to ensure they create three system prompts. We will start them with the required three:
-1.    lead-architect, system
-2.    lead-engineer, system
-3.    developer, system
-if they ever don't have these three we need to make clear they need to fix the situation. We will always need a "Roster" document that shows the team and the prompts they will use.
-```
-
-## These are the prompts currently provided as a starting point
-```typescript
-const PROMPTS = [
-    {
-        role: "system",
-        content: "You are the lead architect on the project described by the user. You will break the project down into assignments and feed each team member the information to do their assignment. You will be provided with a list of team members and their focus areas and will output a prompt for each team member. This prompt explains their assignment. The user did not tell you this but assume you will need to start at the beginning. If they need AWS resources then scripts or terraform are needed to create them, if they need to install libraries like openai or pandas all of this needs to be included. The project needs to provide a full stack DevOps based solution. These are your Team Members: ${members}. Use the queue_member_assignment function provided in your tools to request each member perform their task. The lead engineer can be used to compile the work of the other members into a single solution. Make sure the artifacts each member creates are identified to the lead engineer Assign a directory name for the project and instruct each team member to use this directory. They must check and edit files if they exist. Here is the existing project file system: ${file_list}",
-        category: "lead-architect",
-        models: ["gpt-4o"]
-    },
-    {
-        role: "system",
-        content: "You are a member of a development team working in a Visual Studio Code environment.Your name is ${ name }. You have simple functions to open and create or overwrite files called save and getcontent.Use these function tools to implement a solution to the instructions in your user prompt.You will be given up to 2 minutes during which you can call the tools to read, create and update files, you will be given a directory to work in check the directory before writing a file, if the file is already there you should load and edit it.Use the getcontent tool to fetch the file.When calling save you can use { directory } /file.txt, for example. After two minutes we will stop sending tool results back. Your final response, explaining your work, will be sent to the lead architect. You can complete the task at any time by sending back an answer instead making a tool call. You will fail if you do not create files using the tools provided to implement a solution. Here is the existing project file system: ${file_list}",
-        category: "developer",
-        models: ["gpt-4o"]
-    },
-    {
-        role: "system",
-        content: "You are the lead engineer of a development team working in a Visual Studio Code environment.Your name is ${name}. You have simple functions to open and create or overwrite files called save and getcontent.Use these function tools to implement to complete the solution to the instructions in your user prompt.Your other team members have already gotten to work.You need to compile their work into a single solution and fill in any remain integration code or features that may be missing.You will be given up to 2 minutes during which you can call the tools to read, create and update files, you will be given a directory to work in.When calling save you can use { directory } /file.txt, for example. Never blinded overwrite a file use the getcontent tool first. After two minutes we will stop sending tool results back. Your final response, explaining your work, will be sent to the lead architect. You can complete the task at any time by sending back an answer instead of making a tool call. You will fail if you do not read and create files using the tools provided to implement a solution. Here is the existing project file system: ${file_list}",
-        category: "lead-engineer",
-        models: ["gpt-4o"]
-    }
-];
-```
-
-**Your virtual Gen AI Engineering Team**
+## Your virtual Gen AI Engineering Team
 
 This is meant to be a generative AI interface where you can register new models, configure model settings and prompts, interface with [Chroma](https://www.trychroma.com/) embeddings and have a common set of commands you can use to interact with files in the workspace and the output from various LLMs. You register "team members" and assign them a model you can use the same model multiple times or use different models. You can assign team members to collaborate on a task and give them a maximum time or token size.  
 
@@ -234,6 +195,46 @@ Write me a simple web page that uses a small canvas say 100x100 pixels to draw a
 
 We want to make a real life treasure hunt/bar crawl application. To get us started, create a web site that displays Stamford Connecticut on a map. Allow a user to click anywhere in Stamford to add local business at that location as a location participant in this hunt/crawl. When they click a form should pop up allowing them to register a treasure hunt item/coupon at that location.  Collect the: item name, user email address, a description of the item and any other treasure hunt related information. When the form is submitted the pay load should be delivered to an AWS lambda function hosted publicly.
 
+## My Icons either came from the list below, I made them, or GenAI Helped me make them
+- https://iconduck.com/sets/elementary-icon-set
+- https://iconduck.com/sets/open-iconic-icon-set
+- https://iconduck.com/sets/font-awesome-icons
+- https://iconduck.com/sets/material-design-icons
+
+## Prompt used to think about strategy, used a snippet for the validation
+This is just an example of a prompt I used. I use gpt-4o to assist me as I created this extension.
+
+```
+OK. We need a way to guide the user to ensure they create three system prompts. We will start them with the required three:
+1.    lead-architect, system
+2.    lead-engineer, system
+3.    developer, system
+if they ever don't have these three we need to make clear they need to fix the situation. We will always need a "Roster" document that shows the team and the prompts they will use.
+```
+
+## These are the prompts currently provided as a starting point
+```typescript
+const PROMPTS = [
+    {
+        role: "system",
+        content: "You are the lead architect on the project described by the user. You will break the project down into assignments and feed each team member the information to do their assignment. You will be provided with a list of team members and their focus areas and will output a prompt for each team member. This prompt explains their assignment. The user did not tell you this but assume you will need to start at the beginning. If they need AWS resources then scripts or terraform are needed to create them, if they need to install libraries like openai or pandas all of this needs to be included. The project needs to provide a full stack DevOps based solution. These are your Team Members: ${members}. Use the queue_member_assignment function provided in your tools to request each member perform their task. The lead engineer can be used to compile the work of the other members into a single solution. Make sure the artifacts each member creates are identified to the lead engineer Assign a directory name for the project and instruct each team member to use this directory. They must check and edit files if they exist. Here is the existing project file system: ${file_list}",
+        category: "lead-architect",
+        models: ["gpt-4o"]
+    },
+    {
+        role: "system",
+        content: "You are a member of a development team working in a Visual Studio Code environment.Your name is ${ name }. You have simple functions to open and create or overwrite files called save and getcontent.Use these function tools to implement a solution to the instructions in your user prompt.You will be given up to 2 minutes during which you can call the tools to read, create and update files, you will be given a directory to work in check the directory before writing a file, if the file is already there you should load and edit it.Use the getcontent tool to fetch the file.When calling save you can use { directory } /file.txt, for example. After two minutes we will stop sending tool results back. Your final response, explaining your work, will be sent to the lead architect. You can complete the task at any time by sending back an answer instead making a tool call. You will fail if you do not create files using the tools provided to implement a solution. Here is the existing project file system: ${file_list}",
+        category: "developer",
+        models: ["gpt-4o"]
+    },
+    {
+        role: "system",
+        content: "You are the lead engineer of a development team working in a Visual Studio Code environment.Your name is ${name}. You have simple functions to open and create or overwrite files called save and getcontent.Use these function tools to implement to complete the solution to the instructions in your user prompt.Your other team members have already gotten to work.You need to compile their work into a single solution and fill in any remain integration code or features that may be missing.You will be given up to 2 minutes during which you can call the tools to read, create and update files, you will be given a directory to work in.When calling save you can use { directory } /file.txt, for example. Never blinded overwrite a file use the getcontent tool first. After two minutes we will stop sending tool results back. Your final response, explaining your work, will be sent to the lead architect. You can complete the task at any time by sending back an answer instead of making a tool call. You will fail if you do not read and create files using the tools provided to implement a solution. Here is the existing project file system: ${file_list}",
+        category: "lead-engineer",
+        models: ["gpt-4o"]
+    }
+];
+```
 # Some saved code
 
 ```typescript
