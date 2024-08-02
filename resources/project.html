@@ -48,12 +48,20 @@
             vertical-align: bottom;
             color: #D3D3D3;
         }
+
+        .issues {
+            display: block;
+            color: red;
+        }
     </style>
     <script nonce="${nonce}">
         const vscode = acquireVsCodeApi();
     </script>
 </head>
 <body>
+    <div class="issues" id="issues">
+        <!-- dynamic content -->
+    </div>
     <h1>Project Description</h1>
     <form id="chat-form" onsubmit="handleSubmit(event)">
         <textarea rows="10" id="question" placeholder="Describe your project to get started..." oninput="handleInput(event)"></textarea>
@@ -97,16 +105,35 @@
             vscode.postMessage({ command: 'updateDirected', text: directed });
         }
 
+        function displayIssues(issues) {
+            const issueList = document.getElementById('issues');
+            issueList.innerHTML = '';
+            if(issues.length > 0) {
+                const header = document.createElement('span');
+                header.innerText = "Missing Prompts"
+                issueList.appendChild(header)
+                const ul = document.createElement('ul');
+                issueList.appendChild(ul);
+                issues.forEach((issue, index) => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'issue-item';
+                    listItem.innerHTML = "category: " + issue.category + " role: " + issue.role;
+                    ul.appendChild(listItem);
+                });
+            }
+        };
+
         window.addEventListener('message', event => {
             const message = event.data;
             if (message.command === 'answer') {
                 document.getElementById('response').innerHTML = message.text;
             }
             if (message.command === 'loadData') {
+                displayIssues(message.issues)
                 document.getElementById('question').value = message.question;
                 document.getElementById('directed-question').value = message.directed;
                 document.getElementById('response').innerHTML = message.answer;
-                document.getElementById('go').disabled = !message.lineup_ready
+                document.getElementById('go').disabled = message.issues.length > 0;
             }
 
         });

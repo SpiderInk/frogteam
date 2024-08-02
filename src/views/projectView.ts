@@ -7,10 +7,9 @@ import { projectGo } from '../openai/openaiService';
 import { HistoryManager, HistoryEntry } from '../utils/historyManager';
 import { extractMemberFromPrompt, Setup, validate_fixMemberIcons, load_setups } from '../utils/setup';
 import { queueMemberAssignment } from '../utils/queueMemberAssignment';
-import { Prompt, savePrompt, all_prompts, validatePrompts } from '../utils/prompts';
+import { validatePrompts } from '../utils/prompts';
 import { SETUPS_FILE, HISTORY_FILE, openAnswerPanel, openRosterPanel } from '../extension';
 import { saveJsonToFile } from '../file/fileOperations';
-import { loadJsonFromFileSync } from '../file/loadJson';
 
 export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
     private currentProjectPanel: vscode.WebviewPanel | undefined;
@@ -22,7 +21,7 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
     
     constructor(context: vscode.ExtensionContext) {
         this.global_context = context;
-        this.historyManager = new HistoryManager(HISTORY_FILE);
+        this.historyManager = new HistoryManager(HISTORY_FILE, this);
 
         const setups:Setup[] = load_setups(context);
         context.globalState.update('setups', setups);
@@ -40,8 +39,10 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
 
     getChildren(element?: vscode.TreeItem): Thenable<vscode.TreeItem[]> {
         if (!element) {
-            // Root level: "Project" and "History"
-            const items = [new ProjectItem("Builder"), new ProjectItem("Team Lineup"), new HistoryRootItem("History")];
+            const local_resources = this.global_context.extensionUri;
+            // Root level: Commands
+            const issues = validatePrompts().length > 0;
+            const items = [new ProjectItem("Builder", issues, local_resources), new ProjectItem("Team Lineup", false, local_resources), new HistoryRootItem("History")];
             return Promise.resolve(items);
         } else if (element instanceof HistoryRootItem) {
             // If the element is the HistoryRootItem, return the date entries
@@ -151,12 +152,12 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
             if (!this.global_context) {
                 throw new Error("global_context is not initialized.");
             }
-            const directed = this.global_context.workspaceState.get('directed', '');
             const project = this.global_context.workspaceState.get('project', '');
+            const directed = this.global_context.workspaceState.get('directed', '');
             const answer = this.global_context.workspaceState.get('answer', '');
             const htmlContent = marked(answer);
-            const lineup_status = validatePrompts();
-            this.currentProjectPanel?.webview.postMessage({ command: 'loadData', question: project, answer: htmlContent, lineup_ready: lineup_status.length === 0, directed: directed });
+            const issues = validatePrompts();
+            this.currentProjectPanel?.webview.postMessage({ command: 'loadData', question: project, answer: htmlContent, issues: issues, directed: directed });
         }
     }
 
@@ -204,8 +205,13 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
 }
 
 class ProjectItem extends vscode.TreeItem {
-    constructor(label: string) {
+    constructor(label: string, issues: boolean, resources: vscode.Uri) {
         super(label, vscode.TreeItemCollapsibleState.None);
+        // Use a ThemeIcon and set the color based on the issues flag
+        if (issues) {
+            const resourceUri = vscode.Uri.joinPath(resources, 'resources', 'process-error-symbolic.svg');
+            this.iconPath = resourceUri;
+        }
         this.command = {
             command: 'frogteam.openView',
             title: 'Open View',

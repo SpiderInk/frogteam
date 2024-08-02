@@ -26,6 +26,7 @@ let currentAnswerPanel: vscode.WebviewPanel | undefined;
 
 let promptCollectionViewProvider: PromptCollectionViewProvider | undefined;
 let setupCollectionViewProvider: SetupCollectionViewProvider | undefined;
+let projectViewProvider: ProjectViewProvider | undefined;
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -38,7 +39,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const setups = load_setups(context);
 	context.globalState.update('setups', setups);
 
-	const projectViewProvider = new ProjectViewProvider(context);
+	projectViewProvider = new ProjectViewProvider(context);
 	vscode.window.registerTreeDataProvider('projectView', projectViewProvider);
 
 	setupCollectionViewProvider = new SetupCollectionViewProvider(context);
@@ -85,7 +86,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand('frogteam.openView', (item: vscode.TreeItem) => {
-			projectViewProvider.handleItemSelection(item);
+			projectViewProvider?.handleItemSelection(item);
 		})
 	);
 }
@@ -168,6 +169,7 @@ export async function openPromptPanel(context: vscode.ExtensionContext, data: Pr
 		switch (message.command) {
 			case 'savePrompt':
 				savePrompt(message.prompt);
+				projectViewProvider?.refresh();
 				break;
 			case 'deletePrompt':
 				deletePrompt(message.prompt.id);

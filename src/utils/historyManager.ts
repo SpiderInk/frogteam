@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import { ProjectViewProvider } from '../views/projectView';
 
 interface HistoryEntry {
     ask_by: string;
@@ -13,8 +14,10 @@ interface HistoryEntry {
 class HistoryManager {
     private filePath: string;
     private history: HistoryEntry[];
+    private provider: ProjectViewProvider;
 
-    constructor(filePath: string) {
+    constructor(filePath: string, our_provider: ProjectViewProvider) {
+        this.provider = our_provider;
         this.filePath = filePath;
         this.history = [];
         this.loadHistory();
@@ -50,6 +53,7 @@ class HistoryManager {
         };
         this.history.push(entry);
         this.saveHistory();
+        this.provider.refresh();
     }
 
     public getHistory(): HistoryEntry[] {

@@ -51,11 +51,11 @@
       },
       {
           "command": "frogteam.addSetup",
-          "title": "New Setup"
+          "title": "New Member"
       },
       {
           "command": "frogteam.deleteSetup",
-          "title": "Delete Setup"
+          "title": "Delete Member"
       }
     ],
     "viewsContainers": {

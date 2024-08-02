@@ -2,29 +2,16 @@
 
 Hi there - Thanks for stopping by. I decided to put this out there now. I am at a nice spot where there is some functionality. I am wondering if there is an appetite for what I am doing here. The application could be more fruitful as a learning tool. If I can provide a teacher with a platform 
 
+## Icons from 
+https://iconduck.com/sets/elementary-icon-set
+https://iconduck.com/sets/open-iconic-icon-set
+https://iconduck.com/sets/font-awesome-icons
+https://iconduck.com/sets/material-design-icons
+
+
 ## Tasks 07-07-2024
-- Massive Migration from POC Project Task left
-    - Change the entire UI to use three tree view tabs **done**
-    - items in the tree view will just open in the editor **done**
-
-    - Save Team Configs **done**
-        - Need to add an ID that will not change **done**
-
-    - Delete Prompt **done**
-    - Delete Team Member **done**
-    - Duplicate Prompt **done**
-    - Duplicate Team Member **done**
-    
-    - Display Issues (Validate the required prompts and team members are created)
-        - Just Display on Builder Panel
-        - Show Status indicator in Project View on Builder link
-
-    - Add New Prompt
-    - Add New Team Member
-    - History needs to auto refresh as new items are added
-
-- new icon **done**
-
+- Can the "new Prompt" and "New Setup" Buttons stay visible
+    - **No**
 - make standard commands to start a project and save the project file as a state file for the User Prompt
  - Add a Status Bar indicator
     - add an indicator that something is happening/running
@@ -77,6 +64,26 @@ Hi there - Thanks for stopping by. I decided to put this out there now. I am at 
         - sometimes a file wasn't created yet and that is ok
 
 **DONE**
+- Massive Migration from POC Project Task left
+    - Change the entire UI to use three tree view tabs **done**
+    - items in the tree view will just open in the editor **done**
+
+    - Save Team Configs **done**
+        - Need to add an ID that will not change **done**
+
+    - Delete Prompt **done**
+    - Delete Team Member **done**
+    - Duplicate Prompt **done**
+    - Duplicate Team Member **done**
+    
+    - Display Issues (Validate the required prompts and team members are created)
+        - Just Display on Builder Panel **done**
+        - Show Status indicator in Project View on Builder link **done**
+
+    - Add New Prompt **done**
+    - Add New Team Member **done**
+    - History needs to auto refresh as new items are added **done**
+- new icon **done**
 - Add Prompt/Setup (**done**)
     - needs to make a new empty record every time (**done**)
     - place button on top of panel (**done**)
