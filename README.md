@@ -23,7 +23,7 @@ Hi there - Thanks for stopping by. I decided to put this out there now. I am at 
     - Add New Team Member
     - History needs to auto refresh as new items are added
 
-- new icon
+- new icon **done**
 
 - make standard commands to start a project and save the project file as a state file for the User Prompt
  - Add a Status Bar indicator
@@ -45,6 +45,11 @@ Hi there - Thanks for stopping by. I decided to put this out there now. I am at 
 
 - set up a queue for each member
     - but only allow one to operate at a time
+
+- git integration
+    - stash first
+    - new branch first
+    - PR generation
 
 - configuration for a time or token limit by model/team member
     - this will require tracking

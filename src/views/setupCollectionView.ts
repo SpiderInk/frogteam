@@ -1,12 +1,15 @@
 import * as vscode from 'vscode';
-import { Setup, load_setups } from '../utils/setup'; // Adjust the import path as necessary
+import { Setup, newSetup } from '../utils/setup'; // Adjust the import path as necessary
 import { openSetupPanel } from '../extension';
 
 export class SetupCollectionViewProvider implements vscode.TreeDataProvider<SetupItem> {
     private _onDidChangeTreeData: vscode.EventEmitter<SetupItem | undefined | void> = new vscode.EventEmitter<SetupItem | undefined | void>();
     readonly onDidChangeTreeData: vscode.Event<SetupItem | undefined | void> = this._onDidChangeTreeData.event;
 
-    constructor(private context: vscode.ExtensionContext) {}
+    // constructor(private context: vscode.ExtensionContext) {}
+    constructor(private context: vscode.ExtensionContext) {
+        vscode.commands.registerCommand('frogteam.addSetup', this.addSetup, this);
+    }
 
     refresh(): void {
         this._onDidChangeTreeData.fire();
@@ -24,6 +27,20 @@ export class SetupCollectionViewProvider implements vscode.TreeDataProvider<Setu
             const setups:Setup[] = this.context.globalState.get('setups', []);
             const setupItems = setups.map(setup => new SetupItem(setup));
             return Promise.resolve(setupItems);
+        }
+    }
+
+    async addSetup(): Promise<void> {
+        try {
+            let new_setup:Setup = await newSetup(this.context);
+            this.refresh();
+            const setups: Setup[] = this.context.globalState.get('setups', []);
+            setups.push(new_setup);
+            await this.context.globalState.update('setups', setups);
+            const newItem = new SetupItem(new_setup);
+            this.handleItemSelection(newItem);
+        } catch(error) {
+            vscode.window.showErrorMessage((error as any).message);
         }
     }
 

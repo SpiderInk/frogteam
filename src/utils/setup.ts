@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { MEMBER_ICON_FOLDER } from "../extension";
-import { generateSvgIcon } from "./common";
+import { generateSvgIcon, generateUniqueId } from "./common";
 import { loadJsonFromFileSync } from '../file/loadJson';
 import { SETUPS_FILE } from '../extension';
 import { saveJsonToFile } from '../file/fileOperations';
@@ -20,6 +20,24 @@ export interface Setup {
 export function load_setups(context: any): Setup[] {
     const setups = loadJsonFromFileSync(SETUPS_FILE);
     return setups;
+}
+
+export async function newSetup(context: any): Promise<Setup> {
+    let new_setup:Setup = {
+        id: generateUniqueId(),
+        name: '',
+        purpose: '',
+        model: '',
+        endpoint: '',
+        apiKey: '',
+        color: '',
+        icon: ''
+    };
+    await saveSetup(context, new_setup);
+    const setups: Setup[] = context.globalState.get('setups', []);
+    setups.push(new_setup);
+    await context.globalState.update('setups', setups);
+    return new_setup;
 }
 
 export function validate_fixMemberIcons(setups: Setup[]): boolean {

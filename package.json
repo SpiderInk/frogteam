@@ -43,7 +43,7 @@
       },
       {
         "command": "frogteam.addPrompt",
-        "title": "Add Prompt"
+        "title": "New Prompt"
       },
       {
           "command": "frogteam.deletePrompt",
@@ -51,7 +51,7 @@
       },
       {
           "command": "frogteam.addSetup",
-          "title": "Add Setup"
+          "title": "New Setup"
       },
       {
           "command": "frogteam.deleteSetup",
@@ -64,6 +64,16 @@
           "id": "frogteam",
           "title": "FrogTeam",
           "icon": "resources/icon.png"
+        },
+        {
+          "id": "setupCollection",
+          "title": "Setups",
+          "icon": "resources/icon.svg"
+        },
+        {
+          "id": "promptCollection",
+          "title": "Prompts",
+          "icon": "resources/icon.svg"
         }
       ]
     },
@@ -82,6 +92,20 @@
           "name": "Prompt Library"
         }
       ]
+    },
+    "menus": {
+        "view/title": [
+            {
+                "command": "frogteam.addSetup",
+                "when": "view == setupCollectionView",
+                "group": "navigation"
+            },
+            {
+              "command": "frogteam.addPrompt",
+              "when": "view == promptCollectionView",
+              "group": "navigation"
+            }
+          ]
     }
   },
   "scripts": {

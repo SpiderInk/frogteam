@@ -1,7 +1,9 @@
+import * as vscode from 'vscode';
 import { PROMPTS_FILE } from '../extension';
 import { loadJsonFromFileSync } from '../file/loadJson';
 import { saveJsonToFile } from '../file/fileOperations';
 import { getProjectFilesAsXml } from './listfiles';
+import { generateUniqueId } from './common';
 
 const REQUIRED_PROMPTS = [
     { category: "lead-architect", role: "system" },
@@ -19,6 +21,23 @@ export interface Prompt {
     models: string;
     active: boolean;
     tag: string;
+}
+
+export function newPrompt(context: vscode.ExtensionContext): Prompt {
+    let new_prompt:Prompt = {
+        id: generateUniqueId(),
+        role: '',
+        content: '',
+        category: '',
+        models: '',
+        active: false,
+        tag: ''
+    };
+    savePrompt(new_prompt);
+    const prompts: Prompt[] = context.globalState.get('prompts', []);
+    prompts.push(new_prompt);
+    context.globalState.update('setups', new_prompt);
+    return new_prompt;
 }
 
 export function validatePrompts() {
