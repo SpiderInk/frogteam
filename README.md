@@ -1,117 +1,12 @@
 # frogteam 
 
-Hi there - Thanks for stopping by. I decided to put this out there now. I am at a nice spot where there is some functionality. I am wondering if there is an appetite for what I am doing here. The application could be more fruitful as a learning tool. If I can provide a teacher with a platform 
+Hi there - Thanks for stopping by. I decided to put this out there now. I am at a nice spot where there is some functionality. I am wondering if there is an appetite for what I am doing here. I'll try to post a small demo video soon.
 
 ## Icons from 
 https://iconduck.com/sets/elementary-icon-set
 https://iconduck.com/sets/open-iconic-icon-set
 https://iconduck.com/sets/font-awesome-icons
 https://iconduck.com/sets/material-design-icons
-
-
-## Tasks 07-07-2024
-- Can the "new Prompt" and "New Setup" Buttons stay visible
-    - **No**
-- make standard commands to start a project and save the project file as a state file for the User Prompt
- - Add a Status Bar indicator
-    - add an indicator that something is happening/running
-    - There needs to be a status bar/activity bar/Project Panel indicator that tasks are running
-
-- BUG: sometimes toolCall definitions or results are bad and the process errors out
-- BUG: paste into prompt breaks HTML view until close/re-open (of that view) (data is saved correctly)
-- MESS: generateUniqueId() in WebView HTML files needs consolidation
-- MESS: CSS in WebView HTML files needs consolidation
-
-- how to implement other vendors
-- start by only abstracting queueMemberAssignment this means that the lead-architect will only work with openai models
-    - Langchain has been started and allows a team member to be attached to a Bedrock model **in testing**
-    - bedrock boto3
-    - hugging face
-    - bedrock gateway?
-    - azure?
-
-- set up a queue for each member
-    - but only allow one to operate at a time
-
-- git integration
-    - stash first
-    - new branch first
-    - PR generation
-
-- configuration for a time or token limit by model/team member
-    - this will require tracking
-    - the lead architect will need to be aware of these constrains when giving out assignments
-
-- create a tool that allows any team member (including lead architect) to ask a question directed at the human
-    - this can present in the history but will cause the entire task thread to wait
-    - when clicked on a document cn open that has the state of the current chain allowing the human to answer and resume the chain
-
-## What's Next?
-- mlflow experiment tracking
-- add chromadb instance (optionally?)
-    - URL/Internet or local disc content
-    - file type based
-- implement chunking strategy for the solutions code base
-- implement chunking strategy for the history
-- implement chunking strategy for documentation
-- implement search
-- on demand web crawl that will chink and store in local Chroma
-- enable RAG on/off for generation
-- In History
-    - an icon for content vs function response 
-        - indicate success/fail (green checkmark vs red X)
-        - can we indicate when there is file content and when there isn't (is there a conflict with markdown?)
-        - sometimes a file wasn't created yet and that is ok
-
-**DONE**
-- Massive Migration from POC Project Task left
-    - Change the entire UI to use three tree view tabs **done**
-    - items in the tree view will just open in the editor **done**
-
-    - Save Team Configs **done**
-        - Need to add an ID that will not change **done**
-
-    - Delete Prompt **done**
-    - Delete Team Member **done**
-    - Duplicate Prompt **done**
-    - Duplicate Team Member **done**
-    
-    - Display Issues (Validate the required prompts and team members are created)
-        - Just Display on Builder Panel **done**
-        - Show Status indicator in Project View on Builder link **done**
-
-    - Add New Prompt **done**
-    - Add New Team Member **done**
-    - History needs to auto refresh as new items are added **done**
-- new icon **done**
-- Add Prompt/Setup (**done**)
-    - needs to make a new empty record every time (**done**)
-    - place button on top of panel (**done**)
-- Add a tag field to the prompts to make it easy to label inactive ones for tracking (**done**)
-- add an active field so that prompts can be swapped around (**done**)
-- implement directed commands (**done**)
-    - @teammember - modify index.js add a new function to... (**done**)
-- always send in an existing file map in from the main system prompt (**done**)
-- Highlight History entries that have Markdown responses (**done**)
-- use prompts from the library (**done**)
-- implement prompts interface (**done**)
-- required: (**done**)
-    lead-architect, system
-    lead-engineer, system
-    developer, system
-- validate that these prompts exist (**done**)
-1. Make Role "readonnly" for now its always "system" (**done**)
-2. lead-architect, lead-engineer, developer (as a dropdown) (**done**)
-3. Disable project go (and chat/enhance feature later) when the lineup is incomplete (**done**)
-4. Show the Team Roster on the project page and if any needed categories are missing list them in red (**done**)
-- In History, color for each user (**done**)
-- verification before delete
-    - setups (**done**)
-    - prompts (**done**)
-- enable edit of loaded item (**done**)
-- log all conversations in a tree and make sure the team members or admin process is labelled with it (**done**)
-    - not working great - answers not always logged (**done**)
-- BUG: use the lead-architect and project-manager from "setups" (**done**)
 
 ## Prompt used to think about strategy, used a snippet for the validation
 This is just an example of a prompt I used. I use gpt-4o to assist me as I created this extension.
@@ -201,59 +96,135 @@ You can refine the prompt and submit again. Existing files will be used and edit
 **Chat**
 You can directly request that a team member perform a task. This is nice if you like what has been done and now have follow up work that a member can do for you.
 
-**Tools Needed**
-- Vector DB - I think Chroma
-- Web Crawler Queue
-- Read File (into the prompt)
-- Save File
-
-## Extension Settings
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+- Documentation is weak, I am working on it.
+- No tool call validation so sometimes initial project generation never completes you can try again
+    - validation/retry is coming
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
-
 ### 1.0.0
+This is the first version give it try. The following has is what you can do.
+- Add Team Members and make sure they align with a prompt
+    - You can use openai with API Keys
+    - You can use Amazon Bedrock if your environment is logged in (we use Boto3)
+- You will get validation error messages if you don't have the minimum members/prompts
+- You can use the Team Lineup to validate Member/Prompt alignment
+- You can use the Builder to kick off the initial project creation
+- You can use the Builder to ask a specific team member perform a specific task
+    - You can say @membername can you edit the index.html file and change the title to "Narwhal"
 
-Initial release of ...
+## Tasks/Roadmap
+- Can the "new Prompt" and "New Setup" Buttons stay visible
+    - **No**
+ - Add a Status Bar indicator
+    - add an indicator that something is happening/running
+    - There needs to be a status bar/activity bar/Project Panel indicator that tasks are running
 
----
+- BUG: sometimes toolCall definitions or results are bad and the process errors out
+- BUG: paste into prompt breaks HTML view until close/re-open (of that view) (data is saved correctly)
+- MESS: generateUniqueId() in WebView HTML files needs consolidation
+- MESS: CSS in WebView HTML files needs consolidation
 
-## Following extension guidelines
+- make standard commands to start a project and save the project file as a state file for the User Prompt
 
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
+- Implementing Other Model Sources
+    - start by only abstracting queueMemberAssignment this means that the lead-architect will only work with openai models
+        - Langchain has been started and allows a team member to be attached to a Bedrock model **in testing**
+        - bedrock boto3
+        - hugging face
+        - bedrock gateway?
+        - azure?
 
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
+- set up a queue to process requests from
+    - only process one item at a time
 
-## Working with Markdown
+- git integration
+    - stash first
+    - new branch first
+    - PR generation
 
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
+- configuration for a time or token limit by model/team member
+    - this will require tracking
+    - the lead architect will need to be aware of these constrains when giving out assignments
 
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
+- create a tool that allows any team member (including lead architect) to ask a question directed at the human
+    - this can present in the history but will cause the entire task thread to wait
+        - Document should open with the question on display
+        - when clicked on in History document will open 
+        - Document has the state of the chain allowing the human to answer and resume the chain
 
-## For more information
+## What's Next?
+- mlflow experiment tracking
+- add chromadb instance (optionally?)
+    - URL/Internet or local disc content
+    - file type based
+- implement chunking strategy for the solutions code base
+- implement chunking strategy for the history
+- implement chunking strategy for documentation
+- implement search
+- on demand web crawl that will chink and store in local Chroma
+- enable RAG on/off for generation
+- In History
+    - an icon for content vs function response 
+        - indicate success/fail (green checkmark vs red X)
+        - can we indicate when there is file content and when there isn't (is there a conflict with markdown?)
+        - sometimes a file wasn't created yet and that is ok
 
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+**DONE**
+- Provide default prompts on first startup **done**
+- Massive Migration from POC Project Task left
+    - Change the entire UI to use three tree view tabs **done**
+    - items in the tree view will just open in the editor **done**
 
-**Enjoy!**
+    - Save Team Configs **done**
+        - Need to add an ID that will not change **done**
 
-## Quick Prompts
+    - Delete Prompt **done**
+    - Delete Team Member **done**
+    - Duplicate Prompt **done**
+    - Duplicate Team Member **done**
+    
+    - Display Issues (Validate the required prompts and team members are created)
+        - Just Display on Builder Panel **done**
+        - Show Status indicator in Project View on Builder link **done**
+
+    - Add New Prompt **done**
+    - Add New Team Member **done**
+    - History needs to auto refresh as new items are added **done**
+- new icon **done**
+- Add Prompt/Setup (**done**)
+    - needs to make a new empty record every time (**done**)
+    - place button on top of panel (**done**)
+- Add a tag field to the prompts to make it easy to label inactive ones for tracking (**done**)
+- add an active field so that prompts can be swapped around (**done**)
+- implement directed commands (**done**)
+    - @teammember - modify index.js add a new function to... (**done**)
+- always send in an existing file map in from the main system prompt (**done**)
+- Highlight History entries that have Markdown responses (**done**)
+- use prompts from the library (**done**)
+- implement prompts interface (**done**)
+- required: (**done**)
+    lead-architect, system
+    lead-engineer, system
+    developer, system
+- validate that these prompts exist (**done**)
+1. Make Role "readonnly" for now its always "system" (**done**)
+2. lead-architect, lead-engineer, developer (as a dropdown) (**done**)
+3. Disable project go (and chat/enhance feature later) when the lineup is incomplete (**done**)
+4. Show the Team Roster on the project page and if any needed categories are missing list them in red (**done**)
+- In History, color for each user (**done**)
+- verification before delete
+    - setups (**done**)
+    - prompts (**done**)
+- enable edit of loaded item (**done**)
+- log all conversations in a tree and make sure the team members or admin process is labelled with it (**done**)
+    - not working great - answers not always logged (**done**)
+- BUG: use the lead-architect and project-manager from "setups" (**done**)
+
+## Some Quick Prompts
 
 Write me a simple web page that uses a canvas to draw a ball a start it bouncing around the boundaries of the canvas.
 

@@ -13,6 +13,7 @@ import { PromptCollectionViewProvider } from './views/promptCollectionView';
 import { load_setups, Setup, saveSetup, deleteSetup } from './utils/setup';
 import { getSetupDocContent } from './webview/getSetupDocContent';
 import * as path from 'path';
+import * as fs from 'fs';
 
 export const PROMPTS_FILE = path.join(vscode.workspace.rootPath || '', '.vscode', 'prompts.json');
 export const SETUPS_FILE = path.join(vscode.workspace.rootPath || '', '.vscode', 'setups.json');
@@ -31,6 +32,23 @@ let projectViewProvider: ProjectViewProvider | undefined;
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+
+	const workspaceFolders = vscode.workspace.workspaceFolders;
+    if (workspaceFolders) {
+        const workspaceRoot = workspaceFolders[0].uri.fsPath;
+        const vscodeDir = path.join(workspaceRoot, '.vscode');
+        const promptsFilePath = path.join(vscodeDir, 'prompts.json');
+        const defaultPromptsFilePath = context.asAbsolutePath(path.join('resources', 'prompts.json'));
+
+        if (!fs.existsSync(promptsFilePath)) {
+            if (!fs.existsSync(vscodeDir)) {
+                fs.mkdirSync(vscodeDir);
+            }
+
+            fs.copyFileSync(defaultPromptsFilePath, promptsFilePath);
+            vscode.window.showInformationMessage('Default prompts.json has been created in the .vscode directory.');
+        }
+    }
 
 	// Load the prompts and setups when the extension is activated
 	const prompts = all_prompts();
