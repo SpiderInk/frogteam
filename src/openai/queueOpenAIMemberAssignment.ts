@@ -1,10 +1,10 @@
 import OpenAI from 'openai';
 import { fetchPrompts, personalizePrompt } from '../utils/prompts';
-import { Setup } from '../utils/setup'; 
+import { Setup, get_member_purposes_for_prompt } from '../utils/setup'; 
 import { getcontent, save } from '../file/fileOperations';
 import { HistoryManager } from '../utils/historyManager';
 
-export async function queueOpenAIMemberAssignment(member_object: Setup, question: string, historyManager: HistoryManager): Promise<string> {
+export async function queueOpenAIMemberAssignment(member_object: Setup, question: string, historyManager: HistoryManager, setups: Setup[]): Promise<string> {
     const openai = new OpenAI({ apiKey: member_object?.apiKey });
     let available_tools = [
         {
@@ -48,9 +48,13 @@ export async function queueOpenAIMemberAssignment(member_object: Setup, question
     ];
 
     const engineer_prompt_obj = fetchPrompts('system', member_object?.purpose ?? 'engineer', member_object?.model);
-    const engineer_prompt = personalizePrompt(engineer_prompt_obj[0].content, { name: member_object?.name ?? "no-data" });
+    let engineer_prompt = engineer_prompt_obj[0].content;
+    if(engineer_prompt_obj[0].content.includes("${members")) {
+        engineer_prompt = personalizePrompt(engineer_prompt, { name: member_object?.name ?? "no-data", members: get_member_purposes_for_prompt(setups) });
+    } else {
+        engineer_prompt = personalizePrompt(engineer_prompt, { name: member_object?.name ?? "no-data" });
+    }
     const messages = [{ role: 'system', content: engineer_prompt }, { role: 'user', content: question }];
-
     const startTime = Date.now();
     let response = {} as any;
     let toolCalls = [];

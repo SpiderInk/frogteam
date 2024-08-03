@@ -1,12 +1,12 @@
 import { fetchPrompts, personalizePrompt } from '../utils/prompts';
-import { Setup } from '../utils/setup';
+import { Setup, get_member_purposes_for_prompt } from '../utils/setup';
 import { HistoryManager } from '../utils/historyManager';
 import { HumanMessage, ToolMessage, AIMessageChunk, AIMessage, SystemMessage } from "@langchain/core/messages";
 import { BedrockChat } from "@langchain/community/chat_models/bedrock";
 import { ToolCall } from "@langchain/core/messages/tool";
 import { getFileContentApiTool, saveContentToFileApiTool } from '../utils/langchain-tools';
 
-export async function queueBedrockMemberAssignment(member_object: Setup, question: string, historyManager: HistoryManager): Promise<string> {
+export async function queueBedrockMemberAssignment(member_object: Setup, question: string, historyManager: HistoryManager, setups: Setup[]): Promise<string> {
     
     // ** if I change this function so that I inject llm then I can call this queueLangchainMemberAssignment **
     const llm = new BedrockChat({
@@ -21,7 +21,14 @@ export async function queueBedrockMemberAssignment(member_object: Setup, questio
     ]);
 
     const engineer_prompt_obj = fetchPrompts('system', member_object?.purpose ?? 'engineer', member_object?.model);
-    const engineer_prompt = personalizePrompt(engineer_prompt_obj[0].content, { name: member_object?.name ?? "no-data" });
+
+    let engineer_prompt = engineer_prompt_obj[0].content;
+    if(engineer_prompt_obj[0].content.includes("${members")) {
+        engineer_prompt = personalizePrompt(engineer_prompt, { name: member_object?.name ?? "no-data", members: get_member_purposes_for_prompt(setups) });
+    } else {
+        engineer_prompt = personalizePrompt(engineer_prompt, { name: member_object?.name ?? "no-data" });
+    }
+    // const engineer_prompt = personalizePrompt(engineer_prompt_obj[0].content, { name: member_object?.name ?? "no-data" });
 
     let toolMapping: { [key: string]: any } = {
         "getFileContentApi": getFileContentApiTool,

@@ -38,24 +38,24 @@
         "title": "Refresh Prompt View"
       },
       {
-          "command": "frogteam.openPromptPanel",
-          "title": "Open Prompt Panel"
+        "command": "frogteam.openPromptPanel",
+        "title": "Open Prompt Panel"
       },
       {
         "command": "frogteam.addPrompt",
         "title": "New Prompt"
       },
       {
-          "command": "frogteam.deletePrompt",
-          "title": "Delete Prompt"
+        "command": "frogteam.deletePrompt",
+        "title": "Delete Prompt"
       },
       {
-          "command": "frogteam.addSetup",
-          "title": "New Member"
+        "command": "frogteam.addSetup",
+        "title": "New Member"
       },
       {
-          "command": "frogteam.deleteSetup",
-          "title": "Delete Member"
+        "command": "frogteam.deleteSetup",
+        "title": "Delete Member"
       }
     ],
     "viewsContainers": {
@@ -94,18 +94,18 @@
       ]
     },
     "menus": {
-        "view/title": [
-            {
-                "command": "frogteam.addSetup",
-                "when": "view == setupCollectionView",
-                "group": "navigation"
-            },
-            {
-              "command": "frogteam.addPrompt",
-              "when": "view == promptCollectionView",
-              "group": "navigation"
-            }
-          ]
+      "view/title": [
+        {
+          "command": "frogteam.addSetup",
+          "when": "view == setupCollectionView",
+          "group": "navigation"
+        },
+        {
+          "command": "frogteam.addPrompt",
+          "when": "view == promptCollectionView",
+          "group": "navigation"
+        }
+      ]
     }
   },
   "scripts": {
@@ -117,8 +117,7 @@
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "test": "vscode-test",
-    "postinstall": "npm install"
+    "test": "vscode-test"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.6",
@@ -138,16 +137,11 @@
     "@aws-crypto/sha256-js": "^5.2.0",
     "@aws-sdk/credential-provider-node": "^3.616.0",
     "@aws-sdk/types": "^3.609.0",
-    "@langchain/community": "^0.2.20",
-    "@smithy/protocol-http": "^4.1.0",
-    "@smithy/signature-v4": "^4.1.0",
-    "@smithy/util-utf8": "^3.0.0",
+    "@langchain/community": "^0.2.22",
+    "@langchain/core": "^0.2.19",
+    "@smithy/eventstream-codec": "^2.0.5",
     "axios": "^1.7.2",
-    "langchain": "^0.2.11",
     "marked": "^13.0.2",
     "openai": "^4.52.2"
-  },
-  "resolutions": {
-    "@smithy/eventstream-codec": "^2.0.5"
   }
 }
