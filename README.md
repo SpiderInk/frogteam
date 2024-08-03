@@ -1,4 +1,4 @@
-# <img src="https://spiderink.net/generations/2024/215/frogteam_ai_icon.png" alt="frogteam icon" width="32" height="32"> - frogteam 
+# <img src="https://spiderink.net/generations/2024/216/market_icon.png" alt="frogteam icon" width="32" height="32"> - frogteam 
 
 <br>
 
@@ -58,11 +58,16 @@ You can refine the prompt and submit again. Existing files will be used and edit
 You can directly request that a team member perform a task. This is nice if you like what has been done and now have follow up work that a member can do for you.
 
 
-## Known Issues
+## Known Issues/Limitations
 
+- At present this will only work directly with OpenAI or AWs Bedrock
+    - For OpenAI you need an API Key
+    - For AWS Bedrock you need to be logged into AWS in you VS Code Environment and you need the supported models deployed
 - Documentation is weak, I am working on it.
 - No tool call validation so sometimes initial project generation never completes you can try again
     - validation/retry is coming
+- Validation of Team Members to prompts, for now use Team Lineup view to manually validate. If you see: TypeError: Cannot read properties of undefined (reading 'content') this is the issue.
+- If you paste into the prompt text area UI formatting may not work, it will save so just close and open the editor window for now.
 
 ## Release Notes
 
@@ -78,6 +83,7 @@ This is the first version give it try. The following has is what you can do.
     - You can say @membername can you edit the index.html file and change the title to "Narwhal"
 
 ## Tasks/Roadmap
+- Prompt Validation should also show an error in the Team Configuration when a member does not align with a prompt
 - Can the "new Prompt" and "New Setup" Buttons stay visible
     - **No**
  - Add a Status Bar indicator
@@ -95,6 +101,7 @@ This is the first version give it try. The following has is what you can do.
     - start by only abstracting queueMemberAssignment this means that the lead-architect will only work with openai models
         - Langchain has been started and allows a team member to be attached to a Bedrock model **in testing**
         - bedrock boto3
+            - LLAMA
         - hugging face
         - bedrock gateway?
         - azure?
@@ -234,131 +241,4 @@ const PROMPTS = [
         models: ["gpt-4o"]
     }
 ];
-```
-# Some saved code
-
-```typescript
-// import { createAndOpenFile } from './file/fileOperations';
-// import * as fs from 'fs';
-// import * as os from 'os';
-```
-
-```typescript
-async function queue_member_assignment(question: string): Promise<string> {
-    let tool_functions = {
-        "vectorize": vectorize,
-        "evaluate": evaluate,
-        "crawl": crawl,
-        "getcontent": getcontent,
-        "save": save
-    } as any;
-    let available_tools = [
-        {
-            type: "function" as const,
-            function: {
-                name: "vectorize",
-                description: "request the given content be chunked and stored in our local db",
-                parameters: {
-                    type: "object",
-                    properties: {
-                        content: {
-                            type: "string",
-                            description: "the content to be chunked and stored"
-                        },
-                        type: {
-                            type: "string",
-                            description: "the file type of content being chunked and stored"
-                        }
-                    },
-                    required: ["content", "type"]
-                },
-            },
-        },
-        {
-            type: "function" as const,
-            function: {
-                name: "evaluate",
-                description: "test or execute the given code",
-                parameters: {
-                    type: "object",
-                    properties: {
-                        code: {
-                            type: "string",
-                            description: "the code to be tested or executed"
-                        }
-                    },
-                    require: ["code"],
-                },
-            },
-        },
-        {
-            type: "function" as const,
-            function: {
-                name: "crawl",
-                description: "take the given url, vectorize the content and queue other URLs found on the page. Stays restricted to the domain in the given url.",
-                parameters: {
-                    type: "object",
-                    properties: {
-                        url: {
-                            type: "string",
-                            description: "the url to crawl"
-                        },
-                        depth: {
-                            type: "number",
-                            description: "the depth to crawl"
-                        }
-                    },
-                    required: ["url", "depth"],
-                },
-            },
-        },
-        {
-            type: "function" as const,
-            function: {
-                name: "getcontent",
-                description: "Return the content of the file at the path given",
-                parameters: {
-                    type: "object",
-                    properties: {
-                        file: {
-                            type: "string",
-                            description: "the path to the file"
-                        }
-                    },
-                },
-                required: ["file"],
-            },
-        },
-        {
-            type: "function" as const,
-            function: {
-                name: "save",
-                description: "Save the content to the file path given and open the file",
-                parameters: {
-                    type: "object",
-                    properties: {
-                        content: {
-                            type: "string",
-                            description: "the content to be saved"
-                        },
-                        file: {
-                            type: "string",
-                            description: "the path to the file"
-                        }
-                    },
-                    required: ["content", "file"],
-                },
-            },
-        }
-    ];
-
-    const completion = await openai.chat.completions.create({
-        messages: [{ role: "system", content: question }],
-        model: "gpt-4o",
-    });
-    let answer = completion.choices[0].message.content ?? "";
-
-
-    return answer;
-}
 ```
