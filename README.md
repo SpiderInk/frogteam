@@ -1,4 +1,4 @@
-# <img src="./resources/icon.png" alt="frogteam icon" width="32" height="32"> - frogteam 
+# <img src="https://spiderink.net/generations/2024/215/frogteam_ai_icon.png" alt="frogteam icon" width="32" height="32"> - frogteam 
 
 <br>
 

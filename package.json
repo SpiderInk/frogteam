@@ -1,6 +1,7 @@
 {
   "name": "frogteam",
   "displayName": "FrogTeam",
+  "publisher": "SpiderInk",
   "description": "Your Generative AI Team Workspace",
   "version": "0.0.1",
   "engines": {
@@ -68,12 +69,12 @@
         {
           "id": "setupCollection",
           "title": "Setups",
-          "icon": "resources/icon.svg"
+          "icon": "resources/icon.png"
         },
         {
           "id": "promptCollection",
           "title": "Prompts",
-          "icon": "resources/icon.svg"
+          "icon": "resources/icon.png"
         }
       ]
     },
@@ -110,8 +111,8 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
-    "compile": "webpack",
-    "watch": "webpack --watch",
+    "compile": "webpack --mode development",
+    "watch": "webpack --mode development --watch",
     "package": "webpack --mode production --devtool hidden-source-map",
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
@@ -127,6 +128,7 @@
     "@typescript-eslint/parser": "^7.11.0",
     "@vscode/test-cli": "^0.0.9",
     "@vscode/test-electron": "^2.4.0",
+    "esbuild": "^0.23.0",
     "eslint": "^8.57.0",
     "ts-loader": "^9.5.1",
     "typescript": "^5.4.5",
@@ -143,5 +145,17 @@
     "axios": "^1.7.2",
     "marked": "^13.0.2",
     "openai": "^4.52.2"
-  }
+  },
+  "files": [
+    "out",
+    "resources",
+    "src",
+    "package.json",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ampiazza/frogteam"
+  },
+  "license": "MIT"
 }
