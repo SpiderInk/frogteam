@@ -103,7 +103,12 @@
     <h3>Prompt Editor</h3>
     You need a minimum of three prompts: lead-architect, lead-engineer, and developer. There must be a team member with a "purpose" to match the "category" and "model" of each prompt. The project editor will show you the team roster and status telling what purposes and categories are missing or displaying healthy.
     <br><br>
-    In your prompt using ${ name } will be the current prompts team member name. It is important to say something like "Your name is ${ name }" This way the LLM will recognize its assignment if they are reading from a more general plan that came from a lead.
+    In your prompt using ${ name } will be the current prompts team member name. It is important to say something like "Your name is ${ name }" This way the LLM will recognize its assignment if they are reading from a more general plan that came from a lead. Presently these are the available variable substitutions.<br>
+    <ul>
+        <li>${ name } - The name of a team member. Can be used to assign work. </li>
+        <li>${ members } - The list of team members and their role.</li>
+        <li>{ $file_list } - The directory tree of the files in the solution.</li>
+    </ul>
     <br><br>
     <form id="edit-prompt">
         <div class="checkbox-container">

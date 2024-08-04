@@ -23,7 +23,7 @@
     "role": "system",
     "models": "gpt-4o",
     "id": "789",
-    "active": false,
+    "active": true,
     "tag": "primary"
   },
   {

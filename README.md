@@ -1,14 +1,14 @@
-# <img src="https://spiderink.net/generations/2024/216/market_icon.png" alt="frogteam icon" width="32" height="32"> - frogteam 
+# <img src="https://frogteam.ai/logo.png" alt="frogteam icon" width="32" height="32"> - frogteam 
 
 <br>
 
-Hi there - Thanks for stopping by. I decided to put this out there now. Its at a nice spot where there is some functionality. I am wondering if there is an appetite for what I am doing here. I'll try to post a small demo video soon.
+Hi there - Thanks for stopping by. I decided to put this out there now. Its at a nice spot where there is some functionality. I am wondering if there is an appetite for what I am doing here. Here is a short demo <a href="https://www.youtube.com/watch?v=9Lu13_Zgrhs">video</a>.
+<br><br>
+Follow me on [instagram](https://www.instagram.com/reddoverises/).
 
 ## Your virtual Gen AI Engineering Team
 
 This is meant to be a generative AI interface where you can register new models, configure model settings and prompts, interface with [Chroma](https://www.trychroma.com/) embeddings and have a common set of commands you can use to interact with files in the workspace and the output from various LLMs. You register "team members" and assign them a model you can use the same model multiple times or use different models. You can assign team members to collaborate on a task and give them a maximum time or token size.  
-
-We will start with Python and provide an automated/isolated test environment where team members can test code generations and collaborate on solutions. When hunan interaction is needed the chat interface will be invoked asynchronously, if other tasks can continue they will.
 
 Planned UI Interactions
 - Chat
@@ -83,15 +83,18 @@ This is the first version give it try. The following has is what you can do.
     - You can say @membername can you edit the index.html file and change the title to "Narwhal"
 
 ## Tasks/Roadmap
+- Sync README prompts and resources/prompts.json
 - Prompt Validation should also show an error in the Team Configuration when a member does not align with a prompt
 - Can the "new Prompt" and "New Setup" Buttons stay visible
-    - **No**
+    - **No** not in this tree view
+    - maybe make them Commands in the Project panel for visibility
  - Add a Status Bar indicator
     - add an indicator that something is happening/running
     - There needs to be a status bar/activity bar/Project Panel indicator that tasks are running
 
 - BUG: sometimes toolCall definitions or results are bad and the process errors out
 - BUG: paste into prompt breaks HTML view until close/re-open (of that view) (data is saved correctly)
+- BUG: function call history seems to list number of characters as arguments make this more meaningful
 - MESS: generateUniqueId() in WebView HTML files needs consolidation
 - MESS: CSS in WebView HTML files needs consolidation
 
@@ -125,6 +128,7 @@ This is the first version give it try. The following has is what you can do.
         - Document has the state of the chain allowing the human to answer and resume the chain
 
 ## What's Next?
+- prompt library sharing platform
 - mlflow experiment tracking
 - add chromadb instance (optionally?)
     - URL/Internet or local disc content
@@ -133,13 +137,17 @@ This is the first version give it try. The following has is what you can do.
 - implement chunking strategy for the history
 - implement chunking strategy for documentation
 - implement search
-- on demand web crawl that will chink and store in local Chroma
+- on demand web crawl that will chunk and store in local Chroma
 - enable RAG on/off for generation
 - In History
     - an icon for content vs function response 
         - indicate success/fail (green checkmark vs red X)
         - can we indicate when there is file content and when there isn't (is there a conflict with markdown?)
         - sometimes a file wasn't created yet and that is ok
+- Starting with Python 
+    - automated/isolated test environment where team members can test code generations and collaborate on solutions
+    - When hunan interaction is needed the chat interface will be invoked asynchronously
+        - if other tasks can continue they will
 
 **DONE**
 - Provide default prompts on first startup **done**
@@ -194,13 +202,11 @@ This is the first version give it try. The following has is what you can do.
 
 ## Some Quick Prompts
 
-Write me a simple web page that uses a canvas to draw a ball a start it bouncing around the boundaries of the canvas.
+Write me a simple web page that uses a canvas to draw a ball a start it bouncing around the boundaries of the canvas. Please break the project up into multiple files: index.html, index.js and index.css. This is only the starting point for the project so keep in mind we will be asking for refinements.
 
 Write me a simple web page that uses a canvas to draw a small bird with flapping wings that flies the boundaries of the canvas.
 
 Write me a simple web page that uses a small canvas say 100x100 pixels to draw a small bird with flapping wings. It needs to look like a bird. Make a special assignment about drawing the bird on the canvas and making the wings move.
-
-We want to make a real life treasure hunt/bar crawl application. To get us started, create a web site that displays Stamford Connecticut on a map. Allow a user to click anywhere in Stamford to add local business at that location as a location participant in this hunt/crawl. When they click a form should pop up allowing them to register a treasure hunt item/coupon at that location.  Collect the: item name, user email address, a description of the item and any other treasure hunt related information. When the form is submitted the pay load should be delivered to an AWS lambda function hosted publicly.
 
 ## My Icons either came from the list below, I made them, or GenAI Helped me make them
 - https://iconduck.com/sets/elementary-icon-set
@@ -224,7 +230,7 @@ if they ever don't have these three we need to make clear they need to fix the s
 const PROMPTS = [
     {
         role: "system",
-        content: "You are the lead architect on the project described by the user. You will break the project down into assignments and feed each team member the information to do their assignment. You will be provided with a list of team members and their focus areas and will output a prompt for each team member. This prompt explains their assignment. The user did not tell you this but assume you will need to start at the beginning. If they need AWS resources then scripts or terraform are needed to create them, if they need to install libraries like openai or pandas all of this needs to be included. The project needs to provide a full stack DevOps based solution. These are your Team Members: ${members}. Use the queue_member_assignment function provided in your tools to request each member perform their task. The lead engineer can be used to compile the work of the other members into a single solution. Make sure the artifacts each member creates are identified to the lead engineer Assign a directory name for the project and instruct each team member to use this directory. They must check and edit files if they exist. Here is the existing project file system: ${file_list}",
+        content: "You are the lead architect on the project described by the user. You will break the project down into assignments and feed each team member the information to do their assignment. You will be provided with a list of team members and their focus areas and will output a prompt for each team member. This prompt explains their assignment. The user did not tell you this but assume you will need to start at the beginning. If they need AWS resources then scripts or terraform are needed to create them, if they need to install libraries like openai or pandas all of this needs to be included. The project needs to provide a full stack DevOps based solution. These are your Team Members: ${members}. Use the queue_member_assignment function provided in your tools to request each member perform their task. The lead engineer can be used to compile the work of the other members into a single solution. Make sure the artifacts each member creates are identified to the lead engineer. Assign a directory name for the project and instruct each team member to use this directory. They must check if files exist and edit those files if they do, create them if they do not. Here is the existing project file system: ${file_list}",
         category: "lead-architect",
         models: ["gpt-4o"]
     },

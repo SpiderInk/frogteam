@@ -75,6 +75,8 @@
             <li>Use the "Directed" request feature to request a specific team member (@member) perform a specific project task.</li>
         </ul>
     </form>
+    <h1>Directed Assignment</h1>
+    @team_member_name is requited in this prompt. For instance "@Michael please change the color of the background in index.html."
     <form id="directed-chat-form" onsubmit="handleDirected(event)">
         <textarea rows="10" id="directed-question" placeholder="@teammember please do xyz task on zyx file." oninput="handleDirectedInput(event)"></textarea>        
         <button id="directed-go" type="submit">Directed Go</button>
