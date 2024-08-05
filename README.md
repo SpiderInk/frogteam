@@ -6,7 +6,7 @@ Hi there - Thanks for stopping by. I decided to put this out there now. Its at a
 <br><br>
 Follow me on [instagram](https://www.instagram.com/reddoverises/).
 
-## Your virtual Gen AI Engineering Team
+## Your virtual GenAI Engineering Team
 
 This is meant to be a generative AI interface where you can register new models, configure model settings and prompts, interface with [Chroma](https://www.trychroma.com/) embeddings and have a common set of commands you can use to interact with files in the workspace and the output from various LLMs. You register "team members" and assign them a model you can use the same model multiple times or use different models. You can assign team members to collaborate on a task and give them a maximum time or token size.  
 
@@ -70,6 +70,10 @@ You can directly request that a team member perform a task. This is nice if you 
 - If you paste into the prompt text area UI formatting may not work, it will save so just close and open the editor window for now.
 
 ## Release Notes
+
+## 0.0.9
+Marketplace categorization and copy updates
+
 ## 0.0.8
 - Icon change
 

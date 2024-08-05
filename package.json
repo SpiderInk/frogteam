@@ -2,13 +2,13 @@
   "name": "frogteam",
   "displayName": "FrogTeam",
   "publisher": "SpiderInk",
-  "description": "Your Generative AI Team Workspace",
-  "version": "0.0.8",
+  "description": "Your GenAI Team Workspace",
+  "version": "0.0.9",
   "engines": {
     "vscode": "^1.91.0"
   },
   "categories": [
-    "Other"
+    "AI"
   ],
   "activationEvents": [],
   "main": "./dist/extension.js",
