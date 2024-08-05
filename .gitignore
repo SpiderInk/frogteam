@@ -6,3 +6,8 @@ node_modules
 extras
 **private**
 cert
+notes.md
+.vscode/history.json
+.vscode/prompts.json
+.vscode/setups.json
+.vscode/icons/*

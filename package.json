@@ -3,7 +3,7 @@
   "displayName": "FrogTeam",
   "publisher": "SpiderInk",
   "description": "Your Generative AI Team Workspace",
-  "version": "0.0.4",
+  "version": "0.0.8",
   "engines": {
     "vscode": "^1.91.0"
   },
@@ -158,5 +158,5 @@
     "url": "https://github.com/ampiazza/frogteam"
   },
   "license": "MIT",
-  "icon": "resources/market_icon.png"
+  "icon": "resources/logo.png"
 }

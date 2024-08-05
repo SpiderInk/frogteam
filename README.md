@@ -2,7 +2,7 @@
 
 <br>
 
-Hi there - Thanks for stopping by. I decided to put this out there now. Its at a nice spot where there is some functionality. I am wondering if there is an appetite for what I am doing here. Here is a short demo <a href="https://www.youtube.com/watch?v=9Lu13_Zgrhs">video</a>.
+Hi there - Thanks for stopping by. I decided to put this out there now. Its at a nice spot where there is some functionality. I am wondering if there is an appetite for what I am doing here. Here is a short demo <a href="https://youtu.be/hxatfrgiiAQ">video</a>.
 <br><br>
 Follow me on [instagram](https://www.instagram.com/reddoverises/).
 
@@ -70,9 +70,16 @@ You can directly request that a team member perform a task. This is nice if you 
 - If you paste into the prompt text area UI formatting may not work, it will save so just close and open the editor window for now.
 
 ## Release Notes
+## 0.0.8
+- Icon change
 
-### 1.0.0
-This is the first version give it try. The following has is what you can do.
+### 0.0.7
+- Icon change
+- Copy updates in Prompt and Project views
+- Setting all default prompts to active
+
+### 0.0.6 (and older)
+This is an early version give it try. The following is what you can do.
 - Add Team Members and make sure they align with a prompt
     - You can use openai with API Keys
     - You can use Amazon Bedrock if your environment is logged in
