@@ -70,6 +70,8 @@ You can directly request that a team member perform a task. This is nice if you 
 - If you paste into the prompt text area UI formatting may not work, it will save so just close and open the editor window for now.
 
 ## Release Notes
+## 0.0.10
+- Add region for AWS Bedrock
 
 ## 0.0.9
 Marketplace categorization and copy updates
@@ -94,6 +96,7 @@ This is an early version give it try. The following is what you can do.
     - You can say @membername can you edit the index.html file and change the title to "Narwhal"
 
 ## Tasks/Roadmap
+
 - Sync README prompts and resources/prompts.json
 - Prompt Validation should also show an error in the Team Configuration when a member does not align with a prompt
 - Can the "new Prompt" and "New Setup" Buttons stay visible
@@ -161,6 +164,7 @@ This is an early version give it try. The following is what you can do.
         - if other tasks can continue they will
 
 **DONE**
+- BUG BEDROCK hardcoded us-east-1 **done**
 - Provide default prompts on first startup **done**
 - Massive Migration from POC Project Task left
     - Change the entire UI to use three tree view tabs **done**
