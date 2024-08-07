@@ -10,7 +10,7 @@ export async function queueBedrockMemberAssignment(member_object: Setup, questio
     
     // ** if I change this function so that I inject llm then I can call this queueLangchainMemberAssignment **
     const llm = new BedrockChat({
-        region: "us-east-1",
+        region: member_object?.aws_region,
         model: member_object?.model ?? "no-model",
         maxRetries: 0,
     });

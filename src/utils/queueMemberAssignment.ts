@@ -27,7 +27,7 @@ export async function queueMemberAssignment(member: string, question: string, se
         case 'anthropic.claude-3-5-sonnet-20240620-v1:0':
         case 'anthropic.claude-3-haiku-20240307-v1:0':
             const bedrock_llm = new BedrockChat({
-                region: "us-east-1",
+                region: member_object?.aws_region,
                 model: member_object?.model ?? "no-model",
                 maxRetries: 0,
             });
