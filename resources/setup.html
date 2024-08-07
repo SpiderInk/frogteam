@@ -93,6 +93,9 @@
                 <option value="anthropic.claude-3-haiku-20240307-v1:0">anthropic.claude-3-haiku-20240307-v1:0 (bedrock)</option>
             </select>
 
+            <label for="aws_region">API Key</label>
+            <input type="text" id="aws_region" placeholder="us-east-1">
+
             <label for="model-endpoint">Model Endpoint</label>
             <input type="text" id="model-endpoint" placeholder="Model Endpoint-future feature" readonly="true">
 
@@ -120,7 +123,8 @@
                 endpoint: document.getElementById('model-endpoint').value,
                 apiKey: document.getElementById('api-key').value,
                 color: document.getElementById('color').value,
-                icon: setup.icon
+                icon: setup.icon,
+                aws_region: document.getElementById('aws_region').value
             };
             saveState(); // before we post the message!
             vscode.postMessage({ command: 'saveSetup', setup });
@@ -141,6 +145,7 @@
                     document.getElementById('model-endpoint').value = setup.endpoint;
                     document.getElementById('api-key').value = setup.apiKey;
                     document.getElementById('color').value = setup.color;
+                    document.getElementById('aws_region').value = setup.aws_region;
                     saveState();
                     break;
                 }
@@ -156,6 +161,7 @@
             document.getElementById('model-endpoint').value = state.endpoint;
             document.getElementById('api-key').value = state.apiKey;
             document.getElementById('color').value = state.color;
+            document.getElementById('aws_region').value = state.aws_region;
         };
 
         function saveState() {
@@ -167,7 +173,8 @@
                 endpoint: setup.endpoint,
                 apiKey: setup.apiKey,
                 color: setup.color,
-                icon: setup.icon
+                icon: setup.icon,
+                aws_region: setup.aws_region
             };
             vscode.setState(state);
         };
