@@ -3,7 +3,8 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { marked } from 'marked';
 import { getProjectTabContent } from '../webview/getProjectTabContent';
-import { projectGo } from '../openai/openaiService';
+// import { projectGo } from '../openai/openaiService';
+import { projectGo } from '../utils/lead-architect';
 import { HistoryManager, HistoryEntry } from '../utils/historyManager';
 import { extractMemberFromPrompt, Setup, validate_fixMemberIcons, load_setups } from '../utils/setup';
 import { queueMemberAssignment } from '../utils/queueMemberAssignment';
@@ -240,7 +241,7 @@ class DateItem extends vscode.TreeItem {
 export class HistoryItem extends vscode.TreeItem {
     constructor(public entry: HistoryEntry, private context: vscode.ExtensionContext, icon: string) {
         super(`${entry.response_by} - ${new Date(entry.timestamp).toLocaleTimeString()}`, vscode.TreeItemCollapsibleState.None);
-        this.tooltip = new vscode.MarkdownString(`**${entry.ask}**\n\nModel: ${entry.model}\nResponse by: ${entry.response_by}`);
+        this.tooltip = new vscode.MarkdownString(`${entry.ask ?? ""} \n\n Ask By: ${entry.ask_by} \n\n Model: ${entry.model} \n\n Response by: ${entry.response_by}`);
         this.command = {
             command: 'frogteam.openView',
             title: 'Handle History Item Click',

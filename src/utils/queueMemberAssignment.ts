@@ -1,14 +1,12 @@
 import { fetchSetupByName, Setup } from './setup'; 
 import { HistoryManager } from './historyManager';
-// import { queueOpenAIMemberAssignment } from '../openai/queueOpenAIMemberAssignment';
-// import { queueBedrockMemberAssignment } from '../bedrock/queueBedrockMemberAssignment';
 import { queueLangchainMemberAssignment } from '../langchain/queueLangchainMemberAssignment';
 import { BedrockChat } from "@langchain/community/chat_models/bedrock";
 import { ChatOpenAI } from "@langchain/openai";
 
 export async function queueMemberAssignment(member: string, question: string, setups: any, historyManager: HistoryManager): Promise<string> {
-    const member_object = fetchSetupByName(setups, member);
 
+    const member_object = fetchSetupByName(setups, member);
     switch(member_object?.model) {
         case 'gpt-3.5-turbo':
         case 'gpt-4-turbo':
@@ -17,7 +15,8 @@ export async function queueMemberAssignment(member: string, question: string, se
                 apiKey: member_object?.apiKey,
                 model: member_object?.model ?? "no-model",
                 maxRetries: 0,
-            })
+                maxTokens: 8000
+            });
             return await queueLangchainMemberAssignment(openai_llm, member_object, question, historyManager, setups);
 
             // this is the openai client way
@@ -30,6 +29,7 @@ export async function queueMemberAssignment(member: string, question: string, se
                 region: member_object?.aws_region,
                 model: member_object?.model ?? "no-model",
                 maxRetries: 0,
+                maxTokens: 8000
             });
             return await queueLangchainMemberAssignment(bedrock_llm, member_object, question, historyManager, setups);
             // return await queueBedrockMemberAssignment(member_object, question, historyManager, setups);)

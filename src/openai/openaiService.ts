@@ -4,6 +4,40 @@ import { Setup, fetchSetupByPurpose, get_member_purposes_for_prompt } from '../u
 import { queueMemberAssignment } from '../utils/queueMemberAssignment';
 import { HistoryManager } from '../utils/historyManager';
 
+/*
+- The is the main function that handles the projectGo functionality.
+- It fetches the member object based on the 'lead-architect' purpose from the setups array.
+- It fetches the system prompt, personalizes it with the member's purposes, and sends the question to the OpenAI API.
+- If a tool is required, it calls the corresponding function to handle the tool call.
+- The function returns the response from the OpenAI API.
+- It also manages the history of the conversation using the HistoryManager class.
+- The function is called from the main server.ts file.
+*/
+
+const tools = [
+    {
+        type: "function" as const,
+        function: {
+            name: "queue_member_assignment",
+            description: "Send technical instructions for a software project where file system artifacts will be produced in a Visual Studio Code environment.",
+            parameters: {
+                type: "object",
+                properties: {
+                    member: {
+                        type: "string",
+                        description: "The name of the team member to assign the task to.",
+                    },
+                    instructions: {
+                        type: "string",
+                        description: "The step by step instructions for the assignment.",
+                    }
+                },
+                required: ["instructions"],
+            },
+        },
+    }
+];
+
 export async function projectGo(question: string, setups: Setup[], historyManager: HistoryManager): Promise<string> {
     console.log('starting projectGo');
     const member_object = fetchSetupByPurpose(setups, 'lead-architect');
@@ -17,30 +51,6 @@ export async function projectGo(question: string, setups: Setup[], historyManage
     const messages = [
         { role: 'system', content: prompt },
         { role: 'user', content: question },
-    ];
-
-    const tools = [
-        {
-            type: "function" as const,
-            function: {
-                name: "queue_member_assignment",
-                description: "Send technical instructions for a software project where file system artifacts will be produced in a Visual Studio Code environment.",
-                parameters: {
-                    type: "object",
-                    properties: {
-                        member: {
-                            type: "string",
-                            description: "The name of the team member to assign the task to.",
-                        },
-                        instructions: {
-                            type: "string",
-                            description: "The step by step instructions for the assignment.",
-                        }
-                    },
-                    required: ["instructions"],
-                },
-            },
-        }
     ];
 
     const response = await openai.chat.completions.create({

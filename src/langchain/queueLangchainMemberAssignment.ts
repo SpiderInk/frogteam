@@ -54,7 +54,7 @@ export async function queueLangchainMemberAssignment(llm: BaseChatModel, member_
                         content: toolOutput
                     });
                     messages.push(newTM);
-                    historyManager.addEntry(member_object?.name ?? "no-data", toolCall.name, member_object?.model ?? "no-model", `${toolCall.args.length} arguments`, toolOutput);
+                    historyManager.addEntry(member_object?.name ?? "no-data", toolCall.name, member_object?.model ?? "no-model", `args: ${toolCall.args}`, toolOutput);
                 }
                 llmOutput = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };
             }
