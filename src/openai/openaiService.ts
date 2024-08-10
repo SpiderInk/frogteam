@@ -39,7 +39,6 @@ const tools = [
 ];
 
 export async function projectGo(question: string, setups: Setup[], historyManager: HistoryManager): Promise<string> {
-    console.log('starting projectGo');
     const member_object = fetchSetupByPurpose(setups, 'lead-architect');
     const openai = new OpenAI({ apiKey: member_object?.apiKey });
     let tool_functions = {
@@ -91,6 +90,5 @@ export async function projectGo(question: string, setups: Setup[], historyManage
         historyManager.addEntry('user', system_prompt_obj[0].role, system_prompt_obj[0].models, question, result);
     }
     const final_response = secondResponse.choices[0].message.content ?? '';
-    console.log('completed projectGo');
     return final_response;
 }

@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
+import { output_log } from '../utils/outputChannelManager'
 
 export async function createAndOpenFile(fileName: string, fileContent: string): Promise<string> {
     try {
@@ -27,11 +28,12 @@ export async function createAndOpenFile(fileName: string, fileContent: string): 
         const document = await vscode.workspace.openTextDocument(fileUri);
         await vscode.window.showTextDocument(document);
 
-        vscode.window.showInformationMessage(`File ${fileName} created and opened successfully.`);
+        output_log(`File ${fileName} created and opened successfully.`);
         return `${fileName} written successfully.`;
     } catch (err) {
         const error = err as Error;
         vscode.window.showErrorMessage(`Failed to create and open file: ${error.message}`);
+        output_log(`Failed to create and open file: ${error.message}`);
         return `${fileName} operation failed.`;
     }
 }
@@ -45,17 +47,16 @@ export async function save(content: string, file: string): Promise<string> {
 }
 
 export function load_file_content(filePath: string): string {
+    let data = '';
     try {
         if (fs.existsSync(`${vscode.workspace.rootPath}/${filePath}`)) {
-            const data = fs.readFileSync(`${vscode.workspace.rootPath}/${filePath}`, 'utf8');
-            return data;
-        } else {
-            return '';
+            data = fs.readFileSync(`${vscode.workspace.rootPath}/${filePath}`, 'utf8');
         }
+        output_log(`${filePath} read successfully`);
     } catch (err) {
         console.error(`Error reading file: ${err}`);
-        return '';
     }
+    return data;
 }
 
 export async function saveJsonToFile(filePath: string, json: any): Promise<void> {
@@ -63,12 +64,15 @@ export async function saveJsonToFile(filePath: string, json: any): Promise<void>
     return new Promise((resolve, reject) => {
         fs.mkdir(path.dirname(filePath), { recursive: true }, (err) => {
             if (err) {
+                output_log(`Error creating directory: ${err}`)
                 return reject(err);
             }
             fs.writeFile(filePath, jsonData, (err) => {
                 if (err) {
+                    output_log(`Error writing to file: ${err}`)
                     return reject(err);
                 }
+                output_log(`${filePath} written successfully.`);
                 resolve();
             });
         });

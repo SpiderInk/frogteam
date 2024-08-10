@@ -6,4 +6,35 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
-- Initial release
+## 0.0.12
+- Added Running Status Indicator in the StatusBar says "Frogteam" when its a project run and "Teammeber" when its a directed run.
+- Added an Output Channel called "FrogTeam.ai" that updates with every history entry and on other events.
+- Added New Member and Prompt commands to the project view.
+- Added Error message to tell yu when a team member has no aligned system prompt.
+## 0.0.11
+- lead-architect now supports Bedrock
+
+## 0.0.10
+- Add region for AWS Bedrock
+
+## 0.0.9
+Marketplace categorization and copy updates
+
+## 0.0.8
+- Icon change
+
+### 0.0.7
+- Icon change
+- Copy updates in Prompt and Project views
+- Setting all default prompts to active
+
+### 0.0.6 (and older)
+This is an early version give it try. The following is what you can do.
+- Add Team Members and make sure they align with a prompt
+    - You can use openai with API Keys
+    - You can use Amazon Bedrock if your environment is logged in
+- You will get validation error messages if you don't have the minimum members/prompts
+- You can use the Team Lineup to validate Member/Prompt alignment
+- You can use the Builder to kick off the initial project creation
+- You can use the Builder to ask a specific team member perform a specific task
+    - You can say @membername can you edit the index.html file and change the title to "Narwhal"

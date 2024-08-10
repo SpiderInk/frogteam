@@ -131,7 +131,7 @@
                 document.getElementById('response').innerHTML = message.text;
             }
             if (message.command === 'loadData') {
-                displayIssues(message.issues)
+                displayIssues(message.issues);
                 document.getElementById('question').value = message.question;
                 document.getElementById('directed-question').value = message.directed;
                 document.getElementById('response').innerHTML = message.answer;

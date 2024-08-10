@@ -1,6 +1,7 @@
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
 import { save, getcontent } from "../file/fileOperations";
+import { output_log } from './outputChannelManager';
 
 const getFileContentApiSchema = z.object({
     fileName: z.string().describe("The path of the file to read")
@@ -8,7 +9,7 @@ const getFileContentApiSchema = z.object({
 
 export const getFileContentApiTool = tool(
     async ({ fileName }: { fileName: string }) => {
-        console.log("Reading file: ", fileName);
+        output_log(`Reading file: ${fileName}`);
         return await getcontent(fileName);
     },
     {
@@ -25,7 +26,7 @@ const saveContentToFileApiSchema = z.object({
 
 export const saveContentToFileApiTool = tool(
     async ({ content, fileName }: { content: string; fileName: string }) => {
-        console.log("Saving content to file: ", fileName);
+        output_log(`Saving content to file: ${fileName}`);
         save(content, fileName);
         return `Content written to ${fileName}`;
     },
@@ -52,7 +53,7 @@ function queueMemberAssignment(member: string, question: string){
 // Define the tool function
 export const getQueueMemberAssignmentApiTool = tool(
     async ({ member, question }: z.infer<typeof getQueueMemberAssignmentApiSchema>) => {
-        console.log("Assigning queue member: ", member);
+        output_log(`Assigning queue member: ${member}`);
         return await queueMemberAssignment(member, question);
     },
     {

@@ -131,8 +131,12 @@ export async function openAnswerPanel(context: vscode.ExtensionContext, data: Hi
 	const date = new Date(data.timestamp);
 	const formattedTime = date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
 	const formattedDate = date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
-
-	const markdownContent = marked(data.answer);
+	let markdownContent;
+	if(data.answer.length > 0) {
+		markdownContent = marked(data.answer);
+	} else {
+		markdownContent = data.answer;
+	}
 	const documentContent = `<!DOCTYPE html>
 <html lang="en">
 <head>

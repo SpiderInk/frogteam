@@ -1,5 +1,13 @@
 # <img src="https://frogteam.ai/logo.png" alt="frogteam icon" width="32" height="32"> - frogteam 
 
+08-10-2024
+Updates:
+- Lead Architect can use all implemented models
+- Added Running Status Indicator in the StatusBar says "Frogteam" when its a project run and "member-name" when its a directed run.
+- Added an Output Channel called "FrogTeam.ai" that updates with every history entry and on other events.
+- Added New Member and Prompt commands to the project view to make these actions more visible.
+- Added Error message to tell yu when a team member has no aligned system prompt.
+
 <br>
 08-08-2024
 
@@ -76,44 +84,10 @@ In the Directed Assignment box you can call out a single team member to perform 
 - Validation of Team Members to prompts, for now use Team Lineup view to manually validate that all members are aligned with a system prompt. If you see: TypeError: Cannot read properties of undefined (reading 'content') this is likely the issue.
 - If you paste into the prompt text area UI formatting may not work, it will save so just close and open the editor window for now.
 
-## Release Notes
-## 0.0.11
-- lead-architect now supports Bedrock
-
-## 0.0.10
-- Add region for AWS Bedrock
-
-## 0.0.9
-Marketplace categorization and copy updates
-
-## 0.0.8
-- Icon change
-
-### 0.0.7
-- Icon change
-- Copy updates in Prompt and Project views
-- Setting all default prompts to active
-
-### 0.0.6 (and older)
-This is an early version give it try. The following is what you can do.
-- Add Team Members and make sure they align with a prompt
-    - You can use openai with API Keys
-    - You can use Amazon Bedrock if your environment is logged in
-- You will get validation error messages if you don't have the minimum members/prompts
-- You can use the Team Lineup to validate Member/Prompt alignment
-- You can use the Builder to kick off the initial project creation
-- You can use the Builder to ask a specific team member perform a specific task
-    - You can say @membername can you edit the index.html file and change the title to "Narwhal"
-
 ## Tasks/Roadmap
-- Sync README prompts and resources/prompts.json
-- Prompt Validation should also show an error in the Team Configuration when a member does not align with a prompt
-- Can the "new Prompt" and "New Setup" Buttons stay visible
-    - **No** not in this tree view
-    - maybe make them Commands in the Project panel for visibility
- - Add a Status Bar indicator
-    - add an indicator that something is happening/running
-    - There needs to be a status bar/activity bar/Project Panel indicator that tasks are running
+- **IMPORTANT** Need to start including conversation/history for instance sending in the lead-architect's original instructions
+    - When @directed send that member's original ask
+    - When Project send in all the original assignments the lead-architect assigned
 
 - BUG: sometimes toolCall definitions or results are bad and the process errors out
 - BUG: paste into prompt breaks HTML view until close/re-open (of that view) (data is saved correctly)
@@ -145,12 +119,6 @@ This is an early version give it try. The following is what you can do.
     - this will require tracking
     - the lead architect will need to be aware of these constrains when giving out assignments
 
-- create a tool that allows any team member (including lead architect) to ask a question directed at the human
-    - this can present in the history but will cause the entire task thread to wait
-        - Document should open with the question on display
-        - when clicked on in History document will open 
-        - Document has the state of the chain allowing the human to answer and resume the chain
-
 ## What's Next?
 - prompt library sharing platform
 - mlflow experiment tracking
@@ -172,6 +140,11 @@ This is an early version give it try. The following is what you can do.
     - automated/isolated test environment where team members can test code generations and collaborate on solutions
     - When hunan interaction is needed the chat interface will be invoked asynchronously
         - if other tasks can continue they will
+- create a tool that allows any team member (including lead architect) to ask a question directed at the human
+    - this can present in the history but will cause the entire task thread to wait
+        - Document should open with the question on display
+        - when clicked on in History document will open 
+        - Document has the state of the chain allowing the human to answer and resume the chain
 
 ## Example User Prompt
 
@@ -185,3 +158,12 @@ This is an early version give it try. The following is what you can do.
 - https://iconduck.com/sets/font-awesome-icons
 - https://iconduck.com/sets/material-design-icons
 
+## How to Contribute
+
+We appreciate your interest in contributing to this project. However, we currently do not accept direct contributions such as pull requests. Instead, we encourage you to submit issues if you find any bugs, have feature requests, or need help.
+
+## Submitting Issues
+
+To submit an issue, please use the [GitHub Issues](https://github.com/yourusername/your-repo/issues) feature. Describe your issue in detail, and we will address it as soon as possible.
+
+Thank you for your understanding and support!

@@ -13,6 +13,8 @@ import { validatePrompts } from '../utils/prompts';
 import { SETUPS_FILE, HISTORY_FILE, openAnswerPanel, openRosterPanel } from '../extension';
 import { saveJsonToFile } from '../file/fileOperations';
 import { openSetupPanel, openPromptPanel } from '../extension';
+import { showRunningIndicator, hideRunningIndicator } from '../utils/runningIndicator';
+import { output_log } from '../utils/outputChannelManager';
 
 export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
     private currentProjectPanel: vscode.WebviewPanel | undefined;
@@ -131,18 +133,27 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
             this.currentProjectPanel.webview.onDidReceiveMessage(async (message: { command: string; text: string }) => {
                 switch (message.command) {
                     case 'projectGo':
-                        if (!this.historyManager) {
-                            throw new Error("HistoryManager is not initialized.");
+                        try {
+                            if (!this.historyManager) {
+                                throw new Error("HistoryManager is not initialized.");
+                            }
+                            showRunningIndicator("Frogteam");
+                            output_log(`Received "projectGo" command with text: ${message.text}`);
+                            context.workspaceState.update('project', message.text);
+                            const projectAnswer = await projectGo(message.text, setups, this.historyManager);
+                            if (Object.keys(projectAnswer).length > 0) {
+                                context.workspaceState.update('answer', projectAnswer);
+                                const htmlAnswer = await marked(projectAnswer);
+                                this.currentProjectPanel?.webview.postMessage({ command: 'answer', text: htmlAnswer });
+                                this.openMarkdownPanel(context, htmlAnswer);
+                            }
+                        } catch (error) {
+                            vscode.window.showErrorMessage(`${error}`);
                         }
-                        console.log('Received "projectGo" command with text:', message.text);
-                        context.workspaceState.update('project', message.text);
-                        const projectAnswer = await projectGo(message.text, setups, this.historyManager);
-                        context.workspaceState.update('answer', projectAnswer);
-                        const htmlAnswer = marked(projectAnswer);
-                        this.currentProjectPanel?.webview.postMessage({ command: 'answer', text: htmlAnswer });
+                        hideRunningIndicator();
                         break;
                     case 'directedGo':
-                        console.log('Received "directedGo" command with text:', message.text);
+                        output_log(`Received "directedGo" command with text: ${message.text}`);
                         context.workspaceState.update('directed', message.text);
                         // get member from prompt or reject with no eligible member
                         try {
@@ -150,11 +161,15 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
                                 throw new Error("HistoryManager is not initialized.");
                             }
                             const member = extractMemberFromPrompt(message.text, setups);
+                            showRunningIndicator(member);
                             const directedAnswer = await queueMemberAssignment(member, message.text, setups, this.historyManager);
-                            this.openMarkdownPanel(context, directedAnswer);
+                            if (Object.keys(directedAnswer).length > 0) {
+                                this.openMarkdownPanel(context, directedAnswer);
+                            }
                         } catch (error) {
                             vscode.window.showErrorMessage(`${error}`);
                         }
+                        hideRunningIndicator();
                         break;
                     case 'updateDirected':
                         context.workspaceState.update('directed', message.text);
@@ -186,7 +201,10 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
             const project = this.global_context.workspaceState.get('project', '');
             const directed = this.global_context.workspaceState.get('directed', '');
             const answer = this.global_context.workspaceState.get('answer', '');
-            const htmlContent = marked(answer);
+            let htmlContent;
+            if(answer.length > 0) {
+                htmlContent = marked(answer);
+            }
             const issues = validatePrompts();
             this.currentProjectPanel?.webview.postMessage({ command: 'loadData', question: project, answer: htmlContent, issues: issues, directed: directed });
         }

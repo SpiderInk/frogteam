@@ -8,14 +8,14 @@ export async function queueMemberAssignment(member: string, question: string, se
 
     const member_object = fetchSetupByName(setups, member);
     switch(member_object?.model) {
-        case 'gpt-3.5-turbo':
+        case 'gpt-35-turbo':
         case 'gpt-4-turbo':
         case 'gpt-4o':
             const openai_llm = new ChatOpenAI({
                 apiKey: member_object?.apiKey,
                 model: member_object?.model ?? "no-model",
                 maxRetries: 0,
-                maxTokens: 8000
+                maxTokens: 4096
             });
             return await queueLangchainMemberAssignment(openai_llm, member_object, question, historyManager, setups);
 

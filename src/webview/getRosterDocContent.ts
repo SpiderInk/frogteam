@@ -21,7 +21,7 @@ export function getRosterDocContent(context: vscode.ExtensionContext): string {
             if(prompt !== undefined) {
                 content += "<h2>Aligned Prompt</h2>";
                 content += `<h3>Category: ${prompt.category}, Model: (${prompt.models})</h3>`;
-                content += `<div class="prompt">${marked(prompt.content)}</div>`;
+                content += `<div class="prompt">${prompt.content}</div>`;
             }
         });
         html = html.replace(/\${markdown}/g, content);

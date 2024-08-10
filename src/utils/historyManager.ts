@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import { ProjectViewProvider } from '../views/projectView';
+import { output_log } from './outputChannelManager';
 
 interface HistoryEntry {
     ask_by: string;
@@ -54,6 +55,7 @@ class HistoryManager {
         this.history.push(entry);
         this.saveHistory();
         this.provider.refresh();
+        output_log(`Asked By: ${askBy}, Response By: ${responseBy}, Model: ${model}`);
     }
 
     public getHistory(): HistoryEntry[] {
