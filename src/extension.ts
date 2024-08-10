@@ -269,6 +269,7 @@ export async function openSetupPanel(context: vscode.ExtensionContext, data: Set
 		switch (message.command) {
 			case 'saveSetup':
 				saveSetup(context, message.setup);
+				setupCollectionViewProvider?.refresh();
 				break;
 			case 'deleteSetup':
 				deleteSetup(context, message.setup.id);

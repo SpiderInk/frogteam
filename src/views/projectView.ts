@@ -6,11 +6,13 @@ import { getProjectTabContent } from '../webview/getProjectTabContent';
 // import { projectGo } from '../openai/openaiService';
 import { projectGo } from '../utils/lead-architect';
 import { HistoryManager, HistoryEntry } from '../utils/historyManager';
-import { extractMemberFromPrompt, Setup, validate_fixMemberIcons, load_setups } from '../utils/setup';
+import { extractMemberFromPrompt, Setup, validate_fixMemberIcons, load_setups, newSetup, saveSetup } from '../utils/setup';
+import { Prompt, newPrompt } from '../utils/prompts';
 import { queueMemberAssignment } from '../utils/queueMemberAssignment';
 import { validatePrompts } from '../utils/prompts';
 import { SETUPS_FILE, HISTORY_FILE, openAnswerPanel, openRosterPanel } from '../extension';
 import { saveJsonToFile } from '../file/fileOperations';
+import { openSetupPanel, openPromptPanel } from '../extension';
 
 export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
     private currentProjectPanel: vscode.WebviewPanel | undefined;
@@ -43,7 +45,7 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
             const local_resources = this.global_context.extensionUri;
             // Root level: Commands
             const issues = validatePrompts().length > 0;
-            const items = [new ProjectItem("Builder", issues, local_resources), new ProjectItem("Team Lineup", false, local_resources), new HistoryRootItem("History")];
+            const items = [new ProjectItem("Builder", issues, local_resources), new ProjectItem("Team Lineup", false, local_resources), new ProjectItem("New Member", false, local_resources), new ProjectItem("New Prompt", false, local_resources), new HistoryRootItem("History")];
             return Promise.resolve(items);
         } else if (element instanceof HistoryRootItem) {
             // If the element is the HistoryRootItem, return the date entries
@@ -68,9 +70,37 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
                 this.openProjectPanel(this.global_context);
             } else if(item.label === "Team Lineup") {
                 openRosterPanel(this.global_context);
+            } else if(item.label === "New Member") {
+                this.addSetup();
+            } else if(item.label === "New Prompt") {
+                this.addPrompt();
             }
         } else if (item instanceof HistoryItem && item.entry.markdown) {
             openAnswerPanel(this.global_context, item.entry);
+        }
+    }
+
+    async addSetup(): Promise<void> {
+        try {
+            let new_setup:Setup = await newSetup(this.global_context);
+            saveSetup(this.global_context, new_setup);
+            const setups: Setup[] = this.global_context.globalState.get('setups', []);
+            setups.push(new_setup);
+            await this.global_context.globalState.update('setups', setups);
+            openSetupPanel(this.global_context, new_setup);
+            this.refresh();
+        } catch(error) {
+            vscode.window.showErrorMessage((error as any).message);
+        }
+    }
+
+    async addPrompt(): Promise<void> {
+        try {
+            const new_prompt:Prompt = newPrompt(this.global_context);
+            openPromptPanel(this.global_context, new_prompt);
+            this.refresh();
+        } catch (error) {
+            vscode.window.showErrorMessage((error as any).message);
         }
     }
 

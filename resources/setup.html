@@ -126,8 +126,8 @@
                 icon: setup.icon,
                 aws_region: document.getElementById('aws_region').value
             };
-            saveState(); // before we post the message!
             vscode.postMessage({ command: 'saveSetup', setup });
+            saveState(); // before we post the message!
         };
 
         window.addEventListener('message', event => {
