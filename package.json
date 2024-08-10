@@ -3,7 +3,7 @@
   "displayName": "FrogTeam",
   "publisher": "SpiderInk",
   "description": "Your GenAI Team Workspace",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "homepage": "https://frogteam.ai",
   "engines": {
     "vscode": "^1.91.0"
@@ -156,7 +156,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/ampiazza/frogteam"
+    "url": "https://github.com/SpiderInk/frogteam"
   },
   "license": "MIT",
   "icon": "resources/logo.png"

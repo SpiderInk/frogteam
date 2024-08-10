@@ -6,6 +6,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## 0.0.13
+Moving to GitHub Team: https://github.com/SpiderInk/frogteam
+
 ## 0.0.12
 - Added Running Status Indicator in the StatusBar says "Frogteam" when its a project run and "Teammeber" when its a directed run.
 - Added an Output Channel called "FrogTeam.ai" that updates with every history entry and on other events.
