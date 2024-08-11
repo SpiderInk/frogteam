@@ -3,6 +3,7 @@ import { HistoryManager } from './historyManager';
 import { queueLangchainMemberAssignment } from '../langchain/queueLangchainMemberAssignment';
 import { BedrockChat } from "@langchain/community/chat_models/bedrock";
 import { ChatOpenAI } from "@langchain/openai";
+import { fetchApiKey } from './common';
 
 export async function queueMemberAssignment(member: string, question: string, setups: any, historyManager: HistoryManager): Promise<string> {
 
@@ -12,7 +13,7 @@ export async function queueMemberAssignment(member: string, question: string, se
         case 'gpt-4-turbo':
         case 'gpt-4o':
             const openai_llm = new ChatOpenAI({
-                apiKey: member_object?.apiKey,
+                apiKey: fetchApiKey(member_object?.apiKey),
                 model: member_object?.model ?? "no-model",
                 maxRetries: 0,
                 maxTokens: 4096

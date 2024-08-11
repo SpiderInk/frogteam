@@ -135,8 +135,6 @@ export function updatePromptsFile(context: vscode.ExtensionContext) {
             if (hasUpdates) {
                 fs.writeFileSync(promptsFilePath, JSON.stringify(existingPrompts, null, 2), 'utf-8');
                 vscode.window.showInformationMessage('prompts.json has been updated with missing prompts.');
-            } else {
-                vscode.window.showInformationMessage('prompts.json is already up-to-date.');
             }
         }
     }

@@ -4,7 +4,6 @@ import { Setup, get_member_purposes_for_prompt } from '../utils/setup';
 import { HistoryManager } from '../utils/historyManager';
 import { HumanMessage, ToolMessage, AIMessageChunk, AIMessage, SystemMessage } from "@langchain/core/messages";
 import { BaseChatModel } from "@langchain/core/language_models/chat_models";
-// import { BedrockChat } from "@langchain/community/chat_models/bedrock";
 import { ToolCall } from "@langchain/core/messages/tool";
 import { getFileContentApiTool, saveContentToFileApiTool } from '../utils/langchain-tools';
 import { output_log } from '../utils/outputChannelManager';

@@ -17,3 +17,20 @@ export function generateUniqueId() {
         return v.toString(16);
     });
 };
+
+export function fetchApiKey(apiKey: string): string {
+    // Check if apiKey starts with "ENV="
+    if (apiKey.startsWith("ENV=")) {
+        // Split on the '=' character
+        const envVarName = apiKey.split("=")[1];
+
+        // Fetch the value of the environment variable
+        const envVarValue = process.env[envVarName];
+
+        // Return the value of the environment variable if it exists, otherwise apiKey
+        return envVarValue || apiKey;
+    } else {
+        // If apiKey does not start with "ENV=", return it as is
+        return apiKey;
+    }
+}

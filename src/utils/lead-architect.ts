@@ -10,6 +10,7 @@ import { getQueueMemberAssignmentApiTool } from "./langchain-tools";
 import { queueMemberAssignment } from "./queueMemberAssignment";
 import { ToolCall } from "@langchain/core/messages/tool";
 import { output_log } from './outputChannelManager';
+import { fetchApiKey } from '../utils/common';
 
 export async function projectGo(question: string, setups: Setup[], historyManager: HistoryManager): Promise<string> {
     const member_object = fetchSetupByPurpose(setups, 'lead-architect');
@@ -19,7 +20,7 @@ export async function projectGo(question: string, setups: Setup[], historyManage
         case 'gpt-4-turbo':
         case 'gpt-4o':
             const openai_llm = new ChatOpenAI({
-                apiKey: member_object?.apiKey,
+                apiKey: fetchApiKey(member_object?.apiKey),
                 model: member_object?.model ?? "no-model",
                 maxRetries: 0,
             });
