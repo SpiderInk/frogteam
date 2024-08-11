@@ -7,6 +7,10 @@ Updates:
 - Added an Output Channel called "FrogTeam.ai" that updates with every history entry and on other events.
 - Added New Member and Prompt commands to the project view to make these actions more visible.
 - Added Error message to tell yu when a team member has no aligned system prompt.
+- New prompt for requesting task/project summary
+- Wildcard prompts
+- import new prompts
+- API Key from Environment Variable
 
 <br>
 08-08-2024
@@ -84,51 +88,51 @@ In the Directed Assignment box you can call out a single team member to perform 
 - Validation of Team Members to prompts, for now use Team Lineup view to manually validate that all members are aligned with a system prompt. If you see: TypeError: Cannot read properties of undefined (reading 'content') this is likely the issue.
 - If you paste into the prompt text area UI formatting may not work, it will save so just close and open the editor window for now.
 
-## Tasks/Roadmap
+## Tasks
 - **IMPORTANT** Need to start including conversation/history for instance sending in the lead-architect's original instructions
     - When @directed send that member's original ask
     - When Project send in all the original assignments the lead-architect assigned
 
+- make standard commands to start a project and save the project file as a state file for the User Prompt
+    - **Make Sure Project/Directed Instructions are in the History with a clear way to collect**
+
 - BUG: sometimes toolCall definitions or results are bad and the process errors out
+    - maybe just try catch and report/log/add history what happened?
 - BUG: paste into prompt breaks HTML view until close/re-open (of that view) (data is saved correctly)
 - BUG: function call history seems to list number of characters as arguments make this more meaningful
+    - was this corrected? - nope, now they show args: [object Object]
+
 - MESS: generateUniqueId() in WebView HTML files needs consolidation
+    - can a WebView use <script> tags for local files?
 - MESS: CSS in WebView HTML files needs consolidation
-
-- make standard commands to start a project and save the project file as a state file for the User Prompt
-- implement team member token limits/time limits
-
-- Implementing Other Model Sources
-    - start by only abstracting queueMemberAssignment this means that the lead-architect will only work with openai models
-        - Langchain has been started and allows a team member to be attached to a Bedrock model **in testing**
-        - bedrock boto3
-            - LLAMA
-        - hugging face
-        - bedrock gateway?
-        - azure?
-
-- set up a queue to process requests from
-    - only process one item at a time
-
-- git integration
-    - stash first
-    - new branch first
-    - PR generation
+    - can a WebView use <style> tags for local files?
 
 - configuration for a time or token limit by model/team member
+    - implement team member token limits/time limits/request token limits
     - this will require tracking
     - the lead architect will need to be aware of these constrains when giving out assignments
 
-## What's Next?
+- Implementing Other Model Sources
+    - start by only abstracting queueMemberAssignment this means that the lead-architect will only work with openai models
+        - bedrock boto3
+        - hugging face
+            - is there a standard way?
+        - bedrock gateway?
+            - Show people how to setup the converse API in ECS/Lambda
+        - azure?
+
+## Backlog
 - prompt library sharing platform
-- mlflow experiment tracking
 - add chromadb instance (optionally?)
     - URL/Internet or local disc content
     - file type based
 - implement chunking strategy for the solutions code base
 - implement chunking strategy for the history
 - implement chunking strategy for documentation
-- implement search
+- implement search history/code search
+- MLFlow experiment tracking
+- set up a queue to process requests from
+    - only process one item at a time
 - on demand web crawl that will chunk and store in local Chroma
 - enable RAG on/off for generation
 - In History
@@ -145,6 +149,10 @@ In the Directed Assignment box you can call out a single team member to perform 
         - Document should open with the question on display
         - when clicked on in History document will open 
         - Document has the state of the chain allowing the human to answer and resume the chain
+- git integration
+    - stash first
+    - new branch first
+    - PR generation
 
 ## Example User Prompt
 

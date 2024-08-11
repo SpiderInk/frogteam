@@ -6,6 +6,12 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## 0.0.14
+- New prompt for requesting task/project summary
+- Wildcard prompts
+- import new prompts
+- API Key from Environment Variable
+
 ## 0.0.13
 Moving to GitHub Team: https://github.com/SpiderInk/frogteam
 

@@ -25,8 +25,6 @@ export async function projectGo(question: string, setups: Setup[], historyManage
                 maxRetries: 0,
             });
             return await leadArchitectGo(openai_llm, question, setups, historyManager, member_object?.model, member_object?.name);
-        case 'meta.llama3-8b-instruct-v1:0':
-        case 'meta.llama3-70b-instruct-v1:0':
         case 'anthropic.claude-3-5-sonnet-20240620-v1:0':
         case 'anthropic.claude-3-haiku-20240307-v1:0':
             const bedrock_llm = new BedrockChat({
