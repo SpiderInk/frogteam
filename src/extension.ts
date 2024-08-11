@@ -32,23 +32,7 @@ let projectViewProvider: ProjectViewProvider | undefined;
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-
-	const workspaceFolders = vscode.workspace.workspaceFolders;
-    if (workspaceFolders) {
-        const workspaceRoot = workspaceFolders[0].uri.fsPath;
-        const vscodeDir = path.join(workspaceRoot, '.vscode');
-        const promptsFilePath = path.join(vscodeDir, 'prompts.json');
-        const defaultPromptsFilePath = context.asAbsolutePath(path.join('resources', 'prompts.json'));
-
-        if (!fs.existsSync(promptsFilePath)) {
-            if (!fs.existsSync(vscodeDir)) {
-                fs.mkdirSync(vscodeDir);
-            }
-
-            fs.copyFileSync(defaultPromptsFilePath, promptsFilePath);
-            vscode.window.showInformationMessage('Default prompts.json has been created in the .vscode directory.');
-        }
-    }
+	updatePromptsFile(context);
 
 	// Load the prompts and setups when the extension is activated
 	const prompts = all_prompts();
@@ -107,6 +91,55 @@ export function activate(context: vscode.ExtensionContext) {
 			projectViewProvider?.handleItemSelection(item);
 		})
 	);
+}
+
+export function updatePromptsFile(context: vscode.ExtensionContext) {
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+    if (workspaceFolders) {
+        const workspaceRoot = workspaceFolders[0].uri.fsPath;
+        const vscodeDir = path.join(workspaceRoot, '.vscode');
+        const promptsFilePath = path.join(vscodeDir, 'prompts.json');
+        const defaultPromptsFilePath = context.asAbsolutePath(path.join('resources', 'prompts.json'));
+
+        // Create .vscode directory and copy prompts.json if it doesn't exist
+        if (!fs.existsSync(promptsFilePath)) {
+            if (!fs.existsSync(vscodeDir)) {
+                fs.mkdirSync(vscodeDir);
+            }
+
+            fs.copyFileSync(defaultPromptsFilePath, promptsFilePath);
+            vscode.window.showInformationMessage('Default prompts.json has been created in the .vscode directory.');
+        } else {
+            // Read existing prompts
+            const existingPrompts = JSON.parse(fs.readFileSync(promptsFilePath, 'utf-8'));
+
+            // Read default prompts
+            const defaultPrompts = JSON.parse(fs.readFileSync(defaultPromptsFilePath, 'utf-8'));
+
+            // Create a map of existing prompts by ID for quick lookup
+            const existingPromptsMap = new Map<string, any>();
+            existingPrompts.forEach((prompt: any) => {
+                existingPromptsMap.set(prompt.id, prompt);
+            });
+
+            // Check for missing prompts and add them
+            let hasUpdates = false;
+            defaultPrompts.forEach((defaultPrompt: any) => {
+                if (!existingPromptsMap.has(defaultPrompt.id)) {
+                    existingPrompts.push(defaultPrompt);
+                    hasUpdates = true;
+                }
+            });
+
+            // Write the updated prompts back to the file if there were any updates
+            if (hasUpdates) {
+                fs.writeFileSync(promptsFilePath, JSON.stringify(existingPrompts, null, 2), 'utf-8');
+                vscode.window.showInformationMessage('prompts.json has been updated with missing prompts.');
+            } else {
+                vscode.window.showInformationMessage('prompts.json is already up-to-date.');
+            }
+        }
+    }
 }
 
 export async function openAnswerPanel(context: vscode.ExtensionContext, data: HistoryEntry) {

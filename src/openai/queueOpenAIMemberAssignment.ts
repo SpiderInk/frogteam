@@ -4,6 +4,8 @@ import { Setup, get_member_purposes_for_prompt } from '../utils/setup';
 import { getcontent, save } from '../file/fileOperations';
 import { HistoryManager } from '../utils/historyManager';
 
+// ** we have moved to langchain this is not used
+
 export async function queueOpenAIMemberAssignment(member_object: Setup, question: string, historyManager: HistoryManager, setups: Setup[]): Promise<string> {
     const openai = new OpenAI({ apiKey: member_object?.apiKey });
     let available_tools = [

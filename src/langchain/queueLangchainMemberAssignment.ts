@@ -12,6 +12,7 @@ import { output_log } from '../utils/outputChannelManager';
 export async function queueLangchainMemberAssignment(llm: BaseChatModel, member_object: Setup, question: string, historyManager: HistoryManager, setups: Setup[]): Promise<string> {
     let response = {} as any;
     const engineer_prompt_obj = fetchPrompts('system', member_object?.purpose ?? 'engineer', member_object?.model);
+    const task_summary_prompt = fetchPrompts('system', 'task-summary', member_object?.model);
     let run = true;
     if(engineer_prompt_obj[0] === undefined) {
         const msg = `There is no ${member_object?.purpose ?? 'engineer'} prompt aligned with ${member_object?.model}. Skipping task.`;
@@ -32,7 +33,6 @@ export async function queueLangchainMemberAssignment(llm: BaseChatModel, member_
         } else {
             engineer_prompt = personalizePrompt(engineer_prompt, { name: member_object?.name ?? "no-data" });
         }
-        // const engineer_prompt = personalizePrompt(engineer_prompt_obj[0].content, { name: member_object?.name ?? "no-data" });
 
         let toolMapping: { [key: string]: any } = {
             "getFileContentApi": getFileContentApiTool,
@@ -68,8 +68,8 @@ export async function queueLangchainMemberAssignment(llm: BaseChatModel, member_
                 llmOutput = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };
             }
         } while (llmOutput.tool_calls && llmOutput.tool_calls.length > 0 && (Date.now() - startTime) < 120000);
-
-        messages.push(new HumanMessage("explain your solution by describing each artifact you created or modified. Provide the path to each artifact touched. Explain steps to integrate into the larger solution."));
+        // we are using the "user" message space
+        messages.push(new HumanMessage(task_summary_prompt[0].content));
         const final_completion = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };
         response = final_completion.content.toString();
         if (response.length > 0) {

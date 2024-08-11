@@ -43,5 +43,14 @@
     "models": "anthropic.claude-3-5-sonnet-20240620-v1:0",
     "active": true,
     "tag": "bedrock1"
+  },
+  {
+    "id": "24681357",
+    "content": "Explain your solution by describing each artifact you created or modified and any special instructions that go with it. Provide the path to each artifact touched. Explain the steps to integrate into the larger solution.",
+    "category": "task-summary",
+    "role": "system",
+    "models": "*",
+    "active": true,
+    "tag": "general"
   }
 ]

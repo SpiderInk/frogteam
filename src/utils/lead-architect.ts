@@ -42,6 +42,7 @@ export async function projectGo(question: string, setups: Setup[], historyManage
 export async function leadArchitectGo(llm: BaseChatModel, question: string, setups: Setup[], historyManager: HistoryManager, model: string, member_name: string): Promise<string> {
     let response = {} as any;
     const system_prompt_obj = fetchPrompts('system', 'lead-architect', model);
+    const task_summary_prompt = fetchPrompts('system', 'task-summary', model);
     let run = true;
     if(system_prompt_obj[0] === undefined) {
         const msg = `There is no lead-architect prompt aligned with ${model}. Skipping Action.`;
@@ -86,8 +87,7 @@ export async function leadArchitectGo(llm: BaseChatModel, question: string, setu
                 llmOutput = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };
             }
         } while (llmOutput.tool_calls && llmOutput.tool_calls.length > 0 && (Date.now() - startTime) < 120000);
-
-        messages.push(new HumanMessage("explain your solution by describing each artifact you created or modified. Provide the path to each artifact touched. Explain steps to integrate into the larger solution."));
+        messages.push(new HumanMessage(task_summary_prompt[0].content));
         const final_completion = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };
         response = final_completion.content.toString();
         if (response.length > 0) {

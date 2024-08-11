@@ -8,6 +8,8 @@ import { ToolCall } from "@langchain/core/messages/tool";
 import { getFileContentApiTool, saveContentToFileApiTool } from '../utils/langchain-tools';
 import { output_log } from '../utils/outputChannelManager';
 
+// ** we have moved to langchain this is not used
+
 export async function queueBedrockMemberAssignment(member_object: Setup, question: string, historyManager: HistoryManager, setups: Setup[]): Promise<string> {
     let response = {} as any;
     const llm = new BedrockChat({

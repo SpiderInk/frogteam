@@ -4,6 +4,8 @@ import { Setup, fetchSetupByPurpose, get_member_purposes_for_prompt } from '../u
 import { queueMemberAssignment } from '../utils/queueMemberAssignment';
 import { HistoryManager } from '../utils/historyManager';
 
+// ** we have moved to langchain this is not used
+
 /*
 - The is the main function that handles the projectGo functionality.
 - It fetches the member object based on the 'lead-architect' purpose from the setups array.

@@ -61,7 +61,7 @@ export function fetchPrompts(role: string, category: string, model: string): Pro
     return PROMPTS.filter(prompt =>
         prompt.role === role &&
         prompt.category === category &&
-        prompt.models.includes(model) &&
+        (prompt.models === "*" || prompt.models.includes(model)) &&
         prompt.active === true
     );
 }
