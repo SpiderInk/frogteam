@@ -28,7 +28,6 @@ export async function queueMemberAssignment(member: string, question: string, se
                 maxTokens: 8000
             });
             return await queueLangchainMemberAssignment(bedrock_llm, member_object, question, historyManager, setups);
-            // return await queueBedrockMemberAssignment(member_object, question, historyManager, setups);)
         default:
             return 'no model';
     }

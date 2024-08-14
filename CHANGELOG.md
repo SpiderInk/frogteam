@@ -6,6 +6,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## 0.0.15
+- Tagging History Entries
+- Updated History Display
+
 ## 0.0.14
 - New prompt for requesting task/project summary
 - Wildcard prompts

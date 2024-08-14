@@ -5,12 +5,12 @@ import { marked } from 'marked';
 import { getNonce } from './webview/getNonce';
 import { getRosterDocContent } from './webview/getRosterDocContent';
 import { getPromptDocContent } from './webview/getPromptDocContent';
-import { HistoryManager, HistoryEntry } from './utils/historyManager';
+import { HistoryEntry } from './utils/historyManager';
 import { Prompt, savePrompt, all_prompts, deletePrompt, validatePrompts } from './utils/prompts';
 import { ProjectViewProvider, HistoryItem } from './views/projectView';
 import { SetupCollectionViewProvider } from './views/setupCollectionView';
 import { PromptCollectionViewProvider } from './views/promptCollectionView';
-import { load_setups, Setup, saveSetup, deleteSetup } from './utils/setup';
+import { load_setups, Setup, saveSetup, deleteSetup, fetchSetupByName } from './utils/setup';
 import { getSetupDocContent } from './webview/getSetupDocContent';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -168,6 +168,9 @@ export async function openAnswerPanel(context: vscode.ExtensionContext, data: Hi
 	} else {
 		markdownContent = data.answer;
 	}
+	const setups:Setup[] = context.globalState.get('setups', []);
+	const member = fetchSetupByName(setups, data.response_by);
+
 	const documentContent = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -176,9 +179,12 @@ export async function openAnswerPanel(context: vscode.ExtensionContext, data: Hi
 <title>${data.response_by}</title>
 </head>
 <body>
-<br><br>
-<strong>Response From: ${data.response_by} at ${formattedTime} on ${formattedDate}</strong>
-<br><br>
+<br>
+<strong>Entry Type</strong>: ${data.lookupTag}<br>
+<strong>Response From</strong>: ${data.response_by} at ${formattedTime} on ${formattedDate}<br>
+<strong>Ask</strong>: ${data.ask}<br>
+<br>
+<strong>Answer</strong><br>
 ${markdownContent}
 </body>
 </html>`;

@@ -3,7 +3,7 @@ import { BedrockChat } from "@langchain/community/chat_models/bedrock";
 import { ChatOpenAI } from "@langchain/openai";
 import { fetchPrompts, personalizePrompt } from './prompts';
 import { Setup, fetchSetupByPurpose, get_member_purposes_for_prompt } from './setup';
-import { HistoryManager } from './historyManager';
+import { HistoryManager, LookupTag } from './historyManager';
 import { HumanMessage, ToolMessage, AIMessageChunk, AIMessage, SystemMessage } from "@langchain/core/messages";
 import { BaseChatModel } from "@langchain/core/language_models/chat_models";
 import { getQueueMemberAssignmentApiTool } from "./langchain-tools";
@@ -62,23 +62,28 @@ export async function leadArchitectGo(llm: BaseChatModel, question: string, setu
         const startTime = Date.now();
         let llmOutput = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };
         do {
-
             messages.push(llmOutput as AIMessage);
+            let answer_for_history = "";
             if (llmOutput.content.toString().length > 0) {
-                historyManager.addEntry('user', member_name, model, question, llmOutput.content.toString());
+                answer_for_history = llmOutput.content.toString();
+            } else {
+                answer_for_history = "no answer";
+                if (llmOutput.tool_calls && llmOutput.tool_calls.length > 0) {
+                    answer_for_history = "tool calls pending.";
+                }
             }
-
+            historyManager.addEntry('user', member_name, model, question, answer_for_history, LookupTag.PROJECT_DESC);
             if (llmOutput.tool_calls && llmOutput.tool_calls.length > 0) {
                 for (const toolCall of llmOutput.tool_calls) {
                     if(toolCall.name === "getQueueMemberAssignmentApi") {
-                        // Setups and HistoryManager are too complex for
+                        // Setups and HistoryManager are too complex so we have to inject them more directly
                         let toolOutput = await queueMemberAssignment(toolCall.args.member, toolCall.args.question, setups, historyManager);
                         let newTM = new ToolMessage({
                             tool_call_id: toolCall.id!,
                             content: toolOutput
                         });
                         messages.push(newTM);
-                        historyManager.addEntry(member_name, toolCall.name, model, `args: ${toolCall.args}`, toolOutput);
+                        historyManager.addEntry(member_name, toolCall.name, model, `args: ${JSON.stringify(toolCall.args)}`, toolOutput, LookupTag.TOOL_RESP);
                     } else {
                         throw new Error(`Unknown tool: ${toolCall.name}`);
                     }
@@ -89,9 +94,7 @@ export async function leadArchitectGo(llm: BaseChatModel, question: string, setu
         messages.push(new HumanMessage(task_summary_prompt[0].content));
         const final_completion = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };
         response = final_completion.content.toString();
-        if (response.length > 0) {
-            historyManager.addEntry("user", member_name, model, question, response);
-        }
+        historyManager.addEntry("user", member_name, model, question, (response.length > 0 ? response : "no final response"), LookupTag.PROJECT_RESP);
     } else if(!llm.bindTools) {
         const msg = 'LLM does not support tools';
         vscode.window.showInformationMessage(msg);

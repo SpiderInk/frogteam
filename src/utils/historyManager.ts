@@ -2,6 +2,14 @@ import * as fs from 'fs';
 import { ProjectViewProvider } from '../views/projectView';
 import { output_log } from './outputChannelManager';
 
+export enum LookupTag {
+    PROJECT_DESC = 'ProjectDescription',
+    MEMBER_TASK = 'MemberTask',
+    PROJECT_RESP = 'ProjectResponse',
+    MEMBER_RESP = 'MemberResponse',
+    TOOL_RESP = 'ToolOutput',
+}
+
 interface HistoryEntry {
     ask_by: string;
     response_by: string;
@@ -10,6 +18,7 @@ interface HistoryEntry {
     ask: string;
     answer: string;
     markdown?: boolean;
+    lookupTag: LookupTag;
 }
 
 class HistoryManager {
@@ -42,7 +51,7 @@ class HistoryManager {
         return response.includes('\n');
     }
 
-    public addEntry(askBy: string, responseBy: string, model: string, ask: string, answer: string): void {
+    public addEntry(askBy: string, responseBy: string, model: string, ask: string, answer: string, lookup_tag: LookupTag): void {
         const entry: HistoryEntry = {
             ask_by: askBy,
             response_by: responseBy,
@@ -50,7 +59,8 @@ class HistoryManager {
             model: model,
             ask: ask,
             answer: answer,
-            markdown: this.markDownResponse(answer)
+            markdown: this.markDownResponse(answer),
+            lookupTag: lookup_tag
         };
         this.history.push(entry);
         this.saveHistory();

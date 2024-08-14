@@ -1,7 +1,15 @@
 # <img src="https://frogteam.ai/logo.png" alt="frogteam icon" width="32" height="32"> - frogteam 
 
-08-10-2024
-Updates:
+08-13-2024 Updates:
+
+- Tagging History Entries
+- Updated History Display
+
+Next I am going to add a new tool allowing the LLM to query history as needed. I am also thinking about how to allow the LLM to query the user. If this tool is used the conversation would suspended until the user replies. This is a feature that user may want to turn off. I'd love to hear some feedback about this.
+
+<br>
+08-10-2024 Updates:
+
 - Lead Architect can use all implemented models
 - Added Running Status Indicator in the StatusBar says "Frogteam" when its a project run and "member-name" when its a directed run.
 - Added an Output Channel called "FrogTeam.ai" that updates with every history entry and on other events.
@@ -89,12 +97,19 @@ In the Directed Assignment box you can call out a single team member to perform 
 - If you paste into the prompt text area UI formatting may not work, it will save so just close and open the editor window for now.
 
 ## Tasks
+- New Approach
+    - Give each User input a unique id
+    - Track responses to a unique id
+    - Make a new tool and allow the LLM to query history
+
 - **IMPORTANT** Need to start including conversation/history for instance sending in the lead-architect's original instructions
     - When @directed send that member's original ask
     - When Project send in all the original assignments the lead-architect assigned
 
 - make standard commands to start a project and save the project file as a state file for the User Prompt
     - **Make Sure Project/Directed Instructions are in the History with a clear way to collect**
+
+
 
 - BUG: sometimes toolCall definitions or results are bad and the process errors out
     - maybe just try catch and report/log/add history what happened?
@@ -114,7 +129,7 @@ In the Directed Assignment box you can call out a single team member to perform 
 
 - Implementing Other Model Sources
     - start by only abstracting queueMemberAssignment this means that the lead-architect will only work with openai models
-        - bedrock boto3
+        - bedrock via boto3
         - hugging face
             - is there a standard way?
         - bedrock gateway?

@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { fetchPrompts, personalizePrompt } from '../utils/prompts';
 import { Setup, get_member_purposes_for_prompt } from '../utils/setup';
-import { HistoryManager } from '../utils/historyManager';
+import { HistoryManager, LookupTag } from '../utils/historyManager';
 import { HumanMessage, ToolMessage, AIMessageChunk, AIMessage, SystemMessage } from "@langchain/core/messages";
 import { BaseChatModel } from "@langchain/core/language_models/chat_models";
 import { ToolCall } from "@langchain/core/messages/tool";
@@ -47,12 +47,17 @@ export async function queueLangchainMemberAssignment(llm: BaseChatModel, member_
         let toolCalls = [];
         let llmOutput = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };
         do {
-
             messages.push(llmOutput as AIMessage);
+            let answer_for_history = "";
             if (llmOutput.content.toString().length > 0) {
-                historyManager.addEntry('lead-architect', member_object?.name ?? "no-data", member_object?.model ?? "no-model", question, llmOutput.content.toString());
+                answer_for_history = llmOutput.content.toString();
+            } else {
+                answer_for_history = "no answer";
+                if (llmOutput.tool_calls && llmOutput.tool_calls.length > 0) {
+                    answer_for_history = "tool calls pending.";
+                }
             }
-
+            historyManager.addEntry('lead-architect', member_object?.name ?? "no-data", member_object?.model ?? "no-model", question, answer_for_history, LookupTag.MEMBER_TASK);
             if (llmOutput.tool_calls && llmOutput.tool_calls.length > 0) {
                 for (const toolCall of llmOutput.tool_calls) {
                     let tool = toolMapping[toolCall.name];
@@ -62,7 +67,7 @@ export async function queueLangchainMemberAssignment(llm: BaseChatModel, member_
                         content: toolOutput
                     });
                     messages.push(newTM);
-                    historyManager.addEntry(member_object?.name ?? "no-data", toolCall.name, member_object?.model ?? "no-model", `args: ${toolCall.args}`, toolOutput);
+                    historyManager.addEntry(member_object?.name ?? "no-data", toolCall.name, member_object?.model ?? "no-model", `args: ${JSON.stringify(toolCall.args)}`, toolOutput, LookupTag.TOOL_RESP);
                 }
                 llmOutput = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };
             }
@@ -71,9 +76,7 @@ export async function queueLangchainMemberAssignment(llm: BaseChatModel, member_
         messages.push(new HumanMessage(task_summary_prompt[0].content));
         const final_completion = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };
         response = final_completion.content.toString();
-        if (response.length > 0) {
-            historyManager.addEntry('lead-architect', member_object?.name ?? "no-data", member_object?.model ?? "no-model", question, response);
-        }
+        historyManager.addEntry('lead-architect', member_object?.name ?? "no-data", member_object?.model ?? "no-model", question, (response.length > 0 ? response : "no final response"), LookupTag.MEMBER_RESP);
     } else if(!llm.bindTools) {
         const msg = 'LLM does not support tools';
         vscode.window.showInformationMessage(msg);
