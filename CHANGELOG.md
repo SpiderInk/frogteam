@@ -6,6 +6,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## 0.0.16
+- Azure OpenAI  
+- Upgrade Axios due to vulnerability report
+
 ## 0.0.15
 - Tagging History Entries
 - Updated History Display

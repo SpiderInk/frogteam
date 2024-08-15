@@ -3,7 +3,7 @@
   "displayName": "FrogTeam",
   "publisher": "SpiderInk",
   "description": "Your GenAI Team Workspace",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "homepage": "https://frogteam.ai",
   "engines": {
     "vscode": "^1.91.0"
@@ -143,7 +143,7 @@
     "@langchain/community": "^0.2.22",
     "@langchain/core": "^0.2.19",
     "@smithy/eventstream-codec": "^2.0.5",
-    "axios": "^1.7.2",
+    "axios": "^1.7.4",
     "marked": "^13.0.2",
     "openai": "^4.52.2"
   },

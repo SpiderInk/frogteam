@@ -1,5 +1,10 @@
 # <img src="https://frogteam.ai/logo.png" alt="frogteam icon" width="32" height="32"> - frogteam 
 
+08-14-2024 Updates:
+- Azure OpenAI
+- Upgrade Axios due to vulnerability report
+- Added some notes to the member setup panel
+
 08-13-2024 Updates:
 
 - Tagging History Entries

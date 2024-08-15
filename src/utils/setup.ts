@@ -16,6 +16,7 @@ export interface Setup {
     color: string;
     icon: string;
     aws_region: string;
+    az_deployment: string;
 }
 
 export function load_setups(context: any): Setup[] {
@@ -33,7 +34,8 @@ export async function newSetup(context: any): Promise<Setup> {
         apiKey: '',
         color: '',
         icon: '',
-        aws_region: 'us-east-1'
+        aws_region: 'us-east-1',
+        az_deployment: ''
     };
     await saveSetup(context, new_setup);
     const setups: Setup[] = context.globalState.get('setups', []);

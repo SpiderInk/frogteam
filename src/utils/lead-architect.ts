@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { BedrockChat } from "@langchain/community/chat_models/bedrock";
-import { ChatOpenAI } from "@langchain/openai";
+import { ChatOpenAI, AzureChatOpenAI } from "@langchain/openai";
 import { fetchPrompts, personalizePrompt } from './prompts';
 import { Setup, fetchSetupByPurpose, get_member_purposes_for_prompt } from './setup';
 import { HistoryManager, LookupTag } from './historyManager';
@@ -19,12 +19,25 @@ export async function projectGo(question: string, setups: Setup[], historyManage
         case 'gpt-3.5-turbo':
         case 'gpt-4-turbo':
         case 'gpt-4o':
-            const openai_llm = new ChatOpenAI({
-                apiKey: fetchApiKey(member_object?.apiKey),
-                model: member_object?.model ?? "no-model",
-                maxRetries: 0,
-            });
-            return await leadArchitectGo(openai_llm, question, setups, historyManager, member_object?.model, member_object?.name);
+            if(member_object?.endpoint && member_object?.endpoint.length > 5) {
+                const azure_llm = new AzureChatOpenAI({
+                    model: member_object?.model ?? "no-model",
+                    azureOpenAIBasePath: `${member_object?.endpoint}/openai/deployments`,
+                    azureOpenAIApiKey: member_object?.apiKey,
+                    azureOpenAIApiVersion: "2024-06-01",
+                    azureOpenAIApiDeploymentName: member_object?.az_deployment ?? "no-deployment",
+                    maxRetries: 2,
+                    maxTokens: 4096
+                });
+                return await leadArchitectGo(azure_llm, question, setups, historyManager, member_object?.model, member_object?.name);
+            } else {
+                const openai_llm = new ChatOpenAI({
+                    apiKey: fetchApiKey(member_object?.apiKey),
+                    model: member_object?.model ?? "no-model",
+                    maxRetries: 0,
+                });
+                return await leadArchitectGo(openai_llm, question, setups, historyManager, member_object?.model, member_object?.name);
+            }
         case 'anthropic.claude-3-5-sonnet-20240620-v1:0':
         case 'anthropic.claude-3-haiku-20240307-v1:0':
             const bedrock_llm = new BedrockChat({
