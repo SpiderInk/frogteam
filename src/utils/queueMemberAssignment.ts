@@ -5,7 +5,7 @@ import { BedrockChat } from "@langchain/community/chat_models/bedrock";
 import { ChatOpenAI, AzureChatOpenAI } from "@langchain/openai";
 import { fetchApiKey } from './common';
 
-export async function queueMemberAssignment(member: string, question: string, setups: any, historyManager: HistoryManager): Promise<string> {
+export async function queueMemberAssignment(caller: string, member: string, question: string, setups: any, historyManager: HistoryManager, conversationId: string): Promise<string> {
 
     const member_object = fetchSetupByName(setups, member);
     switch(member_object?.model) {
@@ -22,7 +22,7 @@ export async function queueMemberAssignment(member: string, question: string, se
                     maxRetries: 2,
                     maxTokens: 4096
                 });
-                return await queueLangchainMemberAssignment(azure_llm, member_object, question, historyManager, setups);
+                return await queueLangchainMemberAssignment(caller, azure_llm, member_object, question, historyManager, setups, conversationId);
             } else {
                 const openai_llm = new ChatOpenAI({
                     apiKey: fetchApiKey(member_object?.apiKey),
@@ -30,7 +30,7 @@ export async function queueMemberAssignment(member: string, question: string, se
                     maxRetries: 0,
                     maxTokens: 4096
                 });
-                return await queueLangchainMemberAssignment(openai_llm, member_object, question, historyManager, setups);
+                return await queueLangchainMemberAssignment(caller, openai_llm, member_object, question, historyManager, setups, conversationId);
             }
         case 'anthropic.claude-3-5-sonnet-20240620-v1:0':
         case 'anthropic.claude-3-haiku-20240307-v1:0':
@@ -40,7 +40,7 @@ export async function queueMemberAssignment(member: string, question: string, se
                 maxRetries: 0,
                 maxTokens: 8000
             });
-            return await queueLangchainMemberAssignment(bedrock_llm, member_object, question, historyManager, setups);
+            return await queueLangchainMemberAssignment(caller, bedrock_llm, member_object, question, historyManager, setups, conversationId);
         default:
             return 'no model';
     }

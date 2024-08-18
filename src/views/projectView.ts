@@ -15,6 +15,7 @@ import { saveJsonToFile } from '../file/fileOperations';
 import { openSetupPanel, openPromptPanel } from '../extension';
 import { showRunningIndicator, hideRunningIndicator } from '../utils/runningIndicator';
 import { output_log } from '../utils/outputChannelManager';
+import { generateShortUniqueId } from '../utils/common'
 
 export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
     private currentProjectPanel: vscode.WebviewPanel | undefined;
@@ -129,6 +130,10 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
             this.currentProjectPanel.webview.html = getProjectTabContent(context.extensionUri);
             const setups:Setup[] = context.globalState.get('setups', []);
     
+            // if we are responding to a conversation we need to fetch the id
+            // then we need to load the conversation in projectGo(...) or queueMemberAssignment(...)
+            let conversationId = generateShortUniqueId();
+
             // Handle messages from the webview
             this.currentProjectPanel.webview.onDidReceiveMessage(async (message: { command: string; text: string }) => {
                 switch (message.command) {
@@ -140,7 +145,7 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
                             showRunningIndicator("Frogteam");
                             output_log(`Received "projectGo" command with text: ${message.text}`);
                             context.workspaceState.update('project', message.text);
-                            const projectAnswer = await projectGo(message.text, setups, this.historyManager);
+                            const projectAnswer = await projectGo(message.text, setups, this.historyManager, conversationId);
                             if (Object.keys(projectAnswer).length > 0) {
                                 context.workspaceState.update('answer', projectAnswer);
                                 const htmlAnswer = await marked(projectAnswer);
@@ -162,7 +167,7 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
                             }
                             const member = extractMemberFromPrompt(message.text, setups);
                             showRunningIndicator(member);
-                            const directedAnswer = await queueMemberAssignment(member, message.text, setups, this.historyManager);
+                            const directedAnswer = await queueMemberAssignment('user', member, message.text, setups, this.historyManager, conversationId);
                             if (Object.keys(directedAnswer).length > 0) {
                                 this.openMarkdownPanel(context, directedAnswer);
                             }

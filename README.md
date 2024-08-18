@@ -102,10 +102,32 @@ In the Directed Assignment box you can call out a single team member to perform 
 - If you paste into the prompt text area UI formatting may not work, it will save so just close and open the editor window for now.
 
 ## Tasks
+
+**Obsolete**
+These are Now just notes but the next section is what I am doing
+
+Search By Directory
+    - We need to log the root directory of the response
+Search For Solution Summary
+    - The Final response from a "Project Go" should be LookupType=Solution Summary
+
 - New Approach
     - Give each User input a unique id
     - Track responses to a unique id
     - Make a new tool and allow the LLM to query history
+
+- **For History**
+    1. If you start on the "Project Builder" there is no History in the conversation by default
+    2. If you start on the "Project Builder" a unique conversation id is generated and passed to all the history items
+    3. If you Open a Markdown response (M) there is a "Respond to this Conversation" option in the Document Viewer
+        - When this happens ProjectDescription and ProjectResponse items and/or MemberTask/MemberResponse pairs are used to create a historical conversation to be sent in with a new user item
+        - The user can @Team or @Memeber in the 
+
+
+**then we need to load the conversation in projectGo(...) or queueMemberAssignment(...)**
+    - See projectView.ts
+
+
 
 - **IMPORTANT** Need to start including conversation/history for instance sending in the lead-architect's original instructions
     - When @directed send that member's original ask
