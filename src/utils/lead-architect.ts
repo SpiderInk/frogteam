@@ -90,18 +90,18 @@ export async function leadArchitectGo(llm: BaseChatModel, question: string, setu
                     answer_for_history = "tool calls pending.";
                 }
             }
-            historyManager.addEntry('user', member_name, model, question, answer_for_history, LookupTag.PROJECT_DESC, conversationId, undefined);
+            const parent_id = historyManager.addEntry('user', member_name, model, question, answer_for_history, LookupTag.PROJECT_DESC, conversationId, undefined);
             if (llmOutput.tool_calls && llmOutput.tool_calls.length > 0) {
                 for (const toolCall of llmOutput.tool_calls) {
                     if(toolCall.name === "getQueueMemberAssignmentApi") {
                         // Setups and HistoryManager are too complex so we have to inject them more directly
-                        let toolOutput = await queueMemberAssignment('lead-architect', toolCall.args.member, toolCall.args.question, setups, historyManager, conversationId);
+                        let toolOutput = await queueMemberAssignment('lead-architect', toolCall.args.member, toolCall.args.question, setups, historyManager, conversationId, parent_id);
                         let newTM = new ToolMessage({
                             tool_call_id: toolCall.id!,
                             content: toolOutput
                         });
                         messages.push(newTM);
-                        historyManager.addEntry(member_name, toolCall.name, model, `args: ${JSON.stringify(toolCall.args)}`, toolOutput, LookupTag.TOOL_RESP, conversationId, undefined);
+                        historyManager.addEntry(member_name, `tool:${toolCall.name}`, model, `args: ${JSON.stringify(toolCall.args)}`, toolOutput, LookupTag.TOOL_RESP, conversationId, parent_id);
                     } else {
                         let tool = toolMapping[toolCall.name];
                         let toolOutput = await tool.invoke(toolCall.args);
@@ -110,7 +110,7 @@ export async function leadArchitectGo(llm: BaseChatModel, question: string, setu
                             content: toolOutput
                         });
                         messages.push(newTM);
-                        historyManager.addEntry(member_name, toolCall.name, model, `args: ${JSON.stringify(toolCall.args)}`, toolOutput, LookupTag.TOOL_RESP, conversationId, undefined);
+                        historyManager.addEntry(member_name, `tool:${toolCall.name}`, model, `args: ${JSON.stringify(toolCall.args)}`, toolOutput, LookupTag.TOOL_RESP, conversationId, parent_id);
                     }
                 }
                 llmOutput = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };

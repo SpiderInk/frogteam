@@ -19,6 +19,7 @@ interface TreeNode {
 }
 
 interface HistoryEntry {
+    id: string;
     ask_by: string;
     response_by: string;
     timestamp: string;
@@ -28,7 +29,7 @@ interface HistoryEntry {
     markdown?: boolean;
     lookupTag: LookupTag;
     conversationId: string;
-    parentConversationId: string | undefined;
+    parentId: string | undefined;
 }
 
 class HistoryManager {
@@ -61,8 +62,10 @@ class HistoryManager {
         return response.includes('\n');
     }
 
-    public addEntry(askBy: string, responseBy: string, model: string, ask: string, answer: string, lookup_tag: LookupTag, conversation_id: string, parent_id: string | undefined): void {
+    public addEntry(askBy: string, responseBy: string, model: string, ask: string, answer: string, lookup_tag: LookupTag, conversation_id: string, parent_id: string | undefined): string {
+        const id = crypto.randomUUID();
         const entry: HistoryEntry = {
+            id: id,
             ask_by: askBy,
             response_by: responseBy,
             timestamp: new Date().toISOString(),
@@ -72,7 +75,7 @@ class HistoryManager {
             markdown: this.markDownResponse(answer),
             lookupTag: lookup_tag,
             conversationId: conversation_id,
-            parentConversationId: parent_id
+            parentId: parent_id
         };
         this.history.push(entry);
         this.saveHistory();
@@ -80,10 +83,30 @@ class HistoryManager {
             this.provider.refresh();
         }
         output_log(`Asked By: ${askBy}, Response By: ${responseBy}, Model: ${model}`);
+        return id;
     }
 
     public getHistory(): HistoryEntry[] {
         return this.history;
+    }
+
+    public findEntriesByConversationId(conversationId: string, tool_responses: boolean): HistoryEntry[] {
+        if(tool_responses) {
+            return this.history.filter(entry =>
+                entry.conversationId === conversationId &&
+                entry.lookupTag === LookupTag.TOOL_RESP
+            );
+        } 
+        return this.history.filter(entry => 
+            entry.conversationId === conversationId &&
+            [LookupTag.PROJECT_RESP, LookupTag.MEMBER_RESP].includes(entry.lookupTag)
+        );
+    }
+
+    public findEntryById(id: string): HistoryEntry[] {
+        return this.history.filter(entry => 
+            entry.id === id
+        );
     }
 
     public getHistoryGroupedByDate(): Record<string, HistoryEntry[]> {
@@ -124,9 +147,9 @@ class HistoryManager {
     
             // Link children with their parents
             entries.forEach(entry => {
-                if (entry.parentConversationId) {
-                    const parent = conversationMap.get(entry.parentConversationId);
-                    const node = conversationMap.get(entry.conversationId);
+                if (entry.parentId) {
+                    const parent = conversationMap.get(entry.parentId);
+                    const node = conversationMap.get(entry.id);
                     if (parent && node) {
                         parent.children.push(node);
                     }
@@ -134,7 +157,7 @@ class HistoryManager {
             });
     
             // Collect top-level conversations (those without a parent)
-            const topLevelNodes = Array.from(conversationMap.values()).filter(node => !entries.some(e => e.conversationId === node.id && e.parentConversationId));
+            const topLevelNodes = Array.from(conversationMap.values()).filter(node => !entries.some(e => e.id === node.id && e.parentId));
     
             // Create a date node and add the top-level conversation nodes as its children
             dateNodes.push({
