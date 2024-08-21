@@ -109,6 +109,12 @@ class HistoryManager {
         );
     }
 
+    public findChildrenById(parentid: string): HistoryEntry[] {
+        return this.history.filter(entry => 
+            entry.parentId === parentid
+        );
+    }
+
     public getHistoryGroupedByDate(): Record<string, HistoryEntry[]> {
         return this.history.reduce((acc, entry) => {
             const date = new Date(entry.timestamp).toDateString();

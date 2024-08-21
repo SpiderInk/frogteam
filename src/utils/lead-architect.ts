@@ -79,18 +79,18 @@ export async function leadArchitectGo(llm: BaseChatModel, question: string, setu
 
         const startTime = Date.now();
         let llmOutput = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };
+        let answer_for_history = "";
+        if (llmOutput.content.toString().length > 0) {
+            answer_for_history = llmOutput.content.toString();
+        } else {
+            answer_for_history = "no answer";
+            if (llmOutput.tool_calls && llmOutput.tool_calls.length > 0) {
+                answer_for_history = "tool calls pending.";
+            }
+        }
+        const parent_id = historyManager.addEntry('user', member_name, model, question, answer_for_history, LookupTag.PROJECT_DESC, conversationId, undefined);
         do {
             messages.push(llmOutput as AIMessage);
-            let answer_for_history = "";
-            if (llmOutput.content.toString().length > 0) {
-                answer_for_history = llmOutput.content.toString();
-            } else {
-                answer_for_history = "no answer";
-                if (llmOutput.tool_calls && llmOutput.tool_calls.length > 0) {
-                    answer_for_history = "tool calls pending.";
-                }
-            }
-            const parent_id = historyManager.addEntry('user', member_name, model, question, answer_for_history, LookupTag.PROJECT_DESC, conversationId, undefined);
             if (llmOutput.tool_calls && llmOutput.tool_calls.length > 0) {
                 for (const toolCall of llmOutput.tool_calls) {
                     if(toolCall.name === "getQueueMemberAssignmentApi") {
@@ -119,7 +119,7 @@ export async function leadArchitectGo(llm: BaseChatModel, question: string, setu
         messages.push(new HumanMessage(task_summary_prompt[0].content));
         const final_completion = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };
         response = final_completion.content.toString();
-        historyManager.addEntry("user", member_name, model, question, (response.length > 0 ? response : "no final response"), LookupTag.PROJECT_RESP, conversationId, undefined);
+        historyManager.addEntry("user", member_name, model, question, (response.length > 0 ? response : "no final response"), LookupTag.PROJECT_RESP, conversationId, parent_id);
     } else if(!llm.bindTools) {
         const msg = 'LLM does not support tools';
         vscode.window.showInformationMessage(msg);

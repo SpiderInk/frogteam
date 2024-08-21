@@ -49,18 +49,18 @@ export async function queueLangchainMemberAssignment(caller: string, llm: BaseCh
         const startTime = Date.now();
         let toolCalls = [];
         let llmOutput = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };
+        let answer_for_history = "";
+        if (llmOutput.content.toString().length > 0) {
+            answer_for_history = llmOutput.content.toString();
+        } else {
+            answer_for_history = "no answer";
+            if (llmOutput.tool_calls && llmOutput.tool_calls.length > 0) {
+                answer_for_history = "tool calls pending.";
+            }
+        }
+        const parent_id = historyManager.addEntry(caller, member_object?.name ?? "no-data", member_object?.model ?? "no-model", question, answer_for_history, LookupTag.MEMBER_TASK, conversationId, parentId);
         do {
             messages.push(llmOutput as AIMessage);
-            let answer_for_history = "";
-            if (llmOutput.content.toString().length > 0) {
-                answer_for_history = llmOutput.content.toString();
-            } else {
-                answer_for_history = "no answer";
-                if (llmOutput.tool_calls && llmOutput.tool_calls.length > 0) {
-                    answer_for_history = "tool calls pending.";
-                }
-            }
-            const parent_id = historyManager.addEntry(caller, member_object?.name ?? "no-data", member_object?.model ?? "no-model", question, answer_for_history, LookupTag.MEMBER_TASK, conversationId, parentId);
             if (llmOutput.tool_calls && llmOutput.tool_calls.length > 0) {
                 for (const toolCall of llmOutput.tool_calls) {
                     let tool = toolMapping[toolCall.name];

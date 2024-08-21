@@ -12,8 +12,10 @@ import { SetupCollectionViewProvider } from './views/setupCollectionView';
 import { PromptCollectionViewProvider } from './views/promptCollectionView';
 import { load_setups, Setup, saveSetup, deleteSetup, fetchSetupByName } from './utils/setup';
 import { getSetupDocContent } from './webview/getSetupDocContent';
+import { getAnswerTabContent } from './webview/getAnswerTabContent';
 import * as path from 'path';
 import * as fs from 'fs';
+import { output_log } from './utils/outputChannelManager';
 
 export const PROMPTS_FILE = path.join(vscode.workspace.rootPath || '', '.vscode', 'prompts.json');
 export const SETUPS_FILE = path.join(vscode.workspace.rootPath || '', '.vscode', 'setups.json');
@@ -159,37 +161,19 @@ export async function openAnswerPanel(context: vscode.ExtensionContext, data: Hi
 
 		currentAnswerPanel.iconPath = iconPath;
 	}
-	const date = new Date(data.timestamp);
-	const formattedTime = date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
-	const formattedDate = date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
-	let markdownContent;
-	if(data.answer.length > 0) {
-		markdownContent = marked(data.answer);
-	} else {
-		markdownContent = data.answer;
-	}
-	const setups:Setup[] = context.globalState.get('setups', []);
-	const member = fetchSetupByName(setups, data.response_by);
-
-	const documentContent = `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${data.response_by}</title>
-</head>
-<body>
-<br>
-<strong>Entry Type</strong>: ${data.lookupTag}<br>
-<strong>Response From</strong>: ${data.response_by} at ${formattedTime} on ${formattedDate}<br>
-<strong>Ask</strong>: ${data.ask}<br>
-<br>
-<strong>Answer</strong><br>
-${markdownContent}
-</body>
-</html>`;
-
+	const documentContent = await getAnswerTabContent(context.extensionUri, data);
 	currentAnswerPanel.webview.html = documentContent;
+
+	// Handle messages from the webview
+	currentAnswerPanel.webview.onDidReceiveMessage(async (message: { command: string; member: string; text: string, history_id: string }) => {
+		switch (message.command) {
+			case 'submitTask':
+				output_log(`Received "submitTask" command for member: ${message.member}, with text: ${message.text}, and history id: ${message.history_id}.`);
+				break;
+		}
+	});
+	const setups: Setup[] = context.globalState.get('setups', []);
+	currentAnswerPanel.webview.postMessage({ command: 'loadMembers', setups: setups });
 
 	currentAnswerPanel.onDidDispose(
 		() => {
@@ -218,7 +202,6 @@ export async function openPromptPanel(context: vscode.ExtensionContext, data: Pr
 	const iconPath = vscode.Uri.file(
 		path.join(context.extensionPath, 'resources', 'icon.png')
 	);
-	const nonce = getNonce();
 	currentPromptPanel.iconPath = iconPath;
 	const local_resources = currentPromptPanel.webview.asWebviewUri(context.extensionUri).toString();
 	const documentContent = getPromptDocContent(context.extensionUri, local_resources);

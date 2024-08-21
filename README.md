@@ -104,39 +104,38 @@ In the Directed Assignment box you can call out a single team member to perform 
 ## Tasks
 
 **Obsolete**
-These are Now just notes but the next section is what I am doing
-
-Search By Directory
-    - We need to log the root directory of the response
-Search For Solution Summary
-    - The Final response from a "Project Go" should be LookupType=Solution Summary
 
 - New Approach
-    - Give each User input a unique id
-    - Track responses to a unique id
+    - Give each User input a unique id **done**
+    - Track responses to a unique id **done**
     - Make a new tool and allow the LLM to query history
+        - change this to ancient history or remove it
 
 - **For History**
-    1. If you start on the "Project Builder" there is no History in the conversation by default
-    2. If you start on the "Project Builder" a unique conversation id is generated and passed to all the history items
-    3. If you Open a Markdown response (M) there is a "Respond to this Conversation" option in the Document Viewer
-        - When this happens ProjectDescription and ProjectResponse items and/or MemberTask/MemberResponse pairs are used to create a historical conversation to be sent in with a new user item
-        - The user can @Team or @Memeber in the 
+    1. If you start on the "Project Builder" there is no History in the conversation by default **done**
+        - this allows you to start fresh however the contents of existing files may be considered  **done**
+    2. Project Builder should collect from the user
+            - project name
+            - project sub-directory or project root
+            - project description/instruction
+            - Directed at: Use a Drop Down and choose either "Team" or a specific member
+            - Use a single Textarea and button for submit
+    3. If you start on the "Project Builder" a unique conversation id is generated and passed to all the history items **done**
+    4. On the new answer panel add "Respond to this Conversation" option
+        - Add Input question/assignment box on answer panels
+            - in extension.ps openAnswerPanel(...)
+        - When this happens ProjectDescription/ProjectResponse pairs and/or MemberTask/MemberResponse pairs are used to create a historical conversation to be sent in with a new user thread
+            - projectGo
+            - queueMemberAssignment
+        - The user can @Team or @Memeber in the response
+
+- Add a top level history event that maybe is parent of all project events  **done**
+    - basically input a record for the start of the question and what that question is  **done**
+    - show children  **done**
 
 
-**then we need to load the conversation in projectGo(...) or queueMemberAssignment(...)**
-    - See projectView.ts
-
-
-
-- **IMPORTANT** Need to start including conversation/history for instance sending in the lead-architect's original instructions
-    - When @directed send that member's original ask
-    - When Project send in all the original assignments the lead-architect assigned
-
-- make standard commands to start a project and save the project file as a state file for the User Prompt
-    - **Make Sure Project/Directed Instructions are in the History with a clear way to collect**
-
-
+- MAYBE: make standard commands to start a project and save the project file as a state file for the User Prompt
+    - **maybe the new approach is good and this is not needed**
 
 - BUG: sometimes toolCall definitions or results are bad and the process errors out
     - maybe just try catch and report/log/add history what happened?

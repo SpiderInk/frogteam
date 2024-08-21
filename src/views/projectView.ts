@@ -95,11 +95,9 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
             const memberItems = element.entries.map((entry: HistoryEntry) => new HistoryItem(entry, this.global_context, this.getSetupIcon(entry.response_by), "entry"));
             return Promise.resolve(memberItems);
         } else if (element instanceof HistoryItem) {
-            if(element.entry.parentId) {
-                const items = this.historyManager.findEntryById(element.entry.parentId);
-                const response_items = items.map((entry: HistoryEntry) => new HistoryItem(entry, this.global_context, this.getSetupIcon(entry.response_by), "parent"));
-                return Promise.resolve(response_items);
-            }
+            const items = this.historyManager.findChildrenById(element.entry.id);
+            const response_items = items.map((entry: HistoryEntry) => new HistoryItem(entry, this.global_context, this.getSetupIcon(entry.response_by), "parent"));
+            return Promise.resolve(response_items);
         }
         return Promise.resolve([]);
     }
@@ -359,7 +357,7 @@ class ConversationChildrenItem extends vscode.TreeItem {
 
 export class HistoryItem extends vscode.TreeItem {
     constructor(public entry: HistoryEntry, private context: vscode.ExtensionContext, icon: string, mode: string) {
-        super(`${entry.response_by} - ${new Date(entry.timestamp).toLocaleTimeString()}`, "parentId" in entry ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None);
+        super(`${entry.response_by} - ${new Date(entry.timestamp).toLocaleTimeString()}`, vscode.TreeItemCollapsibleState.Collapsed);
         this.tooltip = new vscode.MarkdownString(`${entry.ask ?? ""} \n\n Ask By: ${entry.ask_by} \n\n Model: ${entry.model} \n\n Response by: ${entry.response_by}`);
         this.command = {
             command: 'frogteam.openView',
