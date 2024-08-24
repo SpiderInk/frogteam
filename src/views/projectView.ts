@@ -15,11 +15,11 @@ import { saveJsonToFile } from '../file/fileOperations';
 import { openSetupPanel, openPromptPanel } from '../extension';
 import { showRunningIndicator, hideRunningIndicator } from '../utils/runningIndicator';
 import { output_log } from '../utils/outputChannelManager';
-import { generateShortUniqueId } from '../utils/common'
+import { generateShortUniqueId } from '../utils/common';
 
 export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
     private currentProjectPanel: vscode.WebviewPanel | undefined;
-    private historyManager: HistoryManager;
+    public historyManager: HistoryManager;
     private global_context: vscode.ExtensionContext;
     private grouping_mode: boolean = false;
 
@@ -178,12 +178,9 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
             this.currentProjectPanel.webview.html = getProjectTabContent(context.extensionUri);
             const setups:Setup[] = context.globalState.get('setups', []);
     
-            // if we are responding to a conversation we need to fetch the id
-            // then we need to load the conversation in projectGo(...) or queueMemberAssignment(...)
-            let conversationId = generateShortUniqueId();
-
             // Handle messages from the webview
             this.currentProjectPanel.webview.onDidReceiveMessage(async (message: { command: string; text: string }) => {
+                let conversationId = generateShortUniqueId();
                 switch (message.command) {
                     case 'projectGo':
                         try {
@@ -191,9 +188,9 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
                                 throw new Error("HistoryManager is not initialized.");
                             }
                             showRunningIndicator("Frogteam");
-                            output_log(`Received "projectGo" command with text: ${message.text}`);
+                            output_log(`Received "projectGo" command with conversationId: ${conversationId} and text: ${message.text}`);
                             context.workspaceState.update('project', message.text);
-                            const projectAnswer = await projectGo(message.text, setups, this.historyManager, conversationId);
+                            const projectAnswer = await projectGo(message.text, setups, this.historyManager, conversationId, undefined);
                             if (Object.keys(projectAnswer).length > 0) {
                                 context.workspaceState.update('answer', projectAnswer);
                                 const htmlAnswer = await marked(projectAnswer);
@@ -206,7 +203,7 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
                         hideRunningIndicator();
                         break;
                     case 'directedGo':
-                        output_log(`Received "directedGo" command with text: ${message.text}`);
+                        output_log(`Received "directedGo" command with conversationId: ${conversationId} and with text: ${message.text}`);
                         context.workspaceState.update('directed', message.text);
                         // get member from prompt or reject with no eligible member
                         try {

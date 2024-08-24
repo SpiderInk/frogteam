@@ -1,11 +1,11 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { marked } from 'marked';
+//import { marked } from 'marked';
 import { getNonce } from './webview/getNonce';
 import { getRosterDocContent } from './webview/getRosterDocContent';
 import { getPromptDocContent } from './webview/getPromptDocContent';
-import { HistoryEntry } from './utils/historyManager';
+import { HistoryManager, HistoryEntry } from './utils/historyManager';
 import { Prompt, savePrompt, all_prompts, deletePrompt, validatePrompts } from './utils/prompts';
 import { ProjectViewProvider, HistoryItem } from './views/projectView';
 import { SetupCollectionViewProvider } from './views/setupCollectionView';
@@ -13,9 +13,13 @@ import { PromptCollectionViewProvider } from './views/promptCollectionView';
 import { load_setups, Setup, saveSetup, deleteSetup, fetchSetupByName } from './utils/setup';
 import { getSetupDocContent } from './webview/getSetupDocContent';
 import { getAnswerTabContent } from './webview/getAnswerTabContent';
+import { generateShortUniqueId } from './utils/common';
+import { projectGo } from './utils/lead-architect';
+import { queueMemberAssignment } from './utils/queueMemberAssignment';
 import * as path from 'path';
 import * as fs from 'fs';
 import { output_log } from './utils/outputChannelManager';
+import { showRunningIndicator, hideRunningIndicator } from './utils/runningIndicator';
 
 export const PROMPTS_FILE = path.join(vscode.workspace.rootPath || '', '.vscode', 'prompts.json');
 export const SETUPS_FILE = path.join(vscode.workspace.rootPath || '', '.vscode', 'setups.json');
@@ -164,12 +168,36 @@ export async function openAnswerPanel(context: vscode.ExtensionContext, data: Hi
 	const documentContent = await getAnswerTabContent(context.extensionUri, data);
 	currentAnswerPanel.webview.html = documentContent;
 
+	// ** this history manager instance does not seem to have a valid reference to projectViewProvider  
+	// it seems only this reference wants to work
+	// try making a new instance again now that you have the await in place
+	const historyManager = projectViewProvider?.historyManager;
+
 	// Handle messages from the webview
 	currentAnswerPanel.webview.onDidReceiveMessage(async (message: { command: string; member: string; text: string, history_id: string }) => {
-		switch (message.command) {
-			case 'submitTask':
-				output_log(`Received "submitTask" command for member: ${message.member}, with text: ${message.text}, and history id: ${message.history_id}.`);
+		let conversationId = generateShortUniqueId();
+		if(historyManager) {
+			let answer = "";
+			showRunningIndicator(message.member === "Team" ? "Frogteam" : message.member);
+			switch (message.member) {
+				case 'Team':
+					// call the lead emgineer
+					// submitTask: message.command
+					output_log(`Received "submitTask" command for member: ${message.member}, with text: ${message.text}, and history id: ${message.history_id}.`);
+					answer = await projectGo(message.text, setups, historyManager, conversationId, message.history_id);
+					break;
+				default:
+					// call queueMemberAssignment
+					output_log(`Received "submitTask" command for member: ${message.member}, with text: ${message.text}, and history id: ${message.history_id}.`);
+					answer = await queueMemberAssignment('user', message.member, message.text, setups, historyManager, conversationId, message.history_id);
 				break;
+			}
+			if (Object.keys(answer).length > 0) {
+				projectViewProvider?.openMarkdownPanel(context, answer);
+			}
+			hideRunningIndicator();
+		} else {
+			throw new Error("HistoryManager is not initialized.");
 		}
 	});
 	const setups: Setup[] = context.globalState.get('setups', []);

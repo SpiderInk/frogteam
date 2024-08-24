@@ -175,6 +175,37 @@ class HistoryManager {
     
         return dateNodes;
     }
+
+    public buildConversationThreads(parentId: string): { HumanMessage: string; AIMessage: string }[] {
+        // Find children entries by parentId
+        let children = this.findChildrenById(parentId);
+        const entry = this.findEntryById(parentId);
+        children = children.concat(entry);
+    
+        // Filter the entries based on the lookupTag
+        const responses = children.filter(entry => 
+            entry.lookupTag === 'ProjectResponse' || entry.lookupTag === 'MemberResponse'
+        );
+    
+        // Separate ProjectResponse and MemberResponse
+        const memberResponses = responses.filter(entry => entry.lookupTag === 'MemberResponse');
+        const projectResponses = responses.filter(entry => entry.lookupTag === 'ProjectResponse');
+    
+        // Combine them into a conversation array with ProjectResponse last
+        const conversation = [
+            ...memberResponses.map(entry => ({
+                HumanMessage: entry.ask,
+                AIMessage: entry.answer,
+            })),
+            ...projectResponses.map(entry => ({
+                HumanMessage: entry.ask,
+                AIMessage: entry.answer,
+            }))
+        ];
+    
+        return conversation;
+    }
+
 }
 
 function FetchHistory(directory: string): string {
@@ -201,3 +232,6 @@ AIMessage: ${result.answer}`;
 }
 
 export { HistoryManager, HistoryEntry, TreeNode, FetchHistory };
+
+
+

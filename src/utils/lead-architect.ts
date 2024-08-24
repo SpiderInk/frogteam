@@ -12,7 +12,7 @@ import { ToolCall } from "@langchain/core/messages/tool";
 import { output_log } from './outputChannelManager';
 import { fetchApiKey } from '../utils/common';
 
-export async function projectGo(question: string, setups: Setup[], historyManager: HistoryManager, conversationId: string): Promise<string> {
+export async function projectGo(question: string, setups: Setup[], historyManager: HistoryManager, conversationId: string, parentId: string | undefined): Promise<string> {
     const member_object = fetchSetupByPurpose(setups, 'lead-architect');
 
     switch(member_object?.model) {
@@ -29,14 +29,14 @@ export async function projectGo(question: string, setups: Setup[], historyManage
                     maxRetries: 2,
                     maxTokens: 4096
                 });
-                return await leadArchitectGo(azure_llm, question, setups, historyManager, member_object?.model, member_object?.name, conversationId);
+                return await leadArchitectGo(azure_llm, question, setups, historyManager, member_object?.model, member_object?.name, conversationId, parentId);
             } else {
                 const openai_llm = new ChatOpenAI({
                     apiKey: fetchApiKey(member_object?.apiKey),
                     model: member_object?.model ?? "no-model",
                     maxRetries: 0,
                 });
-                return await leadArchitectGo(openai_llm, question, setups, historyManager, member_object?.model, member_object?.name, conversationId);
+                return await leadArchitectGo(openai_llm, question, setups, historyManager, member_object?.model, member_object?.name, conversationId, parentId);
             }
         case 'anthropic.claude-3-5-sonnet-20240620-v1:0':
         case 'anthropic.claude-3-haiku-20240307-v1:0':
@@ -45,13 +45,22 @@ export async function projectGo(question: string, setups: Setup[], historyManage
                 model: member_object?.model ?? "no-model",
                 maxRetries: 0,
             });
-            return await leadArchitectGo(bedrock_llm, question, setups, historyManager, member_object?.model, member_object?.name, conversationId);
+            return await leadArchitectGo(bedrock_llm, question, setups, historyManager, member_object?.model, member_object?.name, conversationId, parentId);
         default:
             return 'no model';
     }
 }
 
-export async function leadArchitectGo(llm: BaseChatModel, question: string, setups: Setup[], historyManager: HistoryManager, model: string, member_name: string, conversationId: string): Promise<string> {
+export async function leadArchitectGo(llm: BaseChatModel, question: string, setups: Setup[], historyManager: HistoryManager, model: string, member_name: string, conversationId: string, parentId: string | undefined): Promise<string> {
+
+    /*
+        - lookup who the lead architect is
+        - throw error if there is no lead architect or if there is more than one
+        - historyManager needs to record the member name and role for every entry
+    */
+
+
+
     let response = {} as any;
     const system_prompt_obj = fetchPrompts('system', 'lead-architect', model);
     const task_summary_prompt = fetchPrompts('system', 'task-summary', model);
@@ -64,18 +73,29 @@ export async function leadArchitectGo(llm: BaseChatModel, question: string, setu
     }
     if (run && llm.bindTools) {
         const llmWithTools = llm.bindTools([
-            getQueueMemberAssignmentApiTool,
-            fetchHistoryApiTool
+            getQueueMemberAssignmentApiTool
         ]);
         let toolMapping: { [key: string]: any } = {
-            "getQueueMemberAssignmentApi": queueMemberAssignment,
-            "fetchHistoryApi": fetchHistoryApiTool
+            "getQueueMemberAssignmentApi": queueMemberAssignment
         };
         const prompt = personalizePrompt(system_prompt_obj[0].content, { members: get_member_purposes_for_prompt(setups) });
-        let messages: (SystemMessage | HumanMessage | ToolMessage | AIMessage)[] = [
-            new SystemMessage(prompt),
-            new HumanMessage(question)
-        ];
+
+        // using parentId
+        // fetch from history the original user question and the lead engineers summary response
+        //  - add these as the first HumanMessage and the first AIMessage
+        let messages: (SystemMessage | HumanMessage | ToolMessage | AIMessage)[] = [];
+        messages.push(new SystemMessage(prompt));
+        if(parentId !== undefined) {
+            // Build the conversation threads
+            const conversationThreads = historyManager.buildConversationThreads(parentId);
+            // Map the conversation threads to the appropriate message types and add them to the messages array
+            conversationThreads.forEach(thread => {
+                messages.push(new HumanMessage(thread.HumanMessage));
+                messages.push(new AIMessage(thread.AIMessage));
+            });
+        }
+        // Now add the final prompt and question to the end of the messages array
+        messages.push(new HumanMessage(question));
 
         const startTime = Date.now();
         let llmOutput = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };

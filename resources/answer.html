@@ -93,7 +93,7 @@
 
 <body>
     <!-- Button to toggle the form elements -->
-    <button onclick="toggleFormElements(this)">Respond Here</button>
+    <button id="response_form" onclick="toggleFormElements()">Respond Here</button>
 
     <!-- Form elements that will be toggled -->
     <div id="formElements">
@@ -105,6 +105,7 @@
         <textarea id="textarea" rows="6" cols="60" placeholder="Enter your text here..."></textarea>
         <br><br>
         <button onclick="submitForm()">Submit</button>
+        <button onclick="toggleFormElements()">Cancel</button>
     </div>
 
     <br>
@@ -134,8 +135,18 @@
         </tr>
     </table>
     <script nonce="${nonce}">
+        const history_type = "${lookupTag}";
         const vscode = acquireVsCodeApi();
         document.getElementById('formElements').style.display = 'none';
+
+        window.onload = () => {
+            const validHistoryTypes = ['ProjectDescription', 'MemberResponse', 'ProjectResponse'];
+            if (validHistoryTypes.includes(history_type)) {
+                document.getElementById('response_form').style.display = 'block';
+            } else {
+                document.getElementById('response_form').style.display = 'none';
+            }
+        };
 
         window.addEventListener('message', event => {
             const message = event.data;
@@ -156,14 +167,17 @@
             }
         });
 
-        function toggleFormElements(button) {
+        function toggleFormElements() {
             const formElements = document.getElementById('formElements');
+            const button = document.getElementById('response_form');
             if (formElements.style.display === 'none') {
                 formElements.style.display = 'block';
-                button.innerText = "Hide Response";
+                button.style.display = 'none';
             } else {
+                document.getElementById('select_members').value = "Team";
+                document.getElementById('textarea').value = "";
                 formElements.style.display = 'none';
-                button.innerText = "Respond Here";
+                button.style.display = 'block';
             }
         }
 
@@ -177,6 +191,7 @@
                 text: textareaValue,
                 history_id: history_idValue
             });
+            toggleFormElements();
         }
     </script>
 </body>
