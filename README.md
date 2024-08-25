@@ -1,5 +1,33 @@
 # <img src="https://frogteam.ai/logo.png" alt="frogteam icon" width="32" height="32"> - frogteam 
 
+Updates v0.0.17: 08-25-2024
+<ul>
+    <li>Commands - a top level menu entry</li>
+    <li>History hierarchy Changes 
+        <ul>
+            <li>Toggle History Grouping (See "Commands")</li>
+            <li>Parent/Child elements but a flat tree</li>
+            <ul>
+                <li>This means that child elements appear under their parents and also in the root of the tree</li>
+            </ul>
+        </ul>
+    </li>
+    <li>Respond to Answers directly
+        <ul>
+            <li>In the History's Answer panel when the response is Markdown there is a "Respond Here" button</li>
+            <li>When using this feature relevant immediate history will be included in the new LLM interaction</li>
+        </ul>
+    </li>
+    <li>The Builder now collects a project name and directory
+        <ul>
+            <li>This information is used to format XML that is used in the prompt
+            <li>This tells the LLM exactly what its getting</li>
+            <li>System prompts will be adjusted in future versions</li>
+            <li>The next version will use "Project Name" in the history hierarchy</li>
+        </ul>
+    </li>
+</ul>
+
 08-14-2024 Updates:
 - Azure OpenAI
 - Upgrade Axios due to vulnerability report
@@ -38,7 +66,24 @@ I am wondering if there is an appetite for what I am doing here. Let me know you
 Here is a short demo <a href="https://youtu.be/hxatfrgiiAQ">video</a>. <sub>lead-architect can use other models now</sub><br>
 Follow me on [instagram](https://www.instagram.com/reddoverises/).<br>
 
+- [ - frogteam](#---frogteam)
+  - [Your virtual GenAI Development Team](#your-virtual-genai-development-team)
+    - [Overview](#overview)
+  - [Flow](#flow)
+    - [Open the Builder](#open-the-builder)
+  - [Known Issues/Limitations](#known-issueslimitations)
+  - [Tasks - Implementing Other Model Sources](#tasks---implementing-other-model-sources)
+  - [Tasks - On Deck](#tasks---on-deck)
+  - [Tasks - Backlog](#tasks---backlog)
+  - [Example User Prompt](#example-user-prompt)
+  - [Icons](#icons)
+  - [How to Contribute](#how-to-contribute)
+  - [Submitting Issues](#submitting-issues)
+
+
 ## Your virtual GenAI Development Team
+
+**This is my side project, my I like to write and generate code project.**<br><br>
 
 This is meant to be a generative AI interface where you can register new models, configure model settings and prompts, interface with [Chroma](https://www.trychroma.com/) embeddings (eventually) and have a common set of commands you can use to interact with files in the workspace and the output from various LLMs. You register "team members" and assign them a model. You can use the same model multiple times or use different models. You can assign team members to collaborate on a task.  
 
@@ -86,13 +131,11 @@ When all members have performed their tasks the lead architect gets a final pass
 
 You can refine the prompt and submit again. Existing files will be used and edited.
 
-**Directed Assignment**
-In the Directed Assignment box you can call out a single team member to perform a task. This is nice if you like what has been done and now have follow up work that a member can do for you.
-
 ## Known Issues/Limitations
 - At present this will only work directly with OpenAI or AWs Bedrock
     - For OpenAI you need an API Key
     - For AWS Bedrock you need to be logged into AWS in you VS Code Environment and you need the supported models deployed
+    - OpenAI on Azure is implemented but I confess I have not tested it (**if someone tries it let me know**)
 - Documentation is weak, I am working on it.
 - No tool call validation so sometimes initial project generation never completes you can try again
     - validation/retry is coming
@@ -101,60 +144,57 @@ In the Directed Assignment box you can call out a single team member to perform 
 - Validation of Team Members to prompts, for now use Team Lineup view to manually validate that all members are aligned with a system prompt. If you see: TypeError: Cannot read properties of undefined (reading 'content') this is likely the issue.
 - If you paste into the prompt text area UI formatting may not work, it will save so just close and open the editor window for now.
 
-## Tasks
-- New Approach
-    - Give each User input a unique id
-    - Track responses to a unique id
-    - Make a new tool and allow the LLM to query history
+## Tasks - Implementing Other Model Sources
 
-- **IMPORTANT** Need to start including conversation/history for instance sending in the lead-architect's original instructions
-    - When @directed send that member's original ask
-    - When Project send in all the original assignments the lead-architect assigned
+- Right now I am chasing models that support tool calls using the Langchain framework
+    - OpenAI from OpenAI
+        - gpt-4o **done**
+        - gpt-4-turbo **done**
+        - gpt-35-turbo **done**
+    - AWS Bedrock
+        - Anthropic Claude 3.5 Sonnet **done**
+        - Anthropic Cluade 2 Haiku **done**
+    - OpenAI on Azure
+        - gpt-4o **NEEDS TESTING**
+        - gpt-4-turbo **NEEDS TESTING**
+        - gpt-35-turbo **NEEDS TESTING**
+    - HuggingFace
+        - Is there a standard way I can do this. This is a research task for me.
 
-- make standard commands to start a project and save the project file as a state file for the User Prompt
-    - **Make Sure Project/Directed Instructions are in the History with a clear way to collect**
+## Tasks - On Deck
+- **Now that we collect project name and directory** from the user in the Builder let's make a "Project" level at the top of the history tree
+    - Add a special history entry for when a project is first created and only store the three properties there
+        - name, directory, problem
 
-
+- **Extract the response form out of the Answer Panel** 
+    - Use in Team Member Setup Panel as well so we can do directed top level not history included tasks from there.
+    - Look at the CSS MESS when solving this
+    - configuration for a time or token limit by model/team member
+        - implement team member token limits/time limits/request token limits
+        - this will require tracking
+        - the lead architect will need to be aware of these constrains when giving out assignments
 
 - BUG: sometimes toolCall definitions or results are bad and the process errors out
-    - maybe just try catch and report/log/add history what happened?
-- BUG: paste into prompt breaks HTML view until close/re-open (of that view) (data is saved correctly)
-- BUG: function call history seems to list number of characters as arguments make this more meaningful
-    - was this corrected? - nope, now they show args: [object Object]
-
+    - Maybe just try catch and report/log/add history what happened? **done**
+    - At this time the user can just try clicking "Go" again
 - MESS: generateUniqueId() in WebView HTML files needs consolidation
     - can a WebView use <script> tags for local files?
 - MESS: CSS in WebView HTML files needs consolidation
     - can a WebView use <style> tags for local files?
 
-- configuration for a time or token limit by model/team member
-    - implement team member token limits/time limits/request token limits
-    - this will require tracking
-    - the lead architect will need to be aware of these constrains when giving out assignments
-
-- Implementing Other Model Sources
-    - start by only abstracting queueMemberAssignment this means that the lead-architect will only work with openai models
-        - bedrock via boto3
-        - hugging face
-            - is there a standard way?
-        - bedrock gateway?
-            - Show people how to setup the converse API in ECS/Lambda
-        - azure?
-
-## Backlog
+## Tasks - Backlog
 - prompt library sharing platform
-- add chromadb instance (optionally?)
+    - MLFlow experiment tracking
+- add Chromadb instance (optionally?)
+    - on demand web crawl that will chunk and store in local Chroma
     - URL/Internet or local disc content
     - file type based
-- implement chunking strategy for the solutions code base
-- implement chunking strategy for the history
-- implement chunking strategy for documentation
-- implement search history/code search
-- MLFlow experiment tracking
-- set up a queue to process requests from
+    - implement chunking strategy for the solutions code base
+    - implement chunking strategy for the history
+    - implement chunking strategy for project documentation
+    - implement search history/code search
+- set up a queue to process requests from (so the user can queue up tasks while operations are ongoing)
     - only process one item at a time
-- on demand web crawl that will chunk and store in local Chroma
-- enable RAG on/off for generation
 - In History
     - an icon for content vs function response 
         - indicate success/fail (green checkmark vs red X)
@@ -180,7 +220,9 @@ In the Directed Assignment box you can call out a single team member to perform 
 
 > Create me a single page app that show directions from where the web browser thinks its location is to the closest train station. 
 
-## Any icons you see either came from the list below, I made them, or GenAI Helped me make them
+## Icons
+Any icons you see either came from the list below, I made them, or GenAI Helped me make them.
+
 - https://iconduck.com/sets/elementary-icon-set
 - https://iconduck.com/sets/open-iconic-icon-set
 - https://iconduck.com/sets/font-awesome-icons
@@ -188,10 +230,10 @@ In the Directed Assignment box you can call out a single team member to perform 
 
 ## How to Contribute
 
-We appreciate your interest in contributing to this project. However, we currently do not accept direct contributions such as pull requests. Instead, we encourage you to submit issues if you find any bugs, have feature requests, or need help.
+I appreciate your interest in contributing to this project. However, I currently do not accept direct contributions such as pull requests. Instead, I encourage you to submit issues if you find any bugs, have feature requests, or need help.
 
 ## Submitting Issues
 
-To submit an issue, please use the [GitHub Issues](https://github.com/yourusername/your-repo/issues) feature. Describe your issue in detail, and we will address it as soon as possible.
+To submit an issue, please use the [GitHub Issues](https://github.com/yourusername/your-repo/issues) feature. Describe your issue in detail, and I will address it as soon as possible.
 
 Thank you for your understanding and support!

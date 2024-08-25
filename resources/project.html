@@ -20,8 +20,14 @@
         textarea {
             padding: 10px;
             margin-bottom: 10px;
-            width: 100%;
+            width: 90%;
             background-color:#D3D3D3;
+        }
+
+        input {
+            width: 45%;
+            background-color:#D3D3D3;
+            margin-bottom: 20px;
         }
 
         button {
@@ -62,50 +68,55 @@
     <div class="issues" id="issues">
         <!-- dynamic content -->
     </div>
-    <h1>Project Description</h1>
+    <h1>Project Setup</h1>
     <form id="chat-form" onsubmit="handleSubmit(event)">
+
+        <label for="name">Name</label>
+        <input type="text" id="name" placeholder="Project Name">
+
+        <label for="name">Directory</label>
+        <input type="text" id="directory" placeholder="subdirectory">
+
+        <label for="question">Describe the problem in detail</label>
         <textarea rows="10" id="question" placeholder="Describe your project to get started..." oninput="handleInput(event)"></textarea>
-        <button id="go" type="submit">Project Go</button>
+        <button id="go" type="submit">Go</button>
         <ul>
-            <li>Pressing "Project Go" the first time will get your project started.</li>
-            <li>Pressing "Project Go" additional times will make refinements and you can adjust the main project prompt as needed.</li>
+            <li>Pressing "Go" the first time will get your project started.</li>
+            <li>Pressing "Go" additional times will make refinements without history.</li>
             <li>If existing files are found they will be treated as input.</li>
             <li>Individual prompts will also receive a file roster.</li>
             <li>Scroll down to the see the latest "primary" response.</li>
-            <li>Use the "Directed" request feature to request a specific team member (@member) perform a specific project task.</li>
         </ul>
     </form>
-    <h1>Directed Assignment</h1>
-    @team_member_name is requited in this prompt. For instance "@Michael please change the color of the background in index.html."
-    <form id="directed-chat-form" onsubmit="handleDirected(event)">
-        <textarea rows="10" id="directed-question" placeholder="@teammember please do xyz task on zyx file." oninput="handleDirectedInput(event)"></textarea>        
-        <button id="directed-go" type="submit">Directed Go</button>
-    </form>
-    <h3>Latest Summary Response</h3>
+    <h2>Latest Summary Response</h3>
     <hr>
     <div id="response"></div>
     <script nonce="${nonce}">
         function handleSubmit(event) {
             event.preventDefault(); // Prevent the default form submission
             const question = document.getElementById('question').value;
-            vscode.postMessage({ command: 'projectGo', text: question });
+            const name = document.getElementById('name').value;
+            const directory = document.getElementById('directory').value;
+            vscode.postMessage({ command: 'projectGo', text: question, name: name, directory: directory });
         }
 
         function handleInput(event) {
             const question = document.getElementById('question').value;
-            vscode.postMessage({ command: 'updateProject', text: question });
+            const name = document.getElementById('name').value;
+            const directory = document.getElementById('directory').value;
+            vscode.postMessage({ command: 'updateProject', text: question, name: name, directory: directory });
         }
 
-        function handleDirected(event) {
-            event.preventDefault(); // Prevent the default form submission
-            const directed = document.getElementById('directed-question').value;
-            vscode.postMessage({ command: 'directedGo', text: directed });
-        }
+        // function handleDirected(event) {
+        //     event.preventDefault(); // Prevent the default form submission
+        //     const directed = document.getElementById('directed-question').value;
+        //     vscode.postMessage({ command: 'directedGo', text: directed });
+        // }
 
-        function handleDirectedInput(event) {
-            const directed = document.getElementById('directed-question').value;
-            vscode.postMessage({ command: 'updateDirected', text: directed });
-        }
+        // function handleDirectedInput(event) {
+        //     const directed = document.getElementById('directed-question').value;
+        //     vscode.postMessage({ command: 'updateDirected', text: directed });
+        // }
 
         function displayIssues(issues) {
             const issueList = document.getElementById('issues');
@@ -132,8 +143,10 @@
             }
             if (message.command === 'loadData') {
                 displayIssues(message.issues);
+                document.getElementById('name').value = message.name;
+                document.getElementById('directory').value = message.directory;
                 document.getElementById('question').value = message.question;
-                document.getElementById('directed-question').value = message.directed;
+                //document.getElementById('directed-question').value = message.directed;
                 document.getElementById('response').innerHTML = message.answer;
                 document.getElementById('go').disabled = message.issues.length > 0;
             }

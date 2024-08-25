@@ -2,6 +2,7 @@ import { tool } from "@langchain/core/tools";
 import { z } from "zod";
 import { save, getcontent } from "../file/fileOperations";
 import { output_log } from './outputChannelManager';
+import { FetchHistory } from './historyManager';
 
 const getFileContentApiSchema = z.object({
     fileName: z.string().describe("The path of the file to read")
@@ -39,11 +40,12 @@ export const saveContentToFileApiTool = tool(
 
 // Define the schema for the tool
 const getQueueMemberAssignmentApiSchema = z.object({
+    caller: z.string().describe("The caller responsible for the user prompt"),
     member: z.string().describe("The member to assign to"),
     question: z.string().describe("The user's project description")
 });
 
-function queueMemberAssignment(member: string, question: string){
+function queueMemberAssignment(caller: string, member: string, question: string){
     // **mock** never used
     // the real queueMemberAssignment takes some complex objects that
     // the llm can't output in text so when this tool is used I call the real
@@ -52,13 +54,30 @@ function queueMemberAssignment(member: string, question: string){
 
 // Define the tool function
 export const getQueueMemberAssignmentApiTool = tool(
-    async ({ member, question }: z.infer<typeof getQueueMemberAssignmentApiSchema>) => {
+    async ({ caller, member, question }: z.infer<typeof getQueueMemberAssignmentApiSchema>) => {
         output_log(`Assigning queue member: ${member}`);
-        return await queueMemberAssignment(member, question);
+        return await queueMemberAssignment(caller, member, question);
     },
     {
         name: "getQueueMemberAssignmentApi",
         description: "Assign a queue member to a user based on the project description.",
         schema: getQueueMemberAssignmentApiSchema,
+    }
+);
+
+// Define the schema for the tool
+const fetchHistoryApiSchema = z.object({
+    directory: z.string().describe("(optional) The project directory associated with the inquiry.")
+});
+
+export const fetchHistoryApiTool = tool(
+    async ({ directory }: { directory: string }) => {
+        output_log(`Fetching historic responses for project directory ${directory}`);
+        return await FetchHistory(directory);
+    },
+    {
+        name: "fetchHistoryApi",
+        description: "Search for the original assignment and other interactions to gain better context about the project and question.",
+        schema: fetchHistoryApiSchema,
     }
 );
