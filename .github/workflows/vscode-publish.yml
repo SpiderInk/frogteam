@@ -16,7 +16,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '16'  # Specify the Node.js version you need
+        node-version: '18'  # Use Node.js version 18
 
     - name: Install dependencies
       run: npm install
@@ -24,13 +24,10 @@ jobs:
     - name: Run Compile
       run: npm run compile
 
-    - name: Install VSCE
-      run: npm install -g @vscode/vsce
+    - name: Package Extension with npx
+      run: npx vsce package
 
-    - name: Package Extension
-      run: vsce package
-
-    - name: Publish Extension
+    - name: Publish Extension with npx
       env:
         VSCE_PAT: ${{ secrets.VSCE_PAT }}  # Use a secret for your Personal Access Token
-      run: vsce publish
+      run: npx vsce publish
