@@ -1,0 +1,36 @@
+name: Publish VS Code Extension
+
+on:
+  push:
+    branches:
+      - main  # Trigger the workflow when changes are pushed to the main branch
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'  # Specify the Node.js version you need
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run Compile
+      run: npm run compile
+
+    - name: Install VSCE
+      run: npm install -g @vscode/vsce
+
+    - name: Package Extension
+      run: vsce package
+
+    - name: Publish Extension
+      env:
+        VSCE_PAT: ${{ secrets.VSCE_PAT }}  # Use a secret for your Personal Access Token
+      run: vsce publish
