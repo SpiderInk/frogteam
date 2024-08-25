@@ -1,5 +1,33 @@
 # <img src="https://frogteam.ai/logo.png" alt="frogteam icon" width="32" height="32"> - frogteam 
 
+Updates v0.0.17: 08-25-2024
+<ul>
+    <li>Commands - a top level menu entry</li>
+    <li>History hierarchy Changes 
+        <ul>
+            <li>Toggle History Grouping (See "Commands")</li>
+            <li>Parent/Child elements but a flat tree</li>
+            <ul>
+                <li>This means that child elements appear under their parents and also in the root of the tree</li>
+            </ul>
+        </ul>
+    </li>
+    <li>Respond to Answers directly
+        <ul>
+            <li>In the History's Answer panel when the response is Markdown there is a "Respond Here" button</li>
+            <li>When using this feature relevant immediate history will be included in the new LLM interaction</li>
+        </ul>
+    </li>
+    <li>The Builder now collects a project name and directory
+        <ul>
+            <li>This information is used to format XML that is used in the prompt
+            <li>This tells the LLM exactly what its getting</li>
+            <li>System prompts will be adjusted in future versions</li>
+            <li>The next version will use "Project Name" in the history hierarchy</li>
+        </ul>
+    </li>
+</ul>
+
 08-14-2024 Updates:
 - Azure OpenAI
 - Upgrade Axios due to vulnerability report
