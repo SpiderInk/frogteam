@@ -24,10 +24,33 @@ jobs:
     - name: Run Compile
       run: npm run compile
 
+    - name: Parse version from package.json
+      id: get_version
+      run: echo "VERSION=$(jq -r .version package.json)" >> $GITHUB_ENV
+
+    - name: Check if release exists
+      id: check_release
+      run: |
+        if gh release view "v${{ env.VERSION }}" &> /dev/null; then
+          echo "Release v${{ env.VERSION }} already exists."
+          exit 1
+        else
+          echo "No existing release found for version ${{ env.VERSION }}."
+        fi
+
     - name: Package Extension with npx
       run: npx vsce package
 
+    - name: Create Release
+      id: create_release
+      run: |
+        gh release create "v${{ env.VERSION }}" \
+          --title "Release v${{ env.VERSION }}" \
+          --notes "Automated release for version v${{ env.VERSION }}" \
+          *.vsix
+
     - name: Publish Extension with npx
+      if: success()
       env:
         VSCE_PAT: ${{ secrets.VSCE_PAT }}  # Use a secret for your Personal Access Token
       run: npx vsce publish
