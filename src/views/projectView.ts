@@ -155,6 +155,14 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
         }
     }
 
+    private package_project(name: string, directory: string, problem: string): string {
+        return `<project>
+    <name>${name}</name>
+    <directory>${directory}</directory>
+    <problem>${problem}</problem>
+</project>`;
+    }
+
     private openProjectPanel(context: vscode.ExtensionContext) : void {
         if (this.currentProjectPanel !== undefined) {
             this.currentProjectPanel.reveal(vscode.ViewColumn.One);
@@ -179,7 +187,7 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
             const setups:Setup[] = context.globalState.get('setups', []);
     
             // Handle messages from the webview
-            this.currentProjectPanel.webview.onDidReceiveMessage(async (message: { command: string; text: string }) => {
+            this.currentProjectPanel.webview.onDidReceiveMessage(async (message: { command: string; text: string, name: string, directory: string }) => {
                 let conversationId = generateShortUniqueId();
                 switch (message.command) {
                     case 'projectGo':
@@ -190,7 +198,10 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
                             showRunningIndicator("Frogteam");
                             output_log(`Received "projectGo" command with conversationId: ${conversationId} and text: ${message.text}`);
                             context.workspaceState.update('project', message.text);
-                            const projectAnswer = await projectGo(message.text, setups, this.historyManager, conversationId, undefined);
+                            context.workspaceState.update('project_name', message.name);
+                            context.workspaceState.update('project_directory', message.directory);
+                            const project = this.package_project(message.name, message.directory, message.text);
+                            const projectAnswer = await projectGo(project, setups, this.historyManager, conversationId, undefined);
                             if (Object.keys(projectAnswer).length > 0) {
                                 context.workspaceState.update('answer', projectAnswer);
                                 const htmlAnswer = await marked(projectAnswer);
@@ -203,6 +214,7 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
                         hideRunningIndicator();
                         break;
                     case 'directedGo':
+                        // obsolete
                         output_log(`Received "directedGo" command with conversationId: ${conversationId} and with text: ${message.text}`);
                         context.workspaceState.update('directed', message.text);
                         // get member from prompt or reject with no eligible member
@@ -222,10 +234,13 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
                         hideRunningIndicator();
                         break;
                     case 'updateDirected':
+                        // obsolete
                         context.workspaceState.update('directed', message.text);
                     break;
                     case 'updateProject':
                         context.workspaceState.update('project', message.text);
+                        context.workspaceState.update('project_name', message.name);
+                        context.workspaceState.update('project_directory', message.directory);
                         break;
                     case 'loadData':
                         this.loadProjectData();
