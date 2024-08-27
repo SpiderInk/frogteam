@@ -30,6 +30,7 @@ interface HistoryEntry {
     lookupTag: LookupTag;
     conversationId: string;
     parentId: string | undefined;
+    projectName: string;
 }
 
 class HistoryManager {
@@ -62,7 +63,7 @@ class HistoryManager {
         return response.includes('\n');
     }
 
-    public addEntry(askBy: string, responseBy: string, model: string, ask: string, answer: string, lookup_tag: LookupTag, conversation_id: string, parent_id: string | undefined): string {
+    public addEntry(askBy: string, responseBy: string, model: string, ask: string, answer: string, lookup_tag: LookupTag, conversation_id: string, parent_id: string | undefined, project_name: string): string {
         const id = crypto.randomUUID();
         const entry: HistoryEntry = {
             id: id,
@@ -75,14 +76,15 @@ class HistoryManager {
             markdown: this.markDownResponse(answer),
             lookupTag: lookup_tag,
             conversationId: conversation_id,
-            parentId: parent_id
+            parentId: parent_id,
+            projectName: project_name
         };
         this.history.push(entry);
         this.saveHistory();
         if(this.provider !== undefined) {
             this.provider.refresh();
         }
-        output_log(`Asked By: ${askBy}, Response By: ${responseBy}, Model: ${model}`);
+        output_log(`Asked By: ${askBy}, Response By: ${responseBy}, Model: ${model}, Project: ${project_name}`);
         return id;
     }
 
@@ -115,8 +117,28 @@ class HistoryManager {
         );
     }
 
+    public getProjectByHistoryId(historyId: string): string | undefined {
+        const entry = this.history.find(entry => entry.id === historyId);
+        if (entry) {
+            return entry.projectName;
+        }
+        return undefined;
+    }
+
     public getHistoryGroupedByDate(): Record<string, HistoryEntry[]> {
         return this.history.reduce((acc, entry) => {
+            const date = new Date(entry.timestamp).toDateString();
+            if (!acc[date]) {
+                acc[date] = [];
+            }
+            acc[date].push(entry);
+            return acc;
+        }, {} as Record<string, HistoryEntry[]>);
+    }
+
+    public getHistoryGroupedByDateForProject(projectName: string): Record<string, HistoryEntry[]> {
+        const projectHistory = this.history.filter(entry => entry.projectName === projectName);
+        return projectHistory.reduce((acc, entry) => {
             const date = new Date(entry.timestamp).toDateString();
             if (!acc[date]) {
                 acc[date] = [];

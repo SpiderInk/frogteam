@@ -177,6 +177,7 @@ export async function openAnswerPanel(context: vscode.ExtensionContext, data: Hi
 	currentAnswerPanel.webview.onDidReceiveMessage(async (message: { command: string; member: string; text: string, history_id: string }) => {
 		let conversationId = generateShortUniqueId();
 		if(historyManager) {
+			const project = historyManager.getProjectByHistoryId(message.history_id);
 			let answer = "";
 			showRunningIndicator(message.member === "Team" ? "Frogteam" : message.member);
 			switch (message.member) {
@@ -184,12 +185,12 @@ export async function openAnswerPanel(context: vscode.ExtensionContext, data: Hi
 					// call the lead emgineer
 					// submitTask: message.command
 					output_log(`Received "submitTask" command for member: ${message.member}, with text: ${message.text}, and history id: ${message.history_id}.`);
-					answer = await projectGo(message.text, setups, historyManager, conversationId, message.history_id);
+					answer = await projectGo(message.text, setups, historyManager, conversationId, message.history_id, project ?? "no-project");
 					break;
 				default:
 					// call queueMemberAssignment
 					output_log(`Received "submitTask" command for member: ${message.member}, with text: ${message.text}, and history id: ${message.history_id}.`);
-					answer = await queueMemberAssignment('user', message.member, message.text, setups, historyManager, conversationId, message.history_id);
+					answer = await queueMemberAssignment('user', message.member, message.text, setups, historyManager, conversationId, message.history_id, project ?? "no-project");
 				break;
 			}
 			if (Object.keys(answer).length > 0) {

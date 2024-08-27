@@ -75,7 +75,7 @@ Follow me on [instagram](https://www.instagram.com/reddoverises/).<br>
   - [Tasks - Implementing Other Model Sources](#tasks---implementing-other-model-sources)
   - [Tasks - On Deck](#tasks---on-deck)
   - [Tasks - Backlog](#tasks---backlog)
-  - [Example User Prompt](#example-user-prompt)
+  - [Example User Prompts](#example-user-prompts)
   - [Icons](#icons)
   - [How to Contribute](#how-to-contribute)
   - [Submitting Issues](#submitting-issues)
@@ -162,25 +162,29 @@ You can refine the prompt and submit again. Existing files will be used and edit
         - Is there a standard way I can do this. This is a research task for me.
 
 ## Tasks - On Deck
+
 - **Now that we collect project name and directory** from the user in the Builder let's make a "Project" level at the top of the history tree
     - Add a special history entry for when a project is first created and only store the three properties there
-        - name, directory, problem
+        - name, directory, problem **done**
 
 - **Extract the response form out of the Answer Panel** 
     - Use in Team Member Setup Panel as well so we can do directed top level not history included tasks from there.
     - Look at the CSS MESS when solving this
-    - configuration for a time or token limit by model/team member
-        - implement team member token limits/time limits/request token limits
-        - this will require tracking
-        - the lead architect will need to be aware of these constrains when giving out assignments
+
+- MESS: generateUniqueId() in WebView HTML files needs consolidation
+    - can a WebView use &lt;script&gt; tags for local files?
+- MESS: CSS in WebView HTML files needs consolidation
+    - can a WebView use &lt;style&gt; tags for local files?
+
+- configuration for a time or token limit by model/team member
+    - implement team member token limits/time limits/request token limits
+    - this will require tracking
+    - the lead architect will need to be aware of these constrains when giving out assignments
+    - set temperature and other settings for the team member
 
 - BUG: sometimes toolCall definitions or results are bad and the process errors out
     - Maybe just try catch and report/log/add history what happened? **done**
     - At this time the user can just try clicking "Go" again
-- MESS: generateUniqueId() in WebView HTML files needs consolidation
-    - can a WebView use <script> tags for local files?
-- MESS: CSS in WebView HTML files needs consolidation
-    - can a WebView use <style> tags for local files?
 
 ## Tasks - Backlog
 - prompt library sharing platform
@@ -214,11 +218,18 @@ You can refine the prompt and submit again. Existing files will be used and edit
     - new branch first
     - PR generation
 
-## Example User Prompt
+## Example User Prompts
 
 > Write me a simple web page that uses a canvas to draw a ball and start it bouncing around the boundaries of the canvas. Please break the project up into multiple files: index.html, index.js and index.css. Place the files in a directory called bounce-ball. This is only the starting point for the project so keep in mind we will be asking for refinements.
 
 > Create me a single page app that show directions from where the web browser thinks its location is to the closest train station. 
+
+> Using openstreetmap web based mapping you will simulate tracking an air tag as it moves. 
+from: Point A -> 1 Grey Rock Place, Stamford CT 
+to: Point B -> Cove Island Park, Stamford, CT
+- Do this by generating driving directions between these two locations and then show a dot moving along those directons over time
+- Any files should be created/edited in the "tracking" directory
+- I expect to be able to open index.html from the tracking directory using the LiveServer VS Code extension and when I do I expect to see a map showing the locations I have mentioned.
 
 ## Icons
 Any icons you see either came from the list below, I made them, or GenAI Helped me make them.

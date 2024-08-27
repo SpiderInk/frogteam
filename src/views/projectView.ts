@@ -1,6 +1,7 @@
 // src/views/projectView.ts
 import * as vscode from 'vscode';
 import * as path from 'path';
+import * as fs from 'fs';
 import { marked } from 'marked';
 import { getProjectTabContent } from '../webview/getProjectTabContent';
 // import { projectGo } from '../openai/openaiService';
@@ -16,6 +17,8 @@ import { openSetupPanel, openPromptPanel } from '../extension';
 import { showRunningIndicator, hideRunningIndicator } from '../utils/runningIndicator';
 import { output_log } from '../utils/outputChannelManager';
 import { generateShortUniqueId } from '../utils/common';
+import { addProjectToFile, package_project, getProjects } from '../utils/projectUtils';
+import { dir } from 'console';
 
 export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
     private currentProjectPanel: vscode.WebviewPanel | undefined;
@@ -69,12 +72,16 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
             ];
             return Promise.resolve(commandItems);
         } else if (element instanceof HistoryRootItem) {
-            const groupedHistory = this.historyManager.getHistoryGroupedByDate();
-            const dateItems = Object.keys(groupedHistory).map(date => new DateItem(date));
+            const projects = getProjects();
+            const projectItems = projects.map(project => new HistoryProjectItem(project.projectName));
+            return Promise.resolve(projectItems);
+        } else if (element instanceof HistoryProjectItem) {
+            const groupedHistory = this.historyManager.getHistoryGroupedByDateForProject(element.label as string);
+            const dateItems = Object.keys(groupedHistory).map(date => new DateItem(date, element.label as string));
             return Promise.resolve(dateItems);
         } else if (element instanceof DateItem) {
             if(this.grouping_mode) {
-                const historyEntries = this.historyManager.getHistoryGroupedByDate()[element.label as string];
+                const historyEntries = this.historyManager.getHistoryGroupedByDateForProject(element.project as string)[element.label as string];
                 const memberItems = new Map();
                 historyEntries.forEach((entry: HistoryEntry) => {
                     if (!memberItems.has(entry.response_by)) {
@@ -88,7 +95,7 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
                 }
                 return Promise.resolve(members);
             } else {
-                const historyEntries = this.historyManager.getHistoryGroupedByDate()[element.label as string];
+                const historyEntries = this.historyManager.getHistoryGroupedByDateForProject(element.project as string)[element.label as string];
                 return Promise.resolve(historyEntries.map((entry: HistoryEntry) => new HistoryItem(entry, this.global_context, this.getSetupIcon(entry.response_by), "entry")));
             }
         } else if (element instanceof MemberItem) {
@@ -155,14 +162,6 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
         }
     }
 
-    private package_project(name: string, directory: string, problem: string): string {
-        return `<project>
-    <name>${name}</name>
-    <directory>${directory}</directory>
-    <problem>${problem}</problem>
-</project>`;
-    }
-
     private openProjectPanel(context: vscode.ExtensionContext) : void {
         if (this.currentProjectPanel !== undefined) {
             this.currentProjectPanel.reveal(vscode.ViewColumn.One);
@@ -200,8 +199,11 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
                             context.workspaceState.update('project', message.text);
                             context.workspaceState.update('project_name', message.name);
                             context.workspaceState.update('project_directory', message.directory);
-                            const project = this.package_project(message.name, message.directory, message.text);
-                            const projectAnswer = await projectGo(project, setups, this.historyManager, conversationId, undefined);
+
+                            const project = package_project(message.name, message.directory, message.text);
+                            addProjectToFile(message.name, message.directory, message.text);
+
+                            const projectAnswer = await projectGo(project, setups, this.historyManager, conversationId, undefined, message.name);
                             if (Object.keys(projectAnswer).length > 0) {
                                 context.workspaceState.update('answer', projectAnswer);
                                 const htmlAnswer = await marked(projectAnswer);
@@ -224,7 +226,7 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
                             }
                             const member = extractMemberFromPrompt(message.text, setups);
                             showRunningIndicator(member);
-                            const directedAnswer = await queueMemberAssignment('user', member, message.text, setups, this.historyManager, conversationId, undefined);
+                            const directedAnswer = await queueMemberAssignment('user', member, message.text, setups, this.historyManager, conversationId, undefined, "obsolete");
                             if (Object.keys(directedAnswer).length > 0) {
                                 this.openMarkdownPanel(context, directedAnswer);
                             }
@@ -264,6 +266,8 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
                 throw new Error("global_context is not initialized.");
             }
             const project = this.global_context.workspaceState.get('project', '');
+            const project_name = this.global_context.workspaceState.get('project_name', '');
+            const project_directory = this.global_context.workspaceState.get('project_directory', '');
             const directed = this.global_context.workspaceState.get('directed', '');
             const answer = this.global_context.workspaceState.get('answer', '');
             let htmlContent;
@@ -271,7 +275,7 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
                 htmlContent = marked(answer);
             }
             const issues = validatePrompts();
-            this.currentProjectPanel?.webview.postMessage({ command: 'loadData', question: project, answer: htmlContent, issues: issues, directed: directed });
+            this.currentProjectPanel?.webview.postMessage({ command: 'loadData', question: project, answer: htmlContent, issues: issues, directed: directed, name: project_name, directory: project_directory });
         }
     }
 
@@ -334,6 +338,12 @@ class ProjectItem extends vscode.TreeItem {
     }
 }
 
+class HistoryProjectItem extends vscode.TreeItem {
+    constructor(label: string) {
+        super(label, vscode.TreeItemCollapsibleState.Expanded);
+    }
+}
+
 class HistoryRootItem extends vscode.TreeItem {
     constructor(label: string) {
         super(label, vscode.TreeItemCollapsibleState.Collapsed);
@@ -346,7 +356,7 @@ class HistoryRootItem extends vscode.TreeItem {
 }
 
 class DateItem extends vscode.TreeItem {
-    constructor(label: string) {
+    constructor(label: string, public project: string) {
         super(label, vscode.TreeItemCollapsibleState.Collapsed);
     }
 }
