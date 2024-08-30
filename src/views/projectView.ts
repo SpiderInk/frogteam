@@ -182,7 +182,7 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
             );
             
             this.currentProjectPanel.iconPath = iconPath;
-            this.currentProjectPanel.webview.html = getProjectTabContent(context.extensionUri);
+            this.currentProjectPanel.webview.html = getProjectTabContent(context.extensionUri, this.currentProjectPanel.webview);
             const setups:Setup[] = context.globalState.get('setups', []);
     
             // Handle messages from the webview
@@ -304,6 +304,7 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
     <html lang="en">
     <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none';">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Answer</title>
     </head>

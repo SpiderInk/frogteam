@@ -1,8 +1,9 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
+import { getWorkspaceFolder } from '../utils/common';
 
-const PROJECTS_FILE = path.join(vscode.workspace.rootPath || '', '.vscode', 'projects.json');
+const PROJECTS_FILE = path.join(getWorkspaceFolder() || '', '.vscode', 'projects.json');
 const vscodeDirectory = path.join(__dirname, '..', '.vscode');
 
 // Ensure the .vscode directory exists
@@ -12,7 +13,11 @@ if (!fs.existsSync(vscodeDirectory)) {
 
 // Initialize projects.json if it doesn't exist
 if (!fs.existsSync(PROJECTS_FILE)) {
-    fs.writeFileSync(PROJECTS_FILE, JSON.stringify({ projects: [] }, null, 4));
+    fs.writeFileSync(PROJECTS_FILE, JSON.stringify({ projects: [        {
+        "projectName": "no-project",
+        "projectDirectory": "",
+        "projectDescription": "Homeless history items go here. This should be just the items that are created from talking to a team member on their configuration page."
+    }] }, null, 4));
 }
 
 // Function to add a new project

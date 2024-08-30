@@ -1,4 +1,6 @@
+import * as vscode from 'vscode';
 import * as fs from 'fs';
+import * as path from 'path';
 
 export function generateSvgIcon(color: string, outputPath: string): void {
     const svgContent = `
@@ -41,4 +43,22 @@ export function fetchApiKey(apiKey: string): string {
         // If apiKey does not start with "ENV=", return it as is
         return apiKey;
     }
+}
+
+export function commonWebPanelComponents(extensionUri: vscode.Uri): { css: vscode.Uri; jss: vscode.Uri; } {
+    const cssPath = vscode.Uri.joinPath(extensionUri, 'resources', 'common.css');
+    const jsPath = vscode.Uri.joinPath(extensionUri, 'resources', 'common.js');
+
+    return {
+        css: cssPath,
+        jss: jsPath
+    };
+}
+
+export function getWorkspaceFolder(): string | undefined {
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+    if (workspaceFolders && workspaceFolders.length > 0) {
+        return workspaceFolders[0].uri.fsPath;
+    }
+    throw new Error("No workspace folder found");
 }

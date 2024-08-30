@@ -4,11 +4,15 @@ import * as fs from 'fs';
 import { marked } from 'marked';
 import { Prompt, all_prompts } from '../utils/prompts';
 import { Setup } from '../utils/setup';
+import { commonWebPanelComponents } from '../utils/common';
 
-export function getRosterDocContent(context: vscode.ExtensionContext): string {
+export function getRosterDocContent(context: vscode.ExtensionContext, webView: vscode.Webview): string {
     const htmlFilePath = path.join(context.extensionUri.fsPath, 'resources', 'roster.html');
+    const parts = commonWebPanelComponents(context.extensionUri);
     try {
         let html = fs.readFileSync(htmlFilePath, 'utf8');
+        const css = webView.asWebviewUri(parts.css).toString();
+        const jss = webView.asWebviewUri(parts.jss).toString();
 
         const prompts:Prompt[] = all_prompts();
         const setups:Setup[] = context.globalState.get('setups', []);
@@ -25,6 +29,9 @@ export function getRosterDocContent(context: vscode.ExtensionContext): string {
             }
         });
         html = html.replace(/\${markdown}/g, content);
+        html = html.replace(/\${cssUri}/g, css);
+        html = html.replace(/\${jsUri}/g, jss);
+        html = html.replace(/\${cspSource}/g, webView.cspSource);
         return html;
     } catch (error) {
         console.error(`Error reading HTML file: ${error}`);

@@ -2,33 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' ${cspSource} 'unsafe-inline'; img-src ${cspSource} https:; script-src 'self' ${cspSource} 'nonce-${nonce}';">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>prompt editor</title>
+    <link href="${cssUri}" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 10px;
-            background-color: var(--vscode-editor-background); /* Use VS Code's background color */
-            color: var(--vscode-editor-foreground);
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-        }
-
-        textarea,
-        input[type="text"],
-        input[type="password"],
-        input[type="color"],
-        select {
-            padding: 5px;
-            margin-bottom: 5px;
-            width: 95%;
-            background-color: #D3D3D3;
-            color: black;
-        }
-
         .checkbox-container {
             display: flex;
             align-items: center;
@@ -36,59 +14,10 @@
             margin-bottom: 5px;
         }
 
-        input[type="checkbox"] {
-            background-color: #D3D3D3;
-            color: black;
-            margin: 0;
-            float: left;
-            clear: none;
-        }
-
         .checklabel {
             color: #D3D3D3;
             float: left;
             clear: none;
-        }
-
-        .editable-dark-theme {
-            background-color: #D3D3D3; /* Dark background color */
-            color: black; /* Light text color */
-            border: 1px solid #3c3c3c; /* Border to distinguish the editable area */
-            padding: 10px; /* Padding for better readability */
-            border-radius: 4px; /* Rounded corners */
-            outline: none; /* Remove default outline on focus */
-            font-family: Arial, sans-serif; /* Consistent font */
-            font-size: 14px; /* Font size */
-        }
-
-        .editable-dark-theme:focus {
-            background-color: #D3D3D3; /* Slightly lighter background on focus */
-            border-color: #5c5c5c; /* Change border color on focus */
-        }
-
-        .editable-dark-theme:empty:before {
-            content: attr(data-placeholder); /* Placeholder text */
-            color: #666; /* Placeholder color */
-        }
-    
-        .cmd {
-            width: 100%;
-            height: 20px;
-            padding: 10px;
-        }
-        
-        button {
-            background-color: transparent;
-            border-color: #D3D3D3;
-            border-width: 2px;
-            border-radius: 4px;
-            padding: 6px;
-            float: right;
-        }
-
-        .icon {
-            color: #D3D3D3;
-            fill: #D3D3D3;
         }
     </style>
     <script nonce="${nonce}">
@@ -143,9 +72,11 @@
         <input type="text" id="tag" placeholder="tags...">
 
         <label for="content">Prompt</label>
-        <div id="content" class="editable-dark-theme" contenteditable="true"></div>
+        <!-- <div id="content" class="editable-dark-theme" contenteditable="true"></div> -->
+        <textarea rows="10" id="content" placeholder="You are a software developer..."></textarea>
     </form>
 
+    <script src="${jsUri}" nonce="${nonce}"></script>
     <script nonce="${nonce}">
         let prompt = {};
 
@@ -154,7 +85,8 @@
         });
 
         document.getElementById('edit-prompt').oninput = function () {
-            prompt.content = document.getElementById('content').innerText;
+            // prompt.content = document.getElementById('content').innerText;
+            prompt.content = document.getElementById('content').value;
             prompt.category = document.getElementById('category').value;
             prompt.role = document.getElementById('role').value;
             prompt.models = document.getElementById('models').value;
@@ -172,7 +104,7 @@
                     prompt = message.prompt;
                     saveState();
                     document.getElementById('id').value = prompt.id;
-                    document.getElementById('content').innerText = prompt.content;
+                    document.getElementById('content').value = prompt.content;
                     document.getElementById('category').value = prompt.category;
                     document.getElementById('role').value = prompt.role;
                     document.getElementById('models').value = prompt.models;
@@ -187,7 +119,7 @@
             prompt = state;
             if (state) {
                 document.getElementById('id').value = state.id;
-                document.getElementById('content').innerText = state.content;
+                document.getElementById('content').value = state.content;
                 document.getElementById('category').value = state.category;
                 document.getElementById('role').value = state.role;
                 document.getElementById('models').value = state.models;
@@ -217,14 +149,6 @@
             prompt.id = generateUniqueId();
             saveState();
             vscode.postMessage({ command: 'savePrompt', prompt });
-        };
-
-        function generateUniqueId() {
-            return 'xxxx-xxxx-4xxx-yxxx-xxxx-xxxx-xxxx'.replace(/[xy]/g, function(c) {
-                const r = Math.random() * 16 | 0;
-                const v = c === 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
-            });
         };
     </script>
 </body>

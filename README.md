@@ -1,5 +1,8 @@
 # <img src="https://frogteam.ai/logo.png" alt="frogteam icon" width="32" height="32"> - frogteam 
 
+Updates v0.0.18: 08-30-2024
+Start looking to the change log for details. This is a big one for history reorganization. 
+
 Updates v0.0.17: 08-25-2024
 <ul>
     <li>Commands - a top level menu entry</li>
@@ -163,24 +166,13 @@ You can refine the prompt and submit again. Existing files will be used and edit
 
 ## Tasks - On Deck
 
-- **Now that we collect project name and directory** from the user in the Builder let's make a "Project" level at the top of the history tree
-    - Add a special history entry for when a project is first created and only store the three properties there
-        - name, directory, problem **done**
-
-- **Extract the response form out of the Answer Panel** 
-    - Use in Team Member Setup Panel as well so we can do directed top level not history included tasks from there.
-    - Look at the CSS MESS when solving this
-
-- MESS: generateUniqueId() in WebView HTML files needs consolidation
-    - can a WebView use &lt;script&gt; tags for local files?
-- MESS: CSS in WebView HTML files needs consolidation
-    - can a WebView use &lt;style&gt; tags for local files?
-
 - configuration for a time or token limit by model/team member
     - implement team member token limits/time limits/request token limits
     - this will require tracking
     - the lead architect will need to be aware of these constrains when giving out assignments
     - set temperature and other settings for the team member
+
+- BUG: When asking a member to perform a task sometimes the summary is redundant.
 
 - BUG: sometimes toolCall definitions or results are bad and the process errors out
     - Maybe just try catch and report/log/add history what happened? **done**

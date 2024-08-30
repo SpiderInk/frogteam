@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
+import { getWorkspaceFolder } from '../utils/common';
 
 const ignoreDirs = new Set(['node_modules', '.git', '.vscode', '__pycache__', 'a-saved']);
 
@@ -10,7 +11,7 @@ function listProjectFiles(directory: string): string[] {
 
     files.forEach(file => {
         const fullPath = path.join(directory, file);
-        const relativePath = path.relative(vscode.workspace.rootPath || '', fullPath);
+        const relativePath = path.relative(getWorkspaceFolder() || '', fullPath);
         const stats = fs.statSync(fullPath);
 
         if (stats.isDirectory()) {

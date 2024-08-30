@@ -4,9 +4,11 @@ import * as fs from 'fs';
 import { getNonce } from './getNonce';
 import { HistoryEntry } from '../utils/historyManager';
 import { marked } from 'marked';
+import { commonWebPanelComponents } from '../utils/common';
 
-export async function getAnswerTabContent(extensionUri: vscode.Uri, data: HistoryEntry): Promise<string> {
+export async function getAnswerTabContent(extensionUri: vscode.Uri, webView: vscode.Webview, data: HistoryEntry): Promise<string> {
     const htmlFilePath = path.join(extensionUri.fsPath, 'resources', 'answer.html');
+    const parts = commonWebPanelComponents(extensionUri);
     try {
 
         const date = new Date(data.timestamp);
@@ -18,6 +20,8 @@ export async function getAnswerTabContent(extensionUri: vscode.Uri, data: Histor
         } else {
             markdownContent = data.answer;
         }
+        const css = webView.asWebviewUri(parts.css).toString();
+        const jss = webView.asWebviewUri(parts.jss).toString();
 
         let html = fs.readFileSync(htmlFilePath, 'utf8');
         const nonce = getNonce();
@@ -30,6 +34,9 @@ export async function getAnswerTabContent(extensionUri: vscode.Uri, data: Histor
         html = html.replace(/\${ask}/g, data.ask);
         html = html.replace(/\${markdownContent}/g, markdownContent);
         html = html.replace(/\${history_id}/g, data.id);
+        html = html.replace(/\${cssUri}/g, css);
+        html = html.replace(/\${jsUri}/g, jss);
+        html = html.replace(/\${cspSource}/g, webView.cspSource);
 
         return html;
     } catch (error) {

@@ -9,6 +9,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## 0.0.18
 - Project level at the top of the history tree
     - Project tracked in history entry
+- Multi-Root Workspace Compatibility
+- Task a member directly from their configuration page
+- CSS and JS Webview consolidation
+- Proper content security policies
 
 ## 0.0.17
 - Commands - a top level menu entry
