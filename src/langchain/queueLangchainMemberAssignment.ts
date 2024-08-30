@@ -9,7 +9,7 @@ import { getFileContentApiTool, saveContentToFileApiTool, fetchHistoryApiTool } 
 import { output_log } from '../utils/outputChannelManager';
 import { generateShortUniqueId } from '../utils/common'
 
-export async function queueLangchainMemberAssignment(caller: string, llm: BaseChatModel, member_object: Setup, question: string, historyManager: HistoryManager, setups: Setup[], conversationId: string, parentId: string | undefined): Promise<string> {
+export async function queueLangchainMemberAssignment(caller: string, llm: BaseChatModel, member_object: Setup, question: string, historyManager: HistoryManager, setups: Setup[], conversationId: string, parentId: string | undefined, project: string): Promise<string> {
     let response = {} as any;
     const engineer_prompt_obj = fetchPrompts('system', member_object?.purpose ?? 'engineer', member_object?.model);
     const task_summary_prompt = fetchPrompts('system', 'task-summary', member_object?.model);
@@ -66,7 +66,7 @@ export async function queueLangchainMemberAssignment(caller: string, llm: BaseCh
                 answer_for_history = "tool calls pending.";
             }
         }
-        const parent_id = historyManager.addEntry(caller, member_object?.name ?? "no-data", member_object?.model ?? "no-model", question, answer_for_history, LookupTag.MEMBER_TASK, conversationId, parentId);
+        const parent_id = historyManager.addEntry(caller, member_object?.name ?? "no-data", member_object?.model ?? "no-model", question, answer_for_history, LookupTag.MEMBER_TASK, conversationId, parentId, project);
         do {
             messages.push(llmOutput as AIMessage);
             if (llmOutput.tool_calls && llmOutput.tool_calls.length > 0) {
@@ -78,7 +78,7 @@ export async function queueLangchainMemberAssignment(caller: string, llm: BaseCh
                         content: toolOutput
                     });
                     messages.push(newTM);
-                    historyManager.addEntry(member_object?.name ?? "no-data", `tool:${toolCall.name}`, member_object?.model ?? "no-model", `args: ${JSON.stringify(toolCall.args)}`, toolOutput, LookupTag.TOOL_RESP, conversationId, parent_id);
+                    historyManager.addEntry(member_object?.name ?? "no-data", `tool:${toolCall.name}`, member_object?.model ?? "no-model", `args: ${JSON.stringify(toolCall.args)}`, toolOutput, LookupTag.TOOL_RESP, conversationId, parent_id, project);
                 }
                 llmOutput = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };
             }
@@ -87,7 +87,7 @@ export async function queueLangchainMemberAssignment(caller: string, llm: BaseCh
         messages.push(new HumanMessage(task_summary_prompt[0].content));
         const final_completion = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };
         response = final_completion.content.toString();
-        historyManager.addEntry(caller, member_object?.name ?? "no-data", member_object?.model ?? "no-model", question, (response.length > 0 ? response : "no final response"), LookupTag.MEMBER_RESP, conversationId, parent_id); //what parent id to use here?
+        historyManager.addEntry(caller, member_object?.name ?? "no-data", member_object?.model ?? "no-model", question, (response.length > 0 ? response : "no final response"), LookupTag.MEMBER_RESP, conversationId, parent_id, project); //what parent id to use here?
 
     } else if(!llm.bindTools) {
         const msg = 'LLM does not support tools';

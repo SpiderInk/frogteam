@@ -6,6 +6,24 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## 0.0.18
+- Project level at the top of the history tree
+    - Project tracked in history entry
+- Multi-Root Workspace Compatibility
+- Task a member directly from their configuration page
+- CSS and JS Webview consolidation
+- Proper content security policies
+
+## 0.0.17
+- Commands - a top level menu entry
+- History hierarchy Changes 
+    - Toggle History Grouping (See "Commands")
+    - Parent/Child elements but a flat tree
+- Respond to Answers directly
+    - In the History's Answer panel when the response is Markdown there is a "Respond Here" button
+    - When using this feature relevant immediate history will be included in the new LLM interaction
+- The Builder now collects a project name and directory
+
 ## 0.0.16
 - Azure OpenAI  
 - Upgrade Axios due to vulnerability report

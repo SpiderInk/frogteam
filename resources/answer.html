@@ -3,33 +3,13 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; style-src 'self' ${cspSource} 'unsafe-inline'; img-src ${cspSource} https:; script-src 'self' ${cspSource} 'nonce-${nonce}';">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${response_by}</title>
+    <link href="${cssUri}" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 10px;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-        }
-
-        textarea {
-            padding: 10px;
-            margin-bottom: 10px;
-            width: 90%;
-            background-color: #D3D3D3;
-        }
-
-        select {
-            padding: 5px;
-            background-color: #D3D3D3;
-        }
-
         button {
-            padding: 10px;
             background-color: #4CAF50;
         }
 
@@ -41,74 +21,18 @@
             background-color: grey;
         }
 
-        /* Ensure the first column never wraps, aligns text to the top, adds padding, and stays small */
-        table tr td:first-child {
-            white-space: nowrap;
-            vertical-align: top;
-            /* Align text to the top of the cell */
-            padding-right: 20px;
-            /* Add more padding between column 1 and 2 */
-            width: 150px;
-            /* Set a fixed width to control the column size */
-            max-width: 150px;
-            /* Ensure the column doesn't exceed this width */
-            overflow: hidden;
-            /* Hide overflow if the content is too wide */
-            text-overflow: ellipsis;
-            /* Add ellipsis (...) if the text overflows */
-        }
-
-        /* Ensure the second column takes up the remaining width */
-        table tr td:nth-child(2) {
-            width: 100%;
-            /* Take up all remaining space */
-        }
-
-        /* Optional: Add some padding inside all table cells for better readability */
-        table tr td {
-            padding: 8px;
-        }
-
-        /* Add a vertical border under each row */
-        table tr {
-            border-bottom: 1px solid #ccc;
-            /* Adjust the color and thickness as needed */
-        }
-
-        /* Optional: Add border-collapse to make the borders look more consistent */
-        table {
-            width: 100%;
-            /* Ensure the table itself takes up the full width of the container */
-            border-collapse: collapse;
-            /* Ensures borders don't have gaps between them */
-        }
-
-        /* Hide the form elements initially */
-        #formElements {
-            display: none;
-            margin-top: 10px;
+        #response_div {
+            width: 95%;
+            padding-bottom: 10px;
+            float: none;
         }
     </style>
 </head>
 
 <body>
-    <!-- Button to toggle the form elements -->
-    <button id="response_form" onclick="toggleFormElements()">Respond Here</button>
-
-    <!-- Form elements that will be toggled -->
-    <div id="formElements">
-        <input type="hidden" id="history_id" value="${history_id}">
-        <select id="select_members">
-            <option value="Team">Team</option>
-        </select>
-        <br><br>
-        <textarea id="textarea" rows="6" cols="60" placeholder="Enter your text here..."></textarea>
-        <br><br>
-        <button onclick="submitForm()">Submit</button>
-        <button onclick="toggleFormElements()">Cancel</button>
+    <div class="cmd">
+        <div id="response_div"></div>
     </div>
-
-    <br>
     <table>
         <tr>
             <td>Entry Type</td>
@@ -131,21 +55,29 @@
             <td>${ask}</td>
         </tr>
         <tr>
-            <td colspan="2">${markdownContent}</td>
+            <td colspan="2" style="word-wrap: break-word; word-break: break-word; white-space: normal;">
+                ${markdownContent}</td>
         </tr>
     </table>
+    <script src="${jsUri}" nonce="${nonce}"></script>
     <script nonce="${nonce}">
+        const history_id = "${history_id}";
         const history_type = "${lookupTag}";
         const vscode = acquireVsCodeApi();
-        document.getElementById('formElements').style.display = 'none';
-
         window.onload = () => {
+            // vscode.postMessage({
+            //     command: 'alert',
+            //     text: "Hi",
+            // });
+            createFormElements(history_id, "response_div", 'submitTask');
+            document.getElementById('formElements').style.display = 'none';
             const validHistoryTypes = ['ProjectDescription', 'MemberResponse', 'ProjectResponse'];
             if (validHistoryTypes.includes(history_type)) {
                 document.getElementById('response_form').style.display = 'block';
             } else {
                 document.getElementById('response_form').style.display = 'none';
             }
+            loadPersistedMembers();
         };
 
         window.addEventListener('message', event => {
@@ -153,8 +85,10 @@
             switch (message.command) {
                 case 'loadMembers':
                     const select_members = document.getElementById("select_members");
-                    // Clear existing options (if you want to reset before adding new options)
                     select_members.innerHTML = '<option value="Team">Team</option>';
+
+                    // Persist the setups in localStorage
+                    localStorage.setItem('memberSetups', JSON.stringify(message.setups));
 
                     // Loop through the setups array and create new options
                     message.setups.forEach((setup) => {
@@ -167,32 +101,23 @@
             }
         });
 
-        function toggleFormElements() {
-            const formElements = document.getElementById('formElements');
-            const button = document.getElementById('response_form');
-            if (formElements.style.display === 'none') {
-                formElements.style.display = 'block';
-                button.style.display = 'none';
-            } else {
-                document.getElementById('select_members').value = "Team";
-                document.getElementById('textarea').value = "";
-                formElements.style.display = 'none';
-                button.style.display = 'block';
-            }
-        }
+        // Function to load persisted members from localStorage when the webview is first loaded
+        function loadPersistedMembers() {
+            const storedSetups = localStorage.getItem('memberSetups');
+            if (storedSetups) {
+                const setups = JSON.parse(storedSetups);
+                const select_members = document.getElementById("select_members");
+                select_members.innerHTML = '<option value="Team">Team</option>';
 
-        function submitForm() {
-            const dropdownValue = document.getElementById('select_members').value;
-            const textareaValue = document.getElementById('textarea').value;
-            const history_idValue = document.getElementById('history_id').value;
-            vscode.postMessage({
-                command: 'submitTask',
-                member: dropdownValue,
-                text: textareaValue,
-                history_id: history_idValue
-            });
-            toggleFormElements();
-        }
+                setups.forEach((setup) => {
+                    const option = document.createElement("option");
+                    option.value = setup.name;
+                    option.text = setup.name;
+                    select_members.appendChild(option);
+                });
+            }
+        };
+
     </script>
 </body>
 

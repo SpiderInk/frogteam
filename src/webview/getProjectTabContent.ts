@@ -2,13 +2,20 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { getNonce } from './getNonce';
+import { commonWebPanelComponents } from '../utils/common';
 
-export function getProjectTabContent(extensionUri: vscode.Uri): string {
+export function getProjectTabContent(extensionUri: vscode.Uri, webView: vscode.Webview): string {
     const htmlFilePath = path.join(extensionUri.fsPath, 'resources', 'project.html');
+    const parts = commonWebPanelComponents(extensionUri);
     try {
         let html = fs.readFileSync(htmlFilePath, 'utf8');
         const nonce = getNonce();
+        const css = webView.asWebviewUri(parts.css).toString();
+        const jss = webView.asWebviewUri(parts.jss).toString();
         html = html.replace(/\${nonce}/g, nonce);
+        html = html.replace(/\${cssUri}/g, css);
+        html = html.replace(/\${jsUri}/g, jss);
+        html = html.replace(/\${cspSource}/g, webView.cspSource);
         return html;
     } catch (error) {
         console.error(`Error reading HTML file: ${error}`);

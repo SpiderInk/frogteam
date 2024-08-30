@@ -2,7 +2,8 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
-import { output_log } from '../utils/outputChannelManager'
+import { output_log } from '../utils/outputChannelManager';
+import { getWorkspaceFolder } from '../utils/common';
 
 export async function createAndOpenFile(fileName: string, fileContent: string): Promise<string> {
     try {
@@ -49,8 +50,8 @@ export async function save(content: string, file: string): Promise<string> {
 export function load_file_content(filePath: string): string {
     let data = '';
     try {
-        if (fs.existsSync(`${vscode.workspace.rootPath}/${filePath}`)) {
-            data = fs.readFileSync(`${vscode.workspace.rootPath}/${filePath}`, 'utf8');
+        if (fs.existsSync(`${getWorkspaceFolder()}/${filePath}`)) {
+            data = fs.readFileSync(`${getWorkspaceFolder()}/${filePath}`, 'utf8');
         }
         output_log(`${filePath} read successfully`);
     } catch (err) {

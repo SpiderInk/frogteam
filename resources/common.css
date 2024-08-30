@@ -1,0 +1,112 @@
+body {
+    font-family: Arial, sans-serif;
+    padding: 10px;
+    background-color: var(--vscode-editor-background);
+    /* Use VS Code's background color */
+    color: var(--vscode-editor-foreground);
+}
+
+h1 {
+    font-size: 1.5em;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+button {
+    background-color: transparent;
+    border-color: #D3D3D3;
+    border-width: 2px;
+    border-radius: 4px;
+    padding: 6px;
+    /* float: right; */
+}
+
+textarea,
+input[type="text"],
+input[type="password"],
+input[type="color"],
+select {
+    padding: 5px;
+    margin-bottom: 5px;
+    width: 95%;
+    background-color: #D3D3D3;
+    color: black;
+}
+
+input[type="checkbox"] {
+    background-color: #D3D3D3;
+    color: black;
+    margin: 0;
+    float: left;
+    clear: none;
+}
+
+textarea {
+    padding: 10px;
+    margin-bottom: 10px;
+    width: 90%;
+    background-color: #D3D3D3;
+}
+
+/* Ensure the first column never wraps, aligns text to the top, adds padding, and stays small */
+table tr td:first-child {
+    white-space: nowrap;
+    vertical-align: top;
+    /* Align text to the top of the cell */
+    padding-right: 20px;
+    /* Add more padding between column 1 and 2 */
+    width: 150px;
+    /* Set a fixed width to control the column size */
+    max-width: 150px;
+    /* Ensure the column doesn't exceed this width */
+    overflow: hidden;
+    /* Hide overflow if the content is too wide */
+    text-overflow: ellipsis;
+    /* Add ellipsis (...) if the text overflows */
+}
+
+/* Ensure the second column takes up the remaining width */
+table tr td:nth-child(2) {
+    width: 100%;
+    /* Take up all remaining space */
+}
+
+/* Optional: Add some padding inside all table cells for better readability */
+table tr td {
+    padding: 8px;
+}
+
+/* Add a vertical border under each row */
+table tr {
+    border-bottom: 1px solid #ccc;
+    /* Adjust the color and thickness as needed */
+}
+
+/* Optional: Add border-collapse to make the borders look more consistent */
+table {
+    width: 100%;
+    /* Ensure the table itself takes up the full width of the container */
+    border-collapse: collapse;
+    /* Ensures borders don't have gaps between them */
+}
+
+.cmd {
+    width: 95%;
+    /* height: 20px; */
+    padding-bottom: 10px;
+    float: right;
+}
+
+.icon {
+    color: #D3D3D3;
+    fill: #D3D3D3;
+}
+
+.issues {
+    display: block;
+    color: red;
+    float: left;
+}

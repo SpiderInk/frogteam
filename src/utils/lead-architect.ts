@@ -12,7 +12,7 @@ import { ToolCall } from "@langchain/core/messages/tool";
 import { output_log } from './outputChannelManager';
 import { fetchApiKey } from '../utils/common';
 
-export async function projectGo(question: string, setups: Setup[], historyManager: HistoryManager, conversationId: string, parentId: string | undefined): Promise<string> {
+export async function projectGo(question: string, setups: Setup[], historyManager: HistoryManager, conversationId: string, parentId: string | undefined, project: string): Promise<string> {
     const member_object = fetchSetupByPurpose(setups, 'lead-architect');
 
     switch(member_object?.model) {
@@ -29,14 +29,14 @@ export async function projectGo(question: string, setups: Setup[], historyManage
                     maxRetries: 2,
                     maxTokens: 4096
                 });
-                return await leadArchitectGo(azure_llm, question, setups, historyManager, member_object?.model, member_object?.name, conversationId, parentId);
+                return await leadArchitectGo(azure_llm, question, setups, historyManager, member_object?.model, member_object?.name, conversationId, parentId, project);
             } else {
                 const openai_llm = new ChatOpenAI({
                     apiKey: fetchApiKey(member_object?.apiKey),
                     model: member_object?.model ?? "no-model",
                     maxRetries: 0,
                 });
-                return await leadArchitectGo(openai_llm, question, setups, historyManager, member_object?.model, member_object?.name, conversationId, parentId);
+                return await leadArchitectGo(openai_llm, question, setups, historyManager, member_object?.model, member_object?.name, conversationId, parentId, project);
             }
         case 'anthropic.claude-3-5-sonnet-20240620-v1:0':
         case 'anthropic.claude-3-haiku-20240307-v1:0':
@@ -45,13 +45,13 @@ export async function projectGo(question: string, setups: Setup[], historyManage
                 model: member_object?.model ?? "no-model",
                 maxRetries: 0,
             });
-            return await leadArchitectGo(bedrock_llm, question, setups, historyManager, member_object?.model, member_object?.name, conversationId, parentId);
+            return await leadArchitectGo(bedrock_llm, question, setups, historyManager, member_object?.model, member_object?.name, conversationId, parentId, project);
         default:
             return 'no model';
     }
 }
 
-export async function leadArchitectGo(llm: BaseChatModel, question: string, setups: Setup[], historyManager: HistoryManager, model: string, member_name: string, conversationId: string, parentId: string | undefined): Promise<string> {
+export async function leadArchitectGo(llm: BaseChatModel, question: string, setups: Setup[], historyManager: HistoryManager, model: string, member_name: string, conversationId: string, parentId: string | undefined, project: string): Promise<string> {
 
     /*
         - lookup who the lead architect is
@@ -108,20 +108,20 @@ export async function leadArchitectGo(llm: BaseChatModel, question: string, setu
                 answer_for_history = "tool calls pending.";
             }
         }
-        const parent_id = historyManager.addEntry('user', member_name, model, question, answer_for_history, LookupTag.PROJECT_DESC, conversationId, undefined);
+        const parent_id = historyManager.addEntry('user', member_name, model, question, answer_for_history, LookupTag.PROJECT_DESC, conversationId, undefined, project);
         do {
             messages.push(llmOutput as AIMessage);
             if (llmOutput.tool_calls && llmOutput.tool_calls.length > 0) {
                 for (const toolCall of llmOutput.tool_calls) {
                     if(toolCall.name === "getQueueMemberAssignmentApi") {
                         // Setups and HistoryManager are too complex so we have to inject them more directly
-                        let toolOutput = await queueMemberAssignment('lead-architect', toolCall.args.member, toolCall.args.question, setups, historyManager, conversationId, parent_id);
+                        let toolOutput = await queueMemberAssignment('lead-architect', toolCall.args.member, toolCall.args.question, setups, historyManager, conversationId, parent_id, project);
                         let newTM = new ToolMessage({
                             tool_call_id: toolCall.id!,
                             content: toolOutput
                         });
                         messages.push(newTM);
-                        historyManager.addEntry(member_name, `tool:${toolCall.name}`, model, `args: ${JSON.stringify(toolCall.args)}`, toolOutput, LookupTag.TOOL_RESP, conversationId, parent_id);
+                        historyManager.addEntry(member_name, `tool:${toolCall.name}`, model, `args: ${JSON.stringify(toolCall.args)}`, toolOutput, LookupTag.TOOL_RESP, conversationId, parent_id, project);
                     } else {
                         let tool = toolMapping[toolCall.name];
                         let toolOutput = await tool.invoke(toolCall.args);
@@ -130,7 +130,7 @@ export async function leadArchitectGo(llm: BaseChatModel, question: string, setu
                             content: toolOutput
                         });
                         messages.push(newTM);
-                        historyManager.addEntry(member_name, `tool:${toolCall.name}`, model, `args: ${JSON.stringify(toolCall.args)}`, toolOutput, LookupTag.TOOL_RESP, conversationId, parent_id);
+                        historyManager.addEntry(member_name, `tool:${toolCall.name}`, model, `args: ${JSON.stringify(toolCall.args)}`, toolOutput, LookupTag.TOOL_RESP, conversationId, parent_id, project);
                     }
                 }
                 llmOutput = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };
@@ -139,7 +139,7 @@ export async function leadArchitectGo(llm: BaseChatModel, question: string, setu
         messages.push(new HumanMessage(task_summary_prompt[0].content));
         const final_completion = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };
         response = final_completion.content.toString();
-        historyManager.addEntry("user", member_name, model, question, (response.length > 0 ? response : "no final response"), LookupTag.PROJECT_RESP, conversationId, parent_id);
+        historyManager.addEntry("user", member_name, model, question, (response.length > 0 ? response : "no final response"), LookupTag.PROJECT_RESP, conversationId, parent_id, project);
     } else if(!llm.bindTools) {
         const msg = 'LLM does not support tools';
         vscode.window.showInformationMessage(msg);
