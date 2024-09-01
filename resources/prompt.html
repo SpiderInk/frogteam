@@ -7,6 +7,9 @@
 <title>prompt editor</title>
     <link href="${cssUri}" rel="stylesheet">
     <style>
+        button {
+            float: right;
+        }
         .checkbox-container {
             display: flex;
             align-items: center;
@@ -25,10 +28,10 @@
     </script>
 </head>
 <body>
-    <span class="cmd">
-        <button id="Delete" onclick="delete_prompt();" title="Delete"><img class="icon" src="${local_resources}/resources/trash.svg" width="16" height="16" /></button>
-        <button id="duplicate" onclick="duplicate_prompt();" title="Duplicate"><img class="icon" src="${local_resources}/resources/clone.svg" width="16" height="16" /></button>
-    </span>
+    <div class="cmd">
+        <button id="delete" title="Delete"><img class="icon" src="${local_resources}/resources/trash.svg" width="16" height="16" /></button>
+        <button id="duplicate" title="Duplicate"><img class="icon" src="${local_resources}/resources/clone.svg" width="16" height="16" /></button>
+    </div>
     <h3>Prompt Editor</h3>
     You need a minimum of three prompts: lead-architect, lead-engineer, and developer. There must be a team member with a "purpose" to match the "category" and "model" of each prompt. The project editor will show you the team roster and status telling what purposes and categories are missing or displaying healthy.
     <br><br>
@@ -53,6 +56,7 @@
             <option value="lead-architect">lead-architect</option>
             <option value="lead-engineer">lead-engineer</option>
             <option value="developer">developer</option>
+            <option value="task-summary">task-summary</option>
         </select>
 
         <label for="role">Role</label>
@@ -73,12 +77,17 @@
 
         <label for="content">Prompt</label>
         <!-- <div id="content" class="editable-dark-theme" contenteditable="true"></div> -->
-        <textarea rows="10" id="content" placeholder="You are a software developer..."></textarea>
+        <textarea rows="30" id="content" placeholder="You are a software developer..."></textarea>
     </form>
 
     <script src="${jsUri}" nonce="${nonce}"></script>
     <script nonce="${nonce}">
         let prompt = {};
+
+        window.onload = () => {
+            document.getElementById("delete").onclick = delete_prompt;
+            document.getElementById("duplicate").onclick = duplicate_prompt;
+        };
 
         document.addEventListener('DOMContentLoaded', () => {
             restoreState();

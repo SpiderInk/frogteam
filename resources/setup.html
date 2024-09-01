@@ -48,9 +48,9 @@
 <body>
     <div class="cmd">
         <div id="query_div">&nbsp;</div>
-        <button id="Delete" onclick="delete_setup();" title="Delete"><img class="icon"
+        <button id="delete" title="Delete"><img class="icon"
                 src="${local_resources}/resources/trash.svg" width="16" height="16" /></button>
-        <button id="duplicate" onclick="duplicate_setup();" title="Duplicate"><img class="icon"
+        <button id="duplicate" title="Duplicate"><img class="icon"
                 src="${local_resources}/resources/clone.svg" width="16" height="16" /></button>
     </div>
     <br>
@@ -62,7 +62,7 @@
     <div style="clear: both;">
         <h3>Model Member Setup</h3>
         <div id="TeamSetup">
-            <form id="team-setup-form" oninput="autoSaveSetup()">
+            <form id="team-setup-form">
                 <input type="hidden" id="id" />
 
                 <label for="name">Name</label>
@@ -131,6 +131,9 @@
             createFormElements(null, "query_div", 'queryMember');
             document.getElementById('formElements').style.display = 'none';
             setMemberDropDown();
+            document.getElementById("delete").onclick = delete_setup;
+            document.getElementById("duplicate").onclick = duplicate_setup;
+            document.getElementById("team-setup-form").oninput = autoSaveSetup;
         };
 
         document.addEventListener('DOMContentLoaded', () => {
