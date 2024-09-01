@@ -1,5 +1,9 @@
 # <img src="https://frogteam.ai/logo.png" alt="frogteam icon" width="32" height="32"> - frogteam 
 
+Updates v0.0.19: 09-01-2024
+This release is for Bug Fixes. Delete and Clone buttons fixed. Missing prompt category fixed.
+Also Note: **Prompts can be assigned wildcard (*) for their model.**
+
 Updates v0.0.18: 08-30-2024
 Start looking to the change log for details. This is a big one for history reorganization. 
 
@@ -165,7 +169,8 @@ You can refine the prompt and submit again. Existing files will be used and edit
         - Is there a standard way I can do this. This is a research task for me.
 
 ## Tasks - On Deck
-
+- Add try...catch/check for length where .content is used from llm response
+- Add try...catch for tools calls and loh failure in history
 - configuration for a time or token limit by model/team member
     - implement team member token limits/time limits/request token limits
     - this will require tracking
@@ -177,6 +182,7 @@ You can refine the prompt and submit again. Existing files will be used and edit
 - BUG: sometimes toolCall definitions or results are bad and the process errors out
     - Maybe just try catch and report/log/add history what happened? **done**
     - At this time the user can just try clicking "Go" again
+    - ANy fix will need to address the conversation rules
 
 ## Tasks - Backlog
 - prompt library sharing platform

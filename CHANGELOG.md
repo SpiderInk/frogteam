@@ -6,6 +6,11 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## 0.0.19
+- Bug Fix: task-summary type missing
+- Bug Fix: Duplicate and Delete buttons we erring
+- Updated included prompts
+
 ## 0.0.18
 - Project level at the top of the history tree
     - Project tracked in history entry
