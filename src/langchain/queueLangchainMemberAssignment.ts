@@ -71,13 +71,19 @@ export async function queueLangchainMemberAssignment(caller: string, llm: BaseCh
             messages.push(llmOutput as AIMessage);
             if (llmOutput.tool_calls && llmOutput.tool_calls.length > 0) {
                 for (const toolCall of llmOutput.tool_calls) {
-                    let tool = toolMapping[toolCall.name];
-                    let toolOutput = await tool.invoke(toolCall.args);
-                    let newTM = new ToolMessage({
-                        tool_call_id: toolCall.id!,
-                        content: toolOutput
-                    });
-                    messages.push(newTM);
+                    let toolOutput;
+                    try {
+                        let tool = toolMapping[toolCall.name];
+                        toolOutput = await tool.invoke(toolCall.args);
+                        let newTM = new ToolMessage({
+                            tool_call_id: toolCall.id!,
+                            content: toolOutput
+                        });
+                        messages.push(newTM);
+                    } catch {
+                        toolOutput = "tool failed";
+                        output_log(`${member_object?.name ?? "unknown"}: Tool call ${toolCall.name} failed`);
+                    }
                     historyManager.addEntry(member_object?.name ?? "no-data", `tool:${toolCall.name}`, member_object?.model ?? "no-model", `args: ${JSON.stringify(toolCall.args)}`, toolOutput, LookupTag.TOOL_RESP, conversationId, parent_id, project);
                 }
                 llmOutput = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };
