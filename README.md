@@ -1,5 +1,12 @@
 # <img src="https://frogteam.ai/logo.png" alt="frogteam icon" width="32" height="32"> - <a href="https://marketplace.visualstudio.com/items?itemName=SpiderInk.frogteam">FrogTeam.ai</a> 
 
+Update v0.1.0: 09-07-2024<br>
+<ul>
+    <li>mlFLow experiments early setup mlFlow only work from localhost:5001</li>
+    <li>Fixed webview post message events</li>
+    <li>updated member and prompt tree items</li>
+</ul>
+
 Updates v0.0.19: 09-01-2024<br>
 This release is for Bug Fixes. Delete and Clone buttons fixed. Missing prompt category fixed.<br>
 Also Note: **Prompts can be assigned wildcard (*) for their model.**
@@ -169,12 +176,7 @@ You can refine the prompt and submit again. Existing files will be used and edit
 
 ## Tasks - On Deck
 
-- BUG: Messages getting processed multiple times **done**
-- BUG: Missing projects.json **done**
 - BUG: Answer tab looses context sometimes, needs to have state
-- BUG: Fix projects file, should copy from resources with the one no-project
-
-- Update panel displays for team and prompt lib **done**
 
 mlflow
     - experiment setup
