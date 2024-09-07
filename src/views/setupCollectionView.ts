@@ -54,9 +54,10 @@ export class SetupCollectionViewProvider implements vscode.TreeDataProvider<Setu
 class SetupItem extends vscode.TreeItem {
     constructor(public setup: Setup) {
         super(setup.name, vscode.TreeItemCollapsibleState.None);
-        this.description = setup.model;
+        this.description = setup.purpose;
         this.iconPath = vscode.Uri.file(setup.icon);
-        this.tooltip = `${setup.name}\nModel: ${setup.model}`;
+        // this.tooltip = `${setup.name} Role: ${setup.purpose}`;
+        this.tooltip = setup.model;
         this.command = {
             command: 'frogteam.openSetupPanel',
             title: 'Open Setup Panel',

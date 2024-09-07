@@ -14,7 +14,6 @@ import { fetchApiKey } from '../utils/common';
 
 export async function projectGo(question: string, setups: Setup[], historyManager: HistoryManager, conversationId: string, parentId: string | undefined, project: string): Promise<string> {
     const member_object = fetchSetupByPurpose(setups, 'lead-architect');
-
     switch(member_object?.model) {
         case 'gpt-3.5-turbo':
         case 'gpt-4-turbo':
@@ -52,14 +51,11 @@ export async function projectGo(question: string, setups: Setup[], historyManage
 }
 
 export async function leadArchitectGo(llm: BaseChatModel, question: string, setups: Setup[], historyManager: HistoryManager, model: string, member_name: string, conversationId: string, parentId: string | undefined, project: string): Promise<string> {
-
     /*
         - lookup who the lead architect is
         - throw error if there is no lead architect or if there is more than one
         - historyManager needs to record the member name and role for every entry
     */
-
-
 
     let response = {} as any;
     const system_prompt_obj = fetchPrompts('system', 'lead-architect', model);

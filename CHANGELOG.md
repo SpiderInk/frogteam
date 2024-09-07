@@ -6,6 +6,11 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## 0.1.0
+- mlFLow experiments early setup mlFlow only work from localhost:5001
+- Fixed webview post message events
+- updated member and prompt tree items
+
 ## 0.0.19
 - Bug Fix: task-summary type missing
 - Bug Fix: Duplicate and Delete buttons we erring

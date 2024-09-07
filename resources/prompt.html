@@ -22,6 +22,21 @@
             float: left;
             clear: none;
         }
+
+        #experiment, #clear_experiment {
+            color: white;
+            width: 175px;
+            float: left;
+            padding: 6px;
+            margin: 10px
+        }
+
+        #experiment_id {
+            width: 150px;
+            float: left;
+            padding: 6px;
+            margin: 10px;
+        }
     </style>
     <script nonce="${nonce}">
         const vscode = acquireVsCodeApi();
@@ -78,33 +93,35 @@
         <label for="content">Prompt</label>
         <!-- <div id="content" class="editable-dark-theme" contenteditable="true"></div> -->
         <textarea rows="30" id="content" placeholder="You are a software developer..."></textarea>
+        <br>
+        <br>
+        <div>
+            <p>Use the "Start MLFlow Experiment" to setup and experiment to track this prompts usage. When there is a number in the box there Frogteam will log messages to that experiment. If you want to stop logging to an experiment use the Clear Experiment button.</p>
+            <button id="experiment" type="button">Start MLFlow Experiment</button><input type="text" id="experiment_id" readonly><button id="clear_experiment" type="button">Clear Experiment</button>
+        </div>
     </form>
 
     <script src="${jsUri}" nonce="${nonce}"></script>
     <script nonce="${nonce}">
         let prompt = {};
 
-        window.onload = () => {
-            document.getElementById("delete").onclick = delete_prompt;
-            document.getElementById("duplicate").onclick = duplicate_prompt;
-        };
-
         document.addEventListener('DOMContentLoaded', () => {
             restoreState();
+            setupEventListeners();
         });
 
-        document.getElementById('edit-prompt').oninput = function () {
-            // prompt.content = document.getElementById('content').innerText;
-            prompt.content = document.getElementById('content').value;
-            prompt.category = document.getElementById('category').value;
-            prompt.role = document.getElementById('role').value;
-            prompt.models = document.getElementById('models').value;
-            prompt.active = document.getElementById('active').checked;
-            prompt.tag = document.getElementById('tag').value;
-            prompt.id = document.getElementById('id').value;
-            saveState(); // before we post the message!
-            vscode.postMessage({ command: 'savePrompt', prompt });
-        };
+
+        function setupEventListeners() {
+            setClickListener(document.getElementById("delete"), delete_prompt);
+            // document.getElementById("delete").addEventListener('click', delete_prompt);
+            setClickListener(document.getElementById("duplicate"), duplicate_prompt);
+            // document.getElementById("duplicate").addEventListener('click', duplicate_prompt);
+            setClickListener(document.getElementById("experiment"), start_mlflow_experiment);
+            // document.getElementById("experiment").addEventListener('click', start_mlflow_experiment);
+            setClickListener(document.getElementById("clear_experiment"), end_mlflow_experiment);
+
+            document.getElementById('edit-prompt').addEventListener('input', savePrompt);
+        }
 
         window.addEventListener('message', event => {
             const message = event.data;
@@ -119,6 +136,7 @@
                     document.getElementById('models').value = prompt.models;
                     document.getElementById('active').checked = prompt.active;
                     document.getElementById('tag').value = prompt.tag;
+                    document.getElementById('experiment_id').value = prompt.ml_experiment_id;
                     break;
             }
         });
@@ -134,6 +152,7 @@
                 document.getElementById('models').value = state.models;
                 document.getElementById('active').checked = state.active;
                 document.getElementById('tag').value = state.tag;
+                document.getElementById('experiment_id').value = state.ml_experiment_id;
             }
         };
 
@@ -145,16 +164,46 @@
                 models: prompt.models,
                 id: prompt.id,
                 active: prompt.active,
-                tag: prompt.tag
+                tag: prompt.tag,
+                ml_experiment_id: prompt.ml_experiment_id
             };
             vscode.setState(state);
         };
 
-        function delete_prompt() {
+        function savePrompt() {
+                prompt.content = document.getElementById('content').value;
+                prompt.category = document.getElementById('category').value;
+                prompt.role = document.getElementById('role').value;
+                prompt.models = document.getElementById('models').value;
+                prompt.active = document.getElementById('active').checked;
+                prompt.tag = document.getElementById('tag').value;
+                prompt.id = document.getElementById('id').value;
+                prompt.ml_experiment_id = document.getElementById('experiment_id').value;
+                saveState(); // before we post the message!
+                vscode.postMessage({ command: 'savePrompt', prompt });
+            }
+
+        function end_mlflow_experiment() {
+            document.getElementById('experiment_id').value = "";
+            savePrompt();
+        }
+
+        function start_mlflow_experiment(event) {
+            console.log("Button clicked, posting message...");
+            event.preventDefault(); // Prevent any default action
+            event.stopPropagation(); // Stop event from bubbling up
+            vscode.postMessage({ command: 'createExperiment', prompt });
+        }
+
+        function delete_prompt(event) {
+            event.preventDefault(); // Prevent any default action
+            event.stopPropagation(); // Stop event from bubbling up
             vscode.postMessage({ command: 'deletePrompt', prompt });
         };
 
-        function duplicate_prompt() {
+        function duplicate_prompt(event) {
+            event.preventDefault(); // Prevent any default action
+            event.stopPropagation(); // Stop event from bubbling up
             prompt.id = generateUniqueId();
             saveState();
             vscode.postMessage({ command: 'savePrompt', prompt });

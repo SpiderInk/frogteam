@@ -21,6 +21,7 @@ export interface Prompt {
     models: string;
     active: boolean;
     tag: string;
+    ml_experiment_id?: string;
 }
 
 export function newPrompt(context: vscode.ExtensionContext): Prompt {

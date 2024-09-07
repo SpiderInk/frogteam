@@ -1,7 +1,14 @@
-# <img src="https://frogteam.ai/logo.png" alt="frogteam icon" width="32" height="32"> - frogteam 
+# <img src="https://frogteam.ai/logo.png" alt="frogteam icon" width="32" height="32"> - <a href="https://marketplace.visualstudio.com/items?itemName=SpiderInk.frogteam">FrogTeam.ai</a> 
 
-Updates v0.0.19: 09-01-2024
-This release is for Bug Fixes. Delete and Clone buttons fixed. Missing prompt category fixed.
+Update v0.1.0: 09-07-2024<br>
+<ul>
+    <li>mlFLow experiments early setup mlFlow only work from localhost:5001</li>
+    <li>Fixed webview post message events</li>
+    <li>updated member and prompt tree items</li>
+</ul>
+
+Updates v0.0.19: 09-01-2024<br>
+This release is for Bug Fixes. Delete and Clone buttons fixed. Missing prompt category fixed.<br>
 Also Note: **Prompts can be assigned wildcard (*) for their model.**
 
 Updates v0.0.18: 08-30-2024
@@ -73,7 +80,7 @@ I am wondering if there is an appetite for what I am doing here. Let me know you
 Here is a short demo <a href="https://youtu.be/hxatfrgiiAQ">video</a>. <sub>lead-architect can use other models now</sub><br>
 Follow me on [instagram](https://www.instagram.com/reddoverises/).<br>
 
-- [ - frogteam](#---frogteam)
+- [ - FrogTeam.ai](#---frogteamai)
   - [Your virtual GenAI Development Team](#your-virtual-genai-development-team)
     - [Overview](#overview)
   - [Flow](#flow)
@@ -152,7 +159,6 @@ You can refine the prompt and submit again. Existing files will be used and edit
 - If you paste into the prompt text area UI formatting may not work, it will save so just close and open the editor window for now.
 
 ## Tasks - Implementing Other Model Sources
-
 - Right now I am chasing models that support tool calls using the Langchain framework
     - OpenAI from OpenAI
         - gpt-4o **done**
@@ -169,6 +175,22 @@ You can refine the prompt and submit again. Existing files will be used and edit
         - Is there a standard way I can do this. This is a research task for me.
 
 ## Tasks - On Deck
+
+- BUG: Answer tab looses context sometimes, needs to have state
+
+mlflow
+    - experiment setup
+      - You can start a new experiment and the experiment id will be saved with the object
+      - places where the object is used runs will be created and metrics logged
+      - team member
+      - prompt
+
+- Make a tool for the llm that does a code search, like just use vscode's search to find things in files enabling LLM find/replace
+
+- Change Team List View to show the Role more prominently than the model
+- We need a way to export markdown more easily, user should be able to click a "Copy" icon to copy the Markdown response.
+- Make a new tool that allows the llm to request the content of a URL be fetched, when its an image we should also base64 it
+
 - Add try...catch/check for length where .content is used from llm response
 - Add try...catch for tools calls and loh failure in history
 - configuration for a time or token limit by model/team member
@@ -182,7 +204,8 @@ You can refine the prompt and submit again. Existing files will be used and edit
 - BUG: sometimes toolCall definitions or results are bad and the process errors out
     - Maybe just try catch and report/log/add history what happened? **done**
     - At this time the user can just try clicking "Go" again
-    - ANy fix will need to address the conversation rules
+    - An
+    - 0y fix will need to address the conversation rules
 
 ## Tasks - Backlog
 - prompt library sharing platform
@@ -228,6 +251,8 @@ to: Point B -> Cove Island Park, Stamford, CT
 - Do this by generating driving directions between these two locations and then show a dot moving along those directons over time
 - Any files should be created/edited in the "tracking" directory
 - I expect to be able to open index.html from the tracking directory using the LiveServer VS Code extension and when I do I expect to see a map showing the locations I have mentioned.
+
+> Use an HTML Canvas to make a paddle tenis game where you can move a rectangle block back and forth using the left and right arrow keys. You hit the ball it goes up hits the top and comes back. If you miss and the ball hits the bottom wall you loose a point, if you hit the ball you gain 2 points.
 
 ## Icons
 Any icons you see either came from the list below, I made them, or GenAI Helped me make them.
