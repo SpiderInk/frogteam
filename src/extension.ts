@@ -21,6 +21,7 @@ import * as fs from 'fs';
 import { output_log } from './utils/outputChannelManager';
 import { showRunningIndicator, hideRunningIndicator } from './utils/runningIndicator';
 import { getWorkspaceFolder } from './utils/common';
+import { PromptExperiment } from './mlflow/promptExperiment';
 
 export const PROMPTS_FILE = path.join(getWorkspaceFolder() || '', '.vscode', 'prompts.json');
 export const SETUPS_FILE = path.join(getWorkspaceFolder() || '', '.vscode', 'setups.json');
@@ -148,6 +149,7 @@ export function updatePromptsFile(context: vscode.ExtensionContext) {
 }
 
 export async function openAnswerPanel(context: vscode.ExtensionContext, data: HistoryEntry) {
+	const setups: Setup[] = context.globalState.get('setups', []);
 	if (currentAnswerPanel !== undefined) {
 		currentAnswerPanel.reveal(vscode.ViewColumn.One);
 	} else {
@@ -165,50 +167,49 @@ export async function openAnswerPanel(context: vscode.ExtensionContext, data: Hi
 		);
 
 		currentAnswerPanel.iconPath = iconPath;
+
+		// ** this history manager instance does not seem to have a valid reference to projectViewProvider  
+		// it seems only this reference wants to work
+		// try making a new instance again now that you have the await in place
+		const historyManager = projectViewProvider?.historyManager;
+		// Handle messages from the webview
+		currentAnswerPanel.webview.onDidReceiveMessage(async (message: { command: string; member: string; text: string, history_id: string }) => {
+			let conversationId = generateShortUniqueId();
+			if(historyManager) {
+				switch(message.command) {
+					case "submitTask":
+						const project = historyManager.getProjectByHistoryId(message.history_id);
+						let answer = "";
+						showRunningIndicator(message.member === "Team" ? "Frogteam" : message.member);
+						switch (message.member) {
+							case 'Team':
+								// call the lead emgineer
+								// submitTask: message.command
+								output_log(`Received "submitTask" command for member: ${message.member}, with text: ${message.text}, and history id: ${message.history_id}.`);
+								answer = await projectGo(message.text, setups, historyManager, conversationId, message.history_id, project ?? "no-project");
+								break;
+							default:
+								// call queueMemberAssignment
+								output_log(`Received "submitTask" command for member: ${message.member}, with text: ${message.text}, and history id: ${message.history_id}.`);
+								answer = await queueMemberAssignment('user', message.member, message.text, setups, historyManager, conversationId, message.history_id, project ?? "no-project");
+							break;
+						}
+						if (Object.keys(answer).length > 0) {
+							projectViewProvider?.openMarkdownPanel(context, answer);
+						}
+						hideRunningIndicator();
+						break;
+					case "alert":
+						vscode.window.showInformationMessage(message.text);
+						break;
+				}
+			} else {
+				throw new Error("HistoryManager is not initialized.");
+			}
+		});
 	}
 	const documentContent = await getAnswerTabContent(context.extensionUri, currentAnswerPanel.webview, data);
 	currentAnswerPanel.webview.html = documentContent;
-
-	// ** this history manager instance does not seem to have a valid reference to projectViewProvider  
-	// it seems only this reference wants to work
-	// try making a new instance again now that you have the await in place
-	const historyManager = projectViewProvider?.historyManager;
-	const setups: Setup[] = context.globalState.get('setups', []);
-	// Handle messages from the webview
-	currentAnswerPanel.webview.onDidReceiveMessage(async (message: { command: string; member: string; text: string, history_id: string }) => {
-		let conversationId = generateShortUniqueId();
-		if(historyManager) {
-			switch(message.command) {
-				case "submitTask":
-					const project = historyManager.getProjectByHistoryId(message.history_id);
-					let answer = "";
-					showRunningIndicator(message.member === "Team" ? "Frogteam" : message.member);
-					switch (message.member) {
-						case 'Team':
-							// call the lead emgineer
-							// submitTask: message.command
-							output_log(`Received "submitTask" command for member: ${message.member}, with text: ${message.text}, and history id: ${message.history_id}.`);
-							answer = await projectGo(message.text, setups, historyManager, conversationId, message.history_id, project ?? "no-project");
-							break;
-						default:
-							// call queueMemberAssignment
-							output_log(`Received "submitTask" command for member: ${message.member}, with text: ${message.text}, and history id: ${message.history_id}.`);
-							answer = await queueMemberAssignment('user', message.member, message.text, setups, historyManager, conversationId, message.history_id, project ?? "no-project");
-						break;
-					}
-					if (Object.keys(answer).length > 0) {
-						projectViewProvider?.openMarkdownPanel(context, answer);
-					}
-					hideRunningIndicator();
-					break;
-				case "alert":
-					vscode.window.showInformationMessage(message.text);
-					break;
-			}
-		} else {
-			throw new Error("HistoryManager is not initialized.");
-		}
-	});
 	currentAnswerPanel.webview.postMessage({ command: 'loadMembers', setups: setups });
 
 	currentAnswerPanel.onDidDispose(
@@ -234,31 +235,40 @@ export async function openPromptPanel(context: vscode.ExtensionContext, data: Pr
 				localResourceRoots: [vscode.Uri.file(context.extensionPath)]
 			}
 		);
+	
+		const iconPath = vscode.Uri.file(
+			path.join(context.extensionPath, 'resources', 'icon.png')
+		);
+		currentPromptPanel.iconPath = iconPath;
+		// Handle messages from the webview
+		currentPromptPanel.webview.onDidReceiveMessage(async (message: { command: string; prompt: Prompt }) => {
+			switch (message.command) {
+				case 'savePrompt':
+					savePrompt(message.prompt);
+					projectViewProvider?.refresh();
+					break;
+				case 'deletePrompt':
+					deletePrompt(message.prompt.id);
+					currentPromptPanel?.dispose();
+					currentPromptPanel = undefined;
+					break;
+				case 'createExperiment':
+					const promptExperiment = new PromptExperiment('http://localhost:5001');
+					message.prompt.ml_experiment_id = await promptExperiment.createExperiment(`${message.prompt.category}-${message.prompt.models}`);
+					savePrompt(message.prompt);
+					if(currentPromptPanel !== undefined) {
+						currentPromptPanel.webview.postMessage({ command: 'load', prompt: message.prompt });
+					}
+					break;
+			}
+			const prompts = all_prompts();
+			context.globalState.update('prompts', prompts);
+			promptCollectionViewProvider?.refresh();
+		});
 	}
-	const iconPath = vscode.Uri.file(
-		path.join(context.extensionPath, 'resources', 'icon.png')
-	);
-	currentPromptPanel.iconPath = iconPath;
 	const local_resources = currentPromptPanel.webview.asWebviewUri(context.extensionUri).toString();
 	const documentContent = getPromptDocContent(context.extensionUri, currentPromptPanel.webview, local_resources);
 	currentPromptPanel.webview.html = documentContent;
-	// Handle messages from the webview
-	currentPromptPanel.webview.onDidReceiveMessage(async (message: { command: string; prompt: Prompt }) => {
-		switch (message.command) {
-			case 'savePrompt':
-				savePrompt(message.prompt);
-				projectViewProvider?.refresh();
-				break;
-			case 'deletePrompt':
-				deletePrompt(message.prompt.id);
-				currentPromptPanel?.dispose();
-				currentPromptPanel = undefined;
-				break;
-		}
-		const prompts = all_prompts();
-		context.globalState.update('prompts', prompts);
-		promptCollectionViewProvider?.refresh();
-	});
 	currentPromptPanel.webview.postMessage({ command: 'load', prompt: data });
 
 	currentPromptPanel.onDidDispose(
@@ -315,64 +325,64 @@ export async function openSetupPanel(context: vscode.ExtensionContext, data: Set
 				localResourceRoots: [vscode.Uri.file(context.extensionPath)]
 			}
 		);
+	
+		const iconPath = vscode.Uri.file(
+			path.join(context.extensionPath, 'resources', 'icon.png')
+		);
+		currentSetupPanel.iconPath = iconPath;
+		const historyManager = projectViewProvider?.historyManager;
+		const setups: Setup[] = context.globalState.get('setups', []);
+		// Handle messages from the webview
+		currentSetupPanel.webview.onDidReceiveMessage(async (message: { command: string; setup?: Setup; member?: string; text?: string; history_id?: string }) => {
+			switch (message.command) {
+				case 'saveSetup':
+					if (message.setup) {
+						saveSetup(context, message.setup);
+					}
+					break;
+				
+				case 'deleteSetup':
+					if (message.setup) {
+						deleteSetup(context, message.setup.id);
+						currentSetupPanel?.dispose();
+						currentSetupPanel = undefined;
+					}
+					break;
+				
+				case 'queryMember':
+					if (message.member && message.text && historyManager) {
+						showRunningIndicator(message.member === "Team" ? "Frogteam" : message.member);
+						// Log the received command
+						output_log(`Received "submitTask" command for member: ${message.member}, with text: ${message.text}.`);
+						let conversationId = generateShortUniqueId();
+						// Await the result of queueMemberAssignment
+						const answer = await queueMemberAssignment(
+							'user', 
+							message.member, 
+							message.text, 
+							setups, 
+							historyManager, 
+							conversationId, 
+							undefined, 
+							"no-project"
+						);
+						if (Object.keys(answer).length > 0) {
+							projectViewProvider?.openMarkdownPanel(context, answer);
+						}
+						hideRunningIndicator();
+					}
+					break;
+			}
+		
+			// Common UI and state refresh
+			load_setups(context);
+			setupCollectionViewProvider?.refresh();
+		});
 	}
-	const iconPath = vscode.Uri.file(
-		path.join(context.extensionPath, 'resources', 'icon.png')
-	);
-	const nonce = getNonce();
-	currentSetupPanel.iconPath = iconPath;
 	const local_resources = currentSetupPanel.webview.asWebviewUri(context.extensionUri).toString();
 	const documentContent = getSetupDocContent(context.extensionUri, currentSetupPanel.webview, local_resources);
 	currentSetupPanel.webview.html = documentContent;
 
-	const historyManager = projectViewProvider?.historyManager;
-	const setups: Setup[] = context.globalState.get('setups', []);
-	// Handle messages from the webview
-	currentSetupPanel.webview.onDidReceiveMessage(async (message: { command: string; setup?: Setup; member?: string; text?: string; history_id?: string }) => {
-		switch (message.command) {
-			case 'saveSetup':
-				if (message.setup) {
-					saveSetup(context, message.setup);
-				}
-				break;
-			
-			case 'deleteSetup':
-				if (message.setup) {
-					deleteSetup(context, message.setup.id);
-					currentSetupPanel?.dispose();
-					currentSetupPanel = undefined;
-				}
-				break;
-			
-			case 'queryMember':
-				if (message.member && message.text && historyManager) {
-					showRunningIndicator(message.member === "Team" ? "Frogteam" : message.member);
-					// Log the received command
-					output_log(`Received "submitTask" command for member: ${message.member}, with text: ${message.text}.`);
-					let conversationId = generateShortUniqueId();
-					// Await the result of queueMemberAssignment
-					const answer = await queueMemberAssignment(
-						'user', 
-						message.member, 
-						message.text, 
-						setups, 
-						historyManager, 
-						conversationId, 
-						undefined, 
-						"no-project"
-					);
-					if (Object.keys(answer).length > 0) {
-						projectViewProvider?.openMarkdownPanel(context, answer);
-					}
-					hideRunningIndicator();
-				}
-				break;
-		}
-	
-		// Common UI and state refresh
-		load_setups(context);
-		setupCollectionViewProvider?.refresh();
-	});
 	currentSetupPanel.webview.postMessage({ command: 'load', setup: data });
 
 	currentSetupPanel.onDidDispose(

@@ -182,7 +182,6 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
             );
             
             this.currentProjectPanel.iconPath = iconPath;
-            this.currentProjectPanel.webview.html = getProjectTabContent(context.extensionUri, this.currentProjectPanel.webview);
             const setups:Setup[] = context.globalState.get('setups', []);
     
             // Handle messages from the webview
@@ -249,15 +248,15 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
                         break;
                 }
             });
-    
-            this.currentProjectPanel.onDidDispose(
-                () => {
-                    this.currentProjectPanel = undefined;
-                },
-                null,
-                context.subscriptions
-            );
         }
+        this.currentProjectPanel.webview.html = getProjectTabContent(context.extensionUri, this.currentProjectPanel.webview);
+        this.currentProjectPanel.onDidDispose(
+            () => {
+                this.currentProjectPanel = undefined;
+            },
+            null,
+            context.subscriptions
+        );
     }
 
     loadProjectData() {

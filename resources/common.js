@@ -111,4 +111,9 @@ function createFormElements(history_id, target, responseCommand) {
 
     // Append the formDiv to the target container element
     container.appendChild(formDiv);
-}
+};
+
+function setClickListener(obj, activator) {
+    obj.removeEventListener('click', activator);
+    obj.addEventListener('click', activator);
+};
