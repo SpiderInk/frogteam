@@ -1,5 +1,14 @@
 # <img src="https://frogteam.ai/logo.png" alt="frogteam icon" width="32" height="32"> - <a href="https://marketplace.visualstudio.com/items?itemName=SpiderInk.frogteam">FrogTeam.ai</a> 
 
+Update v0.1.1: 09-08-2024<br>
+<ul>
+    <li>mlFLow experiments for tracking prompts</li>
+    <li>mlFLow config in .vscode/frogteam/config.json</li>
+    <li>moved frogteam files to .vscode/frogteam/</li>
+    <li>Fixed projects.jsonb file</li>
+    <li>Gave answer tab state</li>
+</ul>
+
 Update v0.1.0: 09-07-2024<br>
 <ul>
     <li>mlFLow experiments early setup mlFlow only work from localhost:5001</li>
@@ -176,16 +185,18 @@ You can refine the prompt and submit again. Existing files will be used and edit
 
 ## Tasks - On Deck
 
-- BUG: Answer tab looses context sometimes, needs to have state
+- Make a tool for the llm that does a code search, like just use vscode's search to find things in files enabling LLM find/replace
 
 mlflow
     - experiment setup
-      - You can start a new experiment and the experiment id will be saved with the object
+      - You can start a new experiment and the experiment id will be saved with the prompt object
       - places where the object is used runs will be created and metrics logged
       - team member
       - prompt
 
-- Make a tool for the llm that does a code search, like just use vscode's search to find things in files enabling LLM find/replace
+**SYSTEM PROMPT** Sometimes a large file will just have a comment that says the rest remains unchanged and we need git to fix it
+    "Rememeber these are "live" solution files you have to output the entire file. Saying things like "the  rest of this code remains unchanged" causes the file to be incomplete. Do not do that."
+
 
 - Change Team List View to show the Role more prominently than the model
 - We need a way to export markdown more easily, user should be able to click a "Copy" icon to copy the Markdown response.

@@ -11,6 +11,8 @@ import { queueMemberAssignment } from "./queueMemberAssignment";
 import { ToolCall } from "@langchain/core/messages/tool";
 import { output_log } from './outputChannelManager';
 import { fetchApiKey } from '../utils/common';
+import { PromptExperiment } from '../mlflow/promptExperiment';
+import { getMlflowServerAddress } from '../utils/config';
 
 export async function projectGo(question: string, setups: Setup[], historyManager: HistoryManager, conversationId: string, parentId: string | undefined, project: string): Promise<string> {
     const member_object = fetchSetupByPurpose(setups, 'lead-architect');
@@ -56,7 +58,8 @@ export async function leadArchitectGo(llm: BaseChatModel, question: string, setu
         - throw error if there is no lead architect or if there is more than one
         - historyManager needs to record the member name and role for every entry
     */
-
+   let duration = 0;
+    const promptExperiment = new PromptExperiment(getMlflowServerAddress());
     let response = {} as any;
     const system_prompt_obj = fetchPrompts('system', 'lead-architect', model);
     const task_summary_prompt = fetchPrompts('system', 'task-summary', model);
@@ -75,7 +78,7 @@ export async function leadArchitectGo(llm: BaseChatModel, question: string, setu
             "getQueueMemberAssignmentApi": queueMemberAssignment
         };
         const prompt = personalizePrompt(system_prompt_obj[0].content, { members: get_member_purposes_for_prompt(setups) });
-
+        const lead_prompt_experiment_id = await promptExperiment.startRunAndLogPrompt(system_prompt_obj[0]);
         // using parentId
         // fetch from history the original user question and the lead engineers summary response
         //  - add these as the first HumanMessage and the first AIMessage
@@ -132,9 +135,17 @@ export async function leadArchitectGo(llm: BaseChatModel, question: string, setu
                 llmOutput = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };
             }
         } while (llmOutput.tool_calls && llmOutput.tool_calls.length > 0 && (Date.now() - startTime) < 120000);
+        const endTime = Date.now();
+        duration = endTime - startTime;
+        await promptExperiment.endRunAndLogPromptResult(lead_prompt_experiment_id, JSON.stringify(messages), duration);        
         messages.push(new HumanMessage(task_summary_prompt[0].content));
+        const task_summary_prompt_experiment_id = await promptExperiment.startRunAndLogPrompt(task_summary_prompt[0]);
+        const summary_StartTime = Date.now();
         const final_completion = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };
+        const summary_EndTime = Date.now();
+        duration = summary_EndTime - summary_StartTime;
         response = final_completion.content.toString();
+        await promptExperiment.endRunAndLogPromptResult(task_summary_prompt_experiment_id, response, duration);
         historyManager.addEntry("user", member_name, model, question, (response.length > 0 ? response : "no final response"), LookupTag.PROJECT_RESP, conversationId, parent_id, project);
     } else if(!llm.bindTools) {
         const msg = 'LLM does not support tools';

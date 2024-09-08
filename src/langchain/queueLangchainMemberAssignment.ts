@@ -7,14 +7,13 @@ import { BaseChatModel } from "@langchain/core/language_models/chat_models";
 import { ToolCall } from "@langchain/core/messages/tool";
 import { getFileContentApiTool, saveContentToFileApiTool, fetchHistoryApiTool } from '../utils/langchain-tools';
 import { output_log } from '../utils/outputChannelManager';
-// import { generateShortUniqueId } from '../utils/common';
 import { PromptExperiment } from '../mlflow/promptExperiment';
-// import { MLflowClient } from '../mlflow/client';
+import { getMlflowServerAddress } from '../utils/config';
 
 export async function queueLangchainMemberAssignment(caller: string, llm: BaseChatModel, member_object: Setup, question: string, historyManager: HistoryManager, setups: Setup[], conversationId: string, parentId: string | undefined, project: string): Promise<string> {
     // **1**
     let duration = 0;
-    const promptExperiment = new PromptExperiment('http://localhost:5001');
+    const promptExperiment = new PromptExperiment(getMlflowServerAddress());
     let response = {} as any;
     const engineer_prompt_obj = fetchPrompts('system', member_object?.purpose ?? 'engineer', member_object?.model);
     const task_summary_prompt = fetchPrompts('system', 'task-summary', member_object?.model);
