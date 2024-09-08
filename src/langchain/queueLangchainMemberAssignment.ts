@@ -5,7 +5,7 @@ import { HistoryManager, LookupTag } from '../utils/historyManager';
 import { HumanMessage, ToolMessage, AIMessageChunk, AIMessage, SystemMessage } from "@langchain/core/messages";
 import { BaseChatModel } from "@langchain/core/language_models/chat_models";
 import { ToolCall } from "@langchain/core/messages/tool";
-import { getFileContentApiTool, saveContentToFileApiTool, fetchHistoryApiTool } from '../utils/langchain-tools';
+import { getFileContentApiTool, saveContentToFileApiTool, codeSearchApiTool } from '../utils/langchain-tools';
 import { output_log } from '../utils/outputChannelManager';
 import { PromptExperiment } from '../mlflow/promptExperiment';
 import { getMlflowServerAddress } from '../utils/config';
@@ -28,7 +28,8 @@ export async function queueLangchainMemberAssignment(caller: string, llm: BaseCh
         // ** if I change this function so that I inject llm then I can call this queueLangchainMemberAssignment **
         const llmWithTools = llm.bindTools([
             getFileContentApiTool,
-            saveContentToFileApiTool
+            saveContentToFileApiTool,
+            codeSearchApiTool
         ]);
 
         let engineer_prompt = engineer_prompt_obj[0].content;
@@ -40,7 +41,8 @@ export async function queueLangchainMemberAssignment(caller: string, llm: BaseCh
 
         let toolMapping: { [key: string]: any } = {
             "getFileContentApi": getFileContentApiTool,
-            "saveContentToFileApi": saveContentToFileApiTool
+            "saveContentToFileApi": saveContentToFileApiTool,
+            "codeSearchApiTool": codeSearchApiTool
         };
 
         // ** parent_id should only be used here when this was a direct from user task **
@@ -58,56 +60,61 @@ export async function queueLangchainMemberAssignment(caller: string, llm: BaseCh
         // Now add the final prompt and question to the end of the messages array
         messages.push(new HumanMessage(question));
 
-        let toolCalls = [];
-        // start the the mlflow run for the main prompt's conversation cycle
-        const engineer_prompt_experiment_id = await promptExperiment.startRunAndLogPrompt(engineer_prompt_obj[0]);
-        const startTime = Date.now();
-        let llmOutput = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };
-        let answer_for_history = "";
-        if (llmOutput.content.toString().length > 0) {
-            answer_for_history = llmOutput.content.toString();
-        } else {
-            answer_for_history = "no answer";
-            if (llmOutput.tool_calls && llmOutput.tool_calls.length > 0) {
-                answer_for_history = "tool calls pending.";
-            }
-        }
-        const parent_id = historyManager.addEntry(caller, member_object?.name ?? "no-data", member_object?.model ?? "no-model", question, answer_for_history, LookupTag.MEMBER_TASK, conversationId, parentId, project);
-        do {
-            messages.push(llmOutput as AIMessage);
-            if (llmOutput.tool_calls && llmOutput.tool_calls.length > 0) {
-                for (const toolCall of llmOutput.tool_calls) {
-                    let toolOutput;
-                    try {
-                        let tool = toolMapping[toolCall.name];
-                        toolOutput = await tool.invoke(toolCall.args);
-                        let newTM = new ToolMessage({
-                            tool_call_id: toolCall.id!,
-                            content: toolOutput
-                        });
-                        messages.push(newTM);
-                    } catch {
-                        toolOutput = "tool failed";
-                        output_log(`${member_object?.name ?? "unknown"}: Tool call ${toolCall.name} failed`);
-                    }
-                    historyManager.addEntry(member_object?.name ?? "no-data", `tool:${toolCall.name}`, member_object?.model ?? "no-model", `args: ${JSON.stringify(toolCall.args)}`, toolOutput, LookupTag.TOOL_RESP, conversationId, parent_id, project);
+        try {
+            let toolCalls = [];
+            // start the the mlflow run for the main prompt's conversation cycle
+            const engineer_prompt_experiment_id = await promptExperiment.startRunAndLogPrompt(engineer_prompt_obj[0]);
+            const startTime = Date.now();
+            let llmOutput = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };
+            let answer_for_history = "";
+            if (llmOutput.content.toString().length > 0) {
+                answer_for_history = llmOutput.content.toString();
+            } else {
+                answer_for_history = "no answer";
+                if (llmOutput.tool_calls && llmOutput.tool_calls.length > 0) {
+                    answer_for_history = "tool calls pending.";
                 }
-                llmOutput = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };
             }
-        } while (llmOutput.tool_calls && llmOutput.tool_calls.length > 0 && (Date.now() - startTime) < 120000);
-        const endTime = Date.now();
-        duration = endTime - startTime;
-        await promptExperiment.endRunAndLogPromptResult(engineer_prompt_experiment_id, JSON.stringify(messages), duration);
-        // we are using the "user" message space
-        messages.push(new HumanMessage(task_summary_prompt[0].content));
-        const task_summary_prompt_experiment_id = await promptExperiment.startRunAndLogPrompt(task_summary_prompt[0]);
-        const summary_StartTime = Date.now();
-        const final_completion = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };
-        const summary_EndTime = Date.now();
-        duration = summary_EndTime - summary_StartTime;
-        response = final_completion.content.toString();
-        await promptExperiment.endRunAndLogPromptResult(task_summary_prompt_experiment_id, response, duration);
-        historyManager.addEntry(caller, member_object?.name ?? "no-data", member_object?.model ?? "no-model", question, (response.length > 0 ? response : "no final response"), LookupTag.MEMBER_RESP, conversationId, parent_id, project); //what parent id to use here?
+            const parent_id = historyManager.addEntry(caller, member_object?.name ?? "no-data", member_object?.model ?? "no-model", question, answer_for_history, LookupTag.MEMBER_TASK, conversationId, parentId, project);
+            do {
+                messages.push(llmOutput as AIMessage);
+                if (llmOutput.tool_calls && llmOutput.tool_calls.length > 0) {
+                    for (const toolCall of llmOutput.tool_calls) {
+                        let toolOutput;
+                        try {
+                            let tool = toolMapping[toolCall.name];
+                            toolOutput = await tool.invoke(toolCall.args);
+                            let newTM = new ToolMessage({
+                                tool_call_id: toolCall.id!,
+                                content: toolOutput
+                            });
+                            messages.push(newTM);
+                        } catch {
+                            toolOutput = "tool failed";
+                            output_log(`${member_object?.name ?? "unknown"}: Tool call ${toolCall.name} failed`);
+                        }
+                        historyManager.addEntry(member_object?.name ?? "no-data", `tool:${toolCall.name}`, member_object?.model ?? "no-model", `args: ${JSON.stringify(toolCall.args)}`, toolOutput, LookupTag.TOOL_RESP, conversationId, parent_id, project);
+                    }
+                    llmOutput = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };
+                }
+            } while (llmOutput.tool_calls && llmOutput.tool_calls.length > 0 && (Date.now() - startTime) < 120000);
+            const endTime = Date.now();
+            duration = endTime - startTime;
+            await promptExperiment.endRunAndLogPromptResult(engineer_prompt_experiment_id, JSON.stringify(messages), duration);
+            // we are using the "user" message space
+            messages.push(new HumanMessage(task_summary_prompt[0].content));
+            const task_summary_prompt_experiment_id = await promptExperiment.startRunAndLogPrompt(task_summary_prompt[0]);
+            const summary_StartTime = Date.now();
+            const final_completion = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };
+            const summary_EndTime = Date.now();
+            duration = summary_EndTime - summary_StartTime;
+            response = final_completion.content.toString();
+            await promptExperiment.endRunAndLogPromptResult(task_summary_prompt_experiment_id, response, duration);
+            historyManager.addEntry(caller, member_object?.name ?? "no-data", member_object?.model ?? "no-model", question, (response.length > 0 ? response : "no final response"), LookupTag.MEMBER_RESP, conversationId, parent_id, project); //what parent id to use here?
+        } catch (error) {
+            vscode.window.showErrorMessage(`Error: ${error}\n\nTry submitting again.`);
+            output_log(`Error: ${error}`);
+        }
     } else if(!llm.bindTools) {
         const msg = 'LLM does not support tools';
         vscode.window.showInformationMessage(msg);

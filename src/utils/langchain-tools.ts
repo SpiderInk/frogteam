@@ -3,6 +3,24 @@ import { z } from "zod";
 import { save, getcontent } from "../file/fileOperations";
 import { output_log } from './outputChannelManager';
 import { FetchHistory } from './historyManager';
+import { searchFiles } from '../utils/search';
+
+const codeSearchApiSchema = z.object({
+    searchTerm: z.string().describe("The term to search for within the files."),
+    filePattern: z.string().describe("The file pattern to match (default is '*' for all files).")
+});
+
+export const codeSearchApiTool = tool(
+    async ({ searchTerm, filePattern }: { searchTerm: string, filePattern: string }) => {
+        output_log(`Searching for: ${searchTerm} with pattern: ${filePattern}`);
+        return await searchFiles(searchTerm, filePattern || '*');
+    },
+    {
+        name: "codeSearchApiTool",
+        description: "Searches for files matching the given pattern and containing the specified search term.",
+        schema: codeSearchApiSchema,
+    }
+);
 
 const getFileContentApiSchema = z.object({
     fileName: z.string().describe("The path of the file to read")

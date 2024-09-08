@@ -1,5 +1,11 @@
 # <img src="https://frogteam.ai/logo.png" alt="frogteam icon" width="32" height="32"> - <a href="https://marketplace.visualstudio.com/items?itemName=SpiderInk.frogteam">FrogTeam.ai</a> 
 
+Update v0.1.2: 09-08-2024<br>
+<ul>
+    <li>NEW TOOL: Code Search - If you want to make a change that can affect multiple files there is a new tool the LLM can use to search the code of the solution.</li>
+    <li>Better tool call error handling</li>
+</ul>
+
 Update v0.1.1: 09-08-2024<br>
 <ul>
     <li>mlFLow experiments for tracking prompts</li>
@@ -94,6 +100,7 @@ Follow me on [instagram](https://www.instagram.com/reddoverises/).<br>
     - [Overview](#overview)
   - [Flow](#flow)
     - [Open the Builder](#open-the-builder)
+  - [MLFLow Integration](#mlflow-integration)
   - [Known Issues/Limitations](#known-issueslimitations)
   - [Tasks - Implementing Other Model Sources](#tasks---implementing-other-model-sources)
   - [Tasks - On Deck](#tasks---on-deck)
@@ -154,18 +161,17 @@ When all members have performed their tasks the lead architect gets a final pass
 
 You can refine the prompt and submit again. Existing files will be used and edited.
 
+## MLFLow Integration
+Very basic prompt and duration logging right now. I want to collect a set of solutions each one with a specific user provided project definition and then create an evaluation pipeline to grade system prompts against a set user prompts for each solution. I would like to get to a place where the community could contribute system prompts optimized for specific languages and technologies.  To submit a system prompt you would have to be able to pass an evaluation pipeline. It would be particularly cool to enable sharing of knowledge vectors/embeddings grounding a system prompt around a more specific context. Having MLFLow integrated here is experimental but I envision adding a Test tab where test data can be used and submitted and a submission tab where prompts can be submitted and tracked.
+
 ## Known Issues/Limitations
+- Validation of Team Members to prompts, for now use Team Lineup view to manually validate that all members are aligned with a system prompt. If you see: TypeError: Cannot read properties of undefined (reading 'content') check the Lineup someone probably has no prompt.
+- No tool call validation so sometimes initial project generation never completes--you can try again
+    - validation/retry is coming
 - At present this will only work directly with OpenAI or AWs Bedrock
     - For OpenAI you need an API Key
-    - For AWS Bedrock you need to be logged into AWS in you VS Code Environment and you need the supported models deployed
+    - For AWS Bedrock you need to be logged into AWS in your VS Code Environment and you need the supported models deployed in the proper account/region 
     - OpenAI on Azure is implemented but I confess I have not tested it (**if someone tries it let me know**)
-- Documentation is weak, I am working on it.
-- No tool call validation so sometimes initial project generation never completes you can try again
-    - validation/retry is coming
-- It is hard to tell when the work is done
-    - A status indicator is coming
-- Validation of Team Members to prompts, for now use Team Lineup view to manually validate that all members are aligned with a system prompt. If you see: TypeError: Cannot read properties of undefined (reading 'content') this is likely the issue.
-- If you paste into the prompt text area UI formatting may not work, it will save so just close and open the editor window for now.
 
 ## Tasks - Implementing Other Model Sources
 - Right now I am chasing models that support tool calls using the Langchain framework
@@ -184,23 +190,20 @@ You can refine the prompt and submit again. Existing files will be used and edit
         - Is there a standard way I can do this. This is a research task for me.
 
 ## Tasks - On Deck
-
-- Make a tool for the llm that does a code search, like just use vscode's search to find things in files enabling LLM find/replace
-
-mlflow
+- Make a tool for the llm that does a code search, like just use vscode's search to find things in files enabling LLM find/replace **done**
+- mlflow
     - experiment setup
-      - You can start a new experiment and the experiment id will be saved with the prompt object
-      - places where the object is used runs will be created and metrics logged
-      - team member
-      - prompt
+      - You can start a new experiment and the experiment id will be saved with the prompt object **done**
+      - places where the prompt is used runs will be created and the prompt, duration are logged **done**`
+      - You can stop an experiment by clearing the experiment id **done**
 
-**SYSTEM PROMPT** Sometimes a large file will just have a comment that says the rest remains unchanged and we need git to fix it
-    "Rememeber these are "live" solution files you have to output the entire file. Saying things like "the  rest of this code remains unchanged" causes the file to be incomplete. Do not do that."
+**SYSTEM PROMPT** Sometimes a large file will just have a comment that says the rest remains unchanged leaving the user with git commands to fix it
+    This next sentence need to be added to System Prompts.
+    "Remember these are "live" solution files you have to output the entire file. Saying things like "the  rest of this code remains unchanged" causes the file to be incomplete. Do not do that."
 
-
-- Change Team List View to show the Role more prominently than the model
 - We need a way to export markdown more easily, user should be able to click a "Copy" icon to copy the Markdown response.
 - Make a new tool that allows the llm to request the content of a URL be fetched, when its an image we should also base64 it
+    - should this be for chunk/vectorize/RAG?
 
 - Add try...catch/check for length where .content is used from llm response
 - Add try...catch for tools calls and loh failure in history
@@ -219,8 +222,21 @@ mlflow
     - 0y fix will need to address the conversation rules
 
 ## Tasks - Backlog
-- prompt library sharing platform
-    - MLFlow experiment tracking
+- Ask the Human tool - create a tool that allows any team member (including lead architect) to ask a question directed at the human
+    - this can present in the history but will cause the entire task thread to wait
+        - Document should open with the question on display
+        - when clicked on in History document will open 
+        - Document has the state of the chain allowing the human to answer and resume the chain
+- git integration
+    - commit first
+      - branch first
+      - commit
+    - stash first
+    - PR generation
+- prompt library sharing platform - making more use of MLFlow
+    - Make a data panels to house "golden" solutions to specific user requests
+    - Make a pipeline to evaluate "system" prompts against the golden solutions
+    - Make a prompt submission process
 - add Chromadb instance (optionally?)
     - on demand web crawl that will chunk and store in local Chroma
     - URL/Internet or local disc content
@@ -236,19 +252,6 @@ mlflow
         - indicate success/fail (green checkmark vs red X)
         - can we indicate when there is file content and when there isn't (is there a conflict with markdown?)
         - sometimes a file wasn't created yet and that is ok
-- Starting with Python 
-    - automated/isolated test environment where team members can test code generations and collaborate on solutions
-    - When hunan interaction is needed the chat interface will be invoked asynchronously
-        - if other tasks can continue they will
-- create a tool that allows any team member (including lead architect) to ask a question directed at the human
-    - this can present in the history but will cause the entire task thread to wait
-        - Document should open with the question on display
-        - when clicked on in History document will open 
-        - Document has the state of the chain allowing the human to answer and resume the chain
-- git integration
-    - stash first
-    - new branch first
-    - PR generation
 
 ## Example User Prompts
 
@@ -266,7 +269,7 @@ to: Point B -> Cove Island Park, Stamford, CT
 > Use an HTML Canvas to make a paddle tenis game where you can move a rectangle block back and forth using the left and right arrow keys. You hit the ball it goes up hits the top and comes back. If you miss and the ball hits the bottom wall you loose a point, if you hit the ball you gain 2 points.
 
 ## Icons
-Any icons you see either came from the list below, I made them, or GenAI Helped me make them.
+Any icons you see either came from the list below, I made them, or GenAI Helped me make them. License files stored and distributed in the resources directory.
 
 - https://iconduck.com/sets/elementary-icon-set
 - https://iconduck.com/sets/open-iconic-icon-set
