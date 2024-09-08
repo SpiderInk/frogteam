@@ -1,7 +1,6 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-//import { marked } from 'marked';
 import { getNonce } from './webview/getNonce';
 import { getRosterDocContent } from './webview/getRosterDocContent';
 import { getPromptDocContent } from './webview/getPromptDocContent';
@@ -22,11 +21,13 @@ import { output_log } from './utils/outputChannelManager';
 import { showRunningIndicator, hideRunningIndicator } from './utils/runningIndicator';
 import { getWorkspaceFolder } from './utils/common';
 import { PromptExperiment } from './mlflow/promptExperiment';
+import { FileManager } from './utils/fileManager';
 
-export const PROMPTS_FILE = path.join(getWorkspaceFolder() || '', '.vscode', 'prompts.json');
-export const SETUPS_FILE = path.join(getWorkspaceFolder() || '', '.vscode', 'setups.json');
-export const HISTORY_FILE = path.join(getWorkspaceFolder() || '', '.vscode', 'history.json');
-export const MEMBER_ICON_FOLDER = path.join(getWorkspaceFolder() || '', '.vscode', 'icons');
+const FROGTEAM_DIR = '.vscode/frogteam';
+export const PROMPTS_FILE = path.join(getWorkspaceFolder() || '', FROGTEAM_DIR, 'prompts.json');
+export const SETUPS_FILE = path.join(getWorkspaceFolder() || '', FROGTEAM_DIR, 'setups.json');
+export const HISTORY_FILE = path.join(getWorkspaceFolder() || '', FROGTEAM_DIR, 'history.json');
+export const MEMBER_ICON_FOLDER = path.join(getWorkspaceFolder() || '', FROGTEAM_DIR, 'icons');
 
 let currentRosterPanel: vscode.WebviewPanel | undefined;
 let currentPromptPanel: vscode.WebviewPanel | undefined;
@@ -39,7 +40,10 @@ let projectViewProvider: ProjectViewProvider | undefined;
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
+	const fileManager = new FileManager();
+	await fileManager.initializeFiles();
+
 	updatePromptsFile(context);
 
 	// Load the prompts and setups when the extension is activated
@@ -105,18 +109,18 @@ export function updatePromptsFile(context: vscode.ExtensionContext) {
     const workspaceFolders = vscode.workspace.workspaceFolders;
     if (workspaceFolders) {
         const workspaceRoot = workspaceFolders[0].uri.fsPath;
-        const vscodeDir = path.join(workspaceRoot, '.vscode');
-        const promptsFilePath = path.join(vscodeDir, 'prompts.json');
+        const frogteamDir = path.join(workspaceRoot, FROGTEAM_DIR);
+        const promptsFilePath = path.join(frogteamDir, 'prompts.json');
         const defaultPromptsFilePath = context.asAbsolutePath(path.join('resources', 'prompts.json'));
 
-        // Create .vscode directory and copy prompts.json if it doesn't exist
+        // Create .vscode/frogteam directory and copy prompts.json if it doesn't exist
         if (!fs.existsSync(promptsFilePath)) {
-            if (!fs.existsSync(vscodeDir)) {
-                fs.mkdirSync(vscodeDir);
+            if (!fs.existsSync(frogteamDir)) {
+                fs.mkdirSync(frogteamDir, { recursive: true });
             }
 
             fs.copyFileSync(defaultPromptsFilePath, promptsFilePath);
-            vscode.window.showInformationMessage('Default prompts.json has been created in the .vscode directory.');
+            vscode.window.showInformationMessage('Default prompts.json has been created in the .vscode/frogteam directory.');
         } else {
             // Read existing prompts
             const existingPrompts = JSON.parse(fs.readFileSync(promptsFilePath, 'utf-8'));

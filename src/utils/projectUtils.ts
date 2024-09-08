@@ -3,12 +3,12 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { getWorkspaceFolder } from '../utils/common';
 
-const PROJECTS_FILE = path.join(getWorkspaceFolder() || '', '.vscode', 'projects.json');
-const vscodeDirectory = path.join(__dirname, '..', '.vscode');
+const PROJECTS_FILE = path.join(getWorkspaceFolder() || '', '.vscode', 'frogteam', 'projects.json');
+const vscodeFrogteamDirectory = path.join(getWorkspaceFolder() || '', '.vscode', 'frogteam');
 
-// Ensure the .vscode directory exists
-if (!fs.existsSync(vscodeDirectory)) {
-    fs.mkdirSync(vscodeDirectory);
+// Ensure the .vscode/frogteam directory exists
+if (!fs.existsSync(vscodeFrogteamDirectory)) {
+    fs.mkdirSync(vscodeFrogteamDirectory, { recursive: true });
 }
 
 function createProjectFile() {
