@@ -20,7 +20,7 @@ function toggleFormElements() {
     }
 };
 
-function submitResponseForm(responseCommand) {
+function submitResponseForm(responseCommand, done) {
     const dropdownValue = document.getElementById('select_members').value;
     const textareaValue = document.getElementById('textarea').value;
     let history_idValue = null;
@@ -33,7 +33,9 @@ function submitResponseForm(responseCommand) {
         text: textareaValue,
         history_id: history_idValue
     });
-    toggleFormElements();
+    if(done) {
+        toggleFormElements();
+    }
 };
 
 function createFormElements(history_id, target, responseCommand) {
@@ -97,7 +99,7 @@ function createFormElements(history_id, target, responseCommand) {
     const submitButton = document.createElement('button');
     submitButton.textContent = 'Submit';
     submitButton.onclick = function() {
-        submitResponseForm(responseCommand);
+        submitResponseForm(responseCommand, true);
     };
     formDiv.appendChild(submitButton);
 

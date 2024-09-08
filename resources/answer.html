@@ -78,6 +78,7 @@
                 document.getElementById('response_form').style.display = 'none';
             }
             loadPersistedMembers();
+            document.getElementById('textarea').oninput = saveState;
         };
 
         window.addEventListener('message', event => {
@@ -98,8 +99,22 @@
                         select_members.appendChild(option);  // Add the option to the select element
                     });
                     break;
+                case 'loadResponseState':
+                    if(message.member.length > 0) {
+                        document.getElementById('select_members').value = message.member;
+                    }
+                    if(message.text.length > 0) {
+                        document.getElementById('textarea').value = message.text;
+                    }
+                    break;
             }
         });
+
+        function saveState(event){
+            event.preventDefault(); // Prevent any default action
+            event.stopPropagation(); // Stop event from bubbling up
+            submitResponseForm("savestate", false);
+        };
 
         // Function to load persisted members from localStorage when the webview is first loaded
         function loadPersistedMembers() {

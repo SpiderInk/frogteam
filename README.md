@@ -176,11 +176,13 @@ You can refine the prompt and submit again. Existing files will be used and edit
 
 ## Tasks - On Deck
 
-- BUG: Answer tab looses context sometimes, needs to have state
+- Move files to .vscode/frogteam
+- Add MLServer Config/Setup
+- BUG: Answer tab looses context sometimes, needs to have state **done**
 
 mlflow
     - experiment setup
-      - You can start a new experiment and the experiment id will be saved with the object
+      - You can start a new experiment and the experiment id will be saved with the prompt object
       - places where the object is used runs will be created and metrics logged
       - team member
       - prompt

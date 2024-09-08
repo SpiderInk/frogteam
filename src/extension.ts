@@ -199,6 +199,10 @@ export async function openAnswerPanel(context: vscode.ExtensionContext, data: Hi
 						}
 						hideRunningIndicator();
 						break;
+					case "savestate":
+						context.workspaceState.update(`${message.history_id}-member`, message.member);
+                        context.workspaceState.update(`${message.history_id}-text`, message.text);
+						break;
 					case "alert":
 						vscode.window.showInformationMessage(message.text);
 						break;
@@ -211,6 +215,9 @@ export async function openAnswerPanel(context: vscode.ExtensionContext, data: Hi
 	const documentContent = await getAnswerTabContent(context.extensionUri, currentAnswerPanel.webview, data);
 	currentAnswerPanel.webview.html = documentContent;
 	currentAnswerPanel.webview.postMessage({ command: 'loadMembers', setups: setups });
+	const member = context.workspaceState.get(`${data.id}-member`, '');
+	const text = context.workspaceState.get(`${data.id}-text`, '');
+	currentAnswerPanel.webview.postMessage({ command: 'loadResponseState', member: member, text: text });
 
 	currentAnswerPanel.onDidDispose(
 		() => {
