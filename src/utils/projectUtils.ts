@@ -11,17 +11,20 @@ if (!fs.existsSync(vscodeDirectory)) {
     fs.mkdirSync(vscodeDirectory);
 }
 
-// Initialize projects.json if it doesn't exist
-if (!fs.existsSync(PROJECTS_FILE)) {
-    fs.writeFileSync(PROJECTS_FILE, JSON.stringify({ projects: [        {
-        "projectName": "no-project",
-        "projectDirectory": "",
-        "projectDescription": "Homeless history items go here. This should be just the items that are created from talking to a team member on their configuration page."
-    }] }, null, 4));
+function createProjectFile() {
+    // Initialize projects.json if it doesn't exist
+    if (!fs.existsSync(PROJECTS_FILE)) {
+        fs.writeFileSync(PROJECTS_FILE, JSON.stringify({ projects: [        {
+            "projectName": "no-project",
+            "projectDirectory": "",
+            "projectDescription": "Homeless history items go here. This should be just the items that are created from talking to a team member on their configuration page."
+        }] }, null, 4));
+    }
 }
 
 // Function to add a new project
 export function addProjectToFile(projectName: string, projectDirectory: string, projectDescription: string) {
+    createProjectFile();
     const projectsData = JSON.parse(fs.readFileSync(PROJECTS_FILE, 'utf-8'));
     const existingProject = projectsData.projects.find((p: any) => p.projectName === projectName);
 
@@ -40,6 +43,7 @@ export function package_project(name: string, directory: string, problem: string
 }
 
 export function getProjects(): any[] {
+    createProjectFile();
     if (fs.existsSync(PROJECTS_FILE)) {
         const projectsData = JSON.parse(fs.readFileSync(PROJECTS_FILE, 'utf-8'));
         return projectsData.projects || [];
