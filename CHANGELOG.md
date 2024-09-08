@@ -6,6 +6,13 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## 0.1.1
+- mlFLow experiments for tracking prompts
+- mlFLow config in .vscode/frogteam/config.json
+- moved frogteam files to .vscode/frogteam/
+- Fixed projects.jsonb file
+- Gave answer tab state
+
 ## 0.1.0
 - mlFLow experiments early setup mlFlow only work from localhost:5001
 - Fixed webview post message events

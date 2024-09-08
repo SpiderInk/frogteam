@@ -1,4 +1,5 @@
 .vscode/**
+!.vscode/frogteam/config.json
 .vscode-test/**
 out/**
 node_modules/**

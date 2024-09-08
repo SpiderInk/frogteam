@@ -12,6 +12,7 @@ import { ToolCall } from "@langchain/core/messages/tool";
 import { output_log } from './outputChannelManager';
 import { fetchApiKey } from '../utils/common';
 import { PromptExperiment } from '../mlflow/promptExperiment';
+import { getMlflowServerAddress } from '../utils/config';
 
 export async function projectGo(question: string, setups: Setup[], historyManager: HistoryManager, conversationId: string, parentId: string | undefined, project: string): Promise<string> {
     const member_object = fetchSetupByPurpose(setups, 'lead-architect');
@@ -58,7 +59,7 @@ export async function leadArchitectGo(llm: BaseChatModel, question: string, setu
         - historyManager needs to record the member name and role for every entry
     */
    let duration = 0;
-    const promptExperiment = new PromptExperiment('http://localhost:5001');
+    const promptExperiment = new PromptExperiment(getMlflowServerAddress());
     let response = {} as any;
     const system_prompt_obj = fetchPrompts('system', 'lead-architect', model);
     const task_summary_prompt = fetchPrompts('system', 'task-summary', model);

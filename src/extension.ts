@@ -22,6 +22,7 @@ import { showRunningIndicator, hideRunningIndicator } from './utils/runningIndic
 import { getWorkspaceFolder } from './utils/common';
 import { PromptExperiment } from './mlflow/promptExperiment';
 import { FileManager } from './utils/fileManager';
+import { getMlflowServerAddress, ensureConfigFileExists, registerConfigCommands } from './utils/config';
 
 const FROGTEAM_DIR = '.vscode/frogteam';
 export const PROMPTS_FILE = path.join(getWorkspaceFolder() || '', FROGTEAM_DIR, 'prompts.json');
@@ -44,6 +45,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	const fileManager = new FileManager();
 	await fileManager.initializeFiles();
 
+	ensureConfigFileExists();
 	updatePromptsFile(context);
 
 	// Load the prompts and setups when the extension is activated
@@ -264,7 +266,7 @@ export async function openPromptPanel(context: vscode.ExtensionContext, data: Pr
 					currentPromptPanel = undefined;
 					break;
 				case 'createExperiment':
-					const promptExperiment = new PromptExperiment('http://localhost:5001');
+					const promptExperiment = new PromptExperiment(getMlflowServerAddress());
 					message.prompt.ml_experiment_id = await promptExperiment.createExperiment(`${message.prompt.category}-${message.prompt.models}`);
 					savePrompt(message.prompt);
 					if(currentPromptPanel !== undefined) {
