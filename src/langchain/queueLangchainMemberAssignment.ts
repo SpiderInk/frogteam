@@ -112,11 +112,11 @@ export async function queueLangchainMemberAssignment(caller: string, llm: BaseCh
             await promptExperiment.endRunAndLogPromptResult(task_summary_prompt_experiment_id, response, duration);
             historyManager.addEntry(caller, member_object?.name ?? "no-data", member_object?.model ?? "no-model", question, (response.length > 0 ? response : "no final response"), LookupTag.MEMBER_RESP, conversationId, parent_id, project); //what parent id to use here?
         } catch (error) {
-            vscode.window.showErrorMessage(`Error: ${error}\n\nTry submitting again.`);
-            output_log(`Error: ${error}`);
+            vscode.window.showErrorMessage(`queueLangchainMemberAssignment Error: ${error}\n\nTry submitting again.`);
+            output_log(`queueLangchainMemberAssignment Error: ${error}`);
         }
     } else if(!llm.bindTools) {
-        const msg = 'LLM does not support tools';
+        const msg = 'queueLangchainMemberAssignment: LLM does not support tools';
         vscode.window.showInformationMessage(msg);
         output_log(msg);
     }

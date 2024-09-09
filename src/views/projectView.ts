@@ -158,7 +158,7 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
             openPromptPanel(this.global_context, new_prompt);
             this.refresh();
         } catch (error) {
-            vscode.window.showErrorMessage((error as any).message);
+            vscode.window.showErrorMessage(`projectView.addPrompt: ${(error as any).message}`);
         }
     }
 
@@ -210,7 +210,8 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
                                 this.openMarkdownPanel(context, htmlAnswer);
                             }
                         } catch (error) {
-                            vscode.window.showErrorMessage(`${error}`);
+                            vscode.window.showErrorMessage(`projectGo: ${error}`);
+                            output_log(`projectGo: ${error}`);
                         }
                         hideRunningIndicator();
                         break;
@@ -230,7 +231,7 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
                                 this.openMarkdownPanel(context, directedAnswer);
                             }
                         } catch (error) {
-                            vscode.window.showErrorMessage(`${error}`);
+                            vscode.window.showErrorMessage(`directedGo: ${error}`);
                         }
                         hideRunningIndicator();
                         break;

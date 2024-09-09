@@ -18,7 +18,7 @@ export function getProjectTabContent(extensionUri: vscode.Uri, webView: vscode.W
         html = html.replace(/\${cspSource}/g, webView.cspSource);
         return html;
     } catch (error) {
-        console.error(`Error reading HTML file: ${error}`);
+        vscode.window.showErrorMessage(`Error reading HTML file: ${error}`);
         return `<html><body><h1>Error loading HTML file</h1></body></html>`;
     }
 }
