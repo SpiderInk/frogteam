@@ -17,7 +17,7 @@ export class PromptExperiment {
     } catch (error) {
       vscode.window.showErrorMessage(`PromptExperiment.createExperiment: Error creating experiment: ${error}.`);
       output_log(`PromptExperiment.createExperiment: Error creating experiment: ${error}.`);
-      throw error;
+      return "-1";
     }
   }
 
@@ -41,7 +41,7 @@ export class PromptExperiment {
     } catch (error) {
       vscode.window.showErrorMessage(`PromptExperiment.startRunAndLogPrompt Error starting run and logging prompt: ${error}.`);
       output_log(`PromptExperiment.startRunAndLogPrompt Error starting run and logging prompt: ${error}.`);
-      throw error;
+      return "-1";
     }
   }
 
@@ -56,7 +56,6 @@ export class PromptExperiment {
     } catch (error) {
       vscode.window.showErrorMessage(`PromptExperiment.endRunAndLogPromptResult Error logging prompt result: ${error}.`);
       output_log(`PromptExperiment.endRunAndLogPromptResult Error logging prompt result: ${error}.`);
-      throw error;
     }
   }
 }
