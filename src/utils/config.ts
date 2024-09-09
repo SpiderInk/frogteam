@@ -1,7 +1,7 @@
+import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as vscode from 'vscode';
-
+import { output_log } from '../utils/outputChannelManager';
 interface Config {
     mlflow_server_address: string;
 }
@@ -61,8 +61,8 @@ function getConfig(): Config {
         // Merge loaded config with DEFAULT_CONFIG
         return { ...DEFAULT_CONFIG, ...loadedConfig };
     } catch (error) {
-        console.error('Error reading config file:', error);
-        vscode.window.showErrorMessage(`Failed to read config file: ${error}`);
+        output_log(`config.getConfig: Failed to read config file: ${error}`);
+        vscode.window.showErrorMessage(`config.getConfig: Failed to read config file: ${error}`);
         return DEFAULT_CONFIG;
     }
 }
@@ -86,8 +86,8 @@ export function updateConfig(newConfig: Partial<Config>): void {
         fs.writeFileSync(configPath, JSON.stringify(updatedConfig, null, 2));
         vscode.window.showInformationMessage('Configuration updated successfully');
     } catch (error) {
-        console.error('Error writing config file:', error);
-        vscode.window.showErrorMessage(`Failed to update config file: ${error}`);
+        output_log(`config.updateConfig Error writing config file: ${error}`);
+        vscode.window.showErrorMessage(`config.updateConfig Failed to update config file: ${error}`);
     }
 }
 

@@ -1,4 +1,5 @@
-import { v4 as uuidv4 } from 'uuid';
+import * as vscode from 'vscode';
+import { output_log } from '../utils/outputChannelManager';
 import { MLflowClient } from './client';
 import { Prompt } from '../utils/prompts';
 
@@ -14,7 +15,8 @@ export class PromptExperiment {
       const response = await this.client.createExperiment(name);
       return response.experiment_id;
     } catch (error) {
-      console.error('Error creating experiment:', error);
+      vscode.window.showErrorMessage(`PromptExperiment.createExperiment: Error creating experiment: ${error}.`);
+      output_log(`PromptExperiment.createExperiment: Error creating experiment: ${error}.`);
       throw error;
     }
   }
@@ -37,7 +39,8 @@ export class PromptExperiment {
         return "-1";
       }
     } catch (error) {
-      console.error('Error starting run and logging prompt:', error);
+      vscode.window.showErrorMessage(`PromptExperiment.startRunAndLogPrompt Error starting run and logging prompt: ${error}.`);
+      output_log(`PromptExperiment.startRunAndLogPrompt Error starting run and logging prompt: ${error}.`);
       throw error;
     }
   }
@@ -51,7 +54,8 @@ export class PromptExperiment {
         await this.client.updateRun(runId, 'FINISHED');
       }
     } catch (error) {
-      console.error('Error logging prompt result:', error);
+      vscode.window.showErrorMessage(`PromptExperiment.endRunAndLogPromptResult Error logging prompt result: ${error}.`);
+      output_log(`PromptExperiment.endRunAndLogPromptResult Error logging prompt result: ${error}.`);
       throw error;
     }
   }

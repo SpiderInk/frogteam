@@ -35,7 +35,7 @@ export class PromptCollectionViewProvider implements vscode.TreeDataProvider<Pro
             const newItem = new PromptItem(new_prompt);
             this.handleItemSelection(newItem);
         } catch (error) {
-            vscode.window.showErrorMessage((error as any).message);
+            vscode.window.showErrorMessage(`promptCollectionView.addPrompt: ${(error as any).message}`);
         }
     }
 

@@ -1,4 +1,5 @@
-import { v4 as uuidv4 } from 'uuid';
+import * as vscode from 'vscode';
+import { output_log } from '../utils/outputChannelManager';
 
 /**
  * MLflowClient class for interacting with the MLflow REST API
@@ -41,8 +42,8 @@ export class MLflowClient {
       }
       return await response.json();
     } catch (error) {
-      console.error('Error making request to MLflow API:', error);
-      throw error;
+      vscode.window.showErrorMessage(`MLflowClient.request: Error making request to MLflow API: ${error}.`);
+      output_log(`MLflowClient.request: Error making request to MLflow API: ${error}.`);
     }
   }
 

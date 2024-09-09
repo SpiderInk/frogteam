@@ -151,8 +151,8 @@ export async function leadArchitectGo(llm: BaseChatModel, question: string, setu
             await promptExperiment.endRunAndLogPromptResult(task_summary_prompt_experiment_id, response, duration);
             historyManager.addEntry("user", member_name, model, question, (response.length > 0 ? response : "no final response"), LookupTag.PROJECT_RESP, conversationId, parent_id, project);
         } catch (error) {
-            vscode.window.showErrorMessage(`Error: ${error}\n\nTry submitting again.`);
-            output_log(`Error: ${error}`);
+            vscode.window.showErrorMessage(`leadArchitectGo Error: ${error}\n\nTry submitting again.`);
+            output_log(`leadArchitectGo Error: ${error}`);
         }
     } else if (!llm.bindTools) {
         const msg = 'LLM does not support tools';

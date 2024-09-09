@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
+import { output_log } from '../utils/outputChannelManager';
 
 /**
  * Searches for files matching the given pattern and containing the specified search term.
@@ -27,13 +28,15 @@ export async function searchFiles(searchTerm: string, filePattern: string = '*')
                     results.push(file.fsPath);
                 }
             } catch (error) {
-                console.error(`Error reading file ${file.fsPath}:`, error);
+                vscode.window.showErrorMessage(`search.searchFiles: Error reading file ${file.fsPath}: ${error}.`);
+                output_log(`search.searchFiles: Error reading file ${file.fsPath}: ${error}.`);
             }
         }
 
         return getResultsAsXml(results);
     } catch (error) {
-        console.error('Error searching files:', error);
+        vscode.window.showErrorMessage(`search.searchFiles: Error searching files: ${error}`);
+        output_log(`search.searchFiles: Error searching files: ${error}`);
         throw error;
     }
 }
