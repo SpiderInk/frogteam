@@ -6,6 +6,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## 0.1.5
+- Enable using dall-e-3 to define a graphic artist
+
 ## 0.1.1
 - mlFLow experiments for tracking prompts
 - mlFLow config in .vscode/frogteam/config.json

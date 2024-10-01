@@ -4,14 +4,19 @@ import { queueLangchainMemberAssignment } from '../langchain/queueLangchainMembe
 import { BedrockChat } from "@langchain/community/chat_models/bedrock";
 import { ChatOpenAI, AzureChatOpenAI } from "@langchain/openai";
 import { fetchApiKey } from './common';
+import { generateLangchainDalleImage } from "../langchain/LangchainDalleImage";
 
 export async function queueMemberAssignment(caller: string, member: string, question: string, setups: any, historyManager: HistoryManager, conversationId: string, parentId: string | undefined, project:string): Promise<string> {
 
     const member_object = fetchSetupByName(setups, member);
     switch(member_object?.model) {
+        case 'dall-e-3':
+            return await generateLangchainDalleImage(caller, member_object?.apiKey, member_object, question, historyManager, setups, conversationId, parentId, project);
         case 'gpt-35-turbo':
         case 'gpt-4-turbo':
         case 'gpt-4o':
+        case 'o1-preview':
+        case 'o1-mini':
             if(member_object?.endpoint && member_object?.endpoint.length > 5) {
                 const azure_llm = new AzureChatOpenAI({
                     model: member_object?.model ?? "no-model",

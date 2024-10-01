@@ -51,7 +51,7 @@ export const saveContentToFileApiTool = tool(
     },
     {
         name: "saveContentToFileApi",
-        description: "Save the given content to a specified file.",
+        description: "Save the given content to a specified file. <always>provide the complete content of the file even if you are making an edit.</always>",
         schema: saveContentToFileApiSchema,
     }
 );

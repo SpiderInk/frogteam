@@ -50,3 +50,16 @@ export function getProjects(): any[] {
     }
     return [];
 }
+
+// Function to get the directory of a specific project
+export function getProjectDirectory(projectName: string): string | null {
+    createProjectFile();
+    if (fs.existsSync(PROJECTS_FILE)) {
+        const projectsData = JSON.parse(fs.readFileSync(PROJECTS_FILE, 'utf-8'));
+        const project = projectsData.projects.find((p: any) => p.projectName === projectName);
+        if (project) {
+            return project.projectDirectory;
+        }
+    }
+    return null; // Return null if project not found
+}

@@ -114,6 +114,7 @@ export async function queueLangchainMemberAssignment(caller: string, llm: BaseCh
         } catch (error) {
             vscode.window.showErrorMessage(`queueLangchainMemberAssignment Error: ${error}\n\nTry submitting again.`);
             output_log(`queueLangchainMemberAssignment Error: ${error}`);
+            historyManager.addEntry(caller, member_object?.name ?? "no-data", member_object?.model ?? "no-model", question, `Queue Member Assignment Error: ${error}`, LookupTag.PROJECT_RESP, conversationId, undefined, project);
         }
     } else if(!llm.bindTools) {
         const msg = 'queueLangchainMemberAssignment: LLM does not support tools';

@@ -1,5 +1,17 @@
 # <img src="https://frogteam.ai/logo.png" alt="frogteam icon" width="32" height="32"> - <a href="https://marketplace.visualstudio.com/items?itemName=SpiderInk.frogteam">FrogTeam.ai</a> 
 
+Update v0.1.5: 10-01-2024<br>
+<ul>
+    <li>Add a new Team Member and make them a Graphic Artist</li>
+    <li>Choose the dall-e-3 model</li>
+    <li>This is a new feature there is no validation and no instruction</li>
+</ul>
+<strong>Prompt Example for using a Graphic Artist</strong><br>
+<i>I named my Graphic Artist Jenny. When I described what I wanted I also included the follow to explain Jenny's limitations and how I wanted the lead-architect to handle her assignments.</i><br>
+<br>
+Make sure to ask Jenny to make graphics. Jenny's instructions must be very specific. You can only ask her to make one graphic file at a time and you can only describe what you want her to make in the prompt. A prompt for Jenny should be short, for example: "make me a small icon file that looks like a frog." Jenny just returns the path to the file she made. You need to work around her limitations. As the lead-architect plan out what you need from Jenny first and then tell the others what to do with what you had Jenny create!<br>
+<br>
+<br>
 Update v0.1.2: 09-08-2024<br>
 <ul>
     <li>NEW TOOL: Code Search - If you want to make a change that can affect multiple files there is a new tool the LLM can use to search the code of the solution.</li>
@@ -200,13 +212,18 @@ Very basic prompt and duration logging right now. I want to collect a set of sol
 **SYSTEM PROMPT** Sometimes a large file will just have a comment that says the rest remains unchanged leaving the user with git commands to fix it
     This next sentence need to be added to System Prompts.
     "Remember these are "live" solution files you have to output the entire file. Saying things like "the  rest of this code remains unchanged" causes the file to be incomplete. Do not do that."
+        **FOR NOW I HAVE ADDED TO THE DESCRIPTION OF THE saveContentToFileApi TOOL**
+
+
 
 - We need a way to export markdown more easily, user should be able to click a "Copy" icon to copy the Markdown response.
 - Make a new tool that allows the llm to request the content of a URL be fetched, when its an image we should also base64 it
     - should this be for chunk/vectorize/RAG?
 
+
+
 - Add try...catch/check for length where .content is used from llm response
-- Add try...catch for tools calls and loh failure in history
+- Add try...catch for tools calls and log failure in history **done**
 - configuration for a time or token limit by model/team member
     - implement team member token limits/time limits/request token limits
     - this will require tracking
@@ -267,6 +284,8 @@ to: Point B -> Cove Island Park, Stamford, CT
 - I expect to be able to open index.html from the tracking directory using the LiveServer VS Code extension and when I do I expect to see a map showing the locations I have mentioned.
 
 > Use an HTML Canvas to make a paddle tenis game where you can move a rectangle block back and forth using the left and right arrow keys. You hit the ball it goes up hits the top and comes back. If you miss and the ball hits the bottom wall you loose a point, if you hit the ball you gain 2 points.
+
+> Write a puzzle game for html canvas. It should contain a selection of shapes that are cycling and when you click you lock in a shape, and when click a selected shape the shape rotates. After the user selects three shapes the shapes start falling down the canvas area. The user needs to get three shapes to lock together to form another shape before reaching the bottom, when two shapes are locked maybe the falling speed slows. The user does this by clicing the shapes to rotate them.
 
 ## Icons
 Any icons you see either came from the list below, I made them, or GenAI Helped me make them. License files stored and distributed in the resources directory.

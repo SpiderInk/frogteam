@@ -20,6 +20,8 @@ export async function projectGo(question: string, setups: Setup[], historyManage
         case 'gpt-3.5-turbo':
         case 'gpt-4-turbo':
         case 'gpt-4o':
+        case 'o1-preview':
+        case 'o1-mini':
             if (member_object?.endpoint && member_object?.endpoint.length > 5) {
                 const azure_llm = new AzureChatOpenAI({
                     model: member_object?.model ?? "no-model",
@@ -153,6 +155,7 @@ export async function leadArchitectGo(llm: BaseChatModel, question: string, setu
         } catch (error) {
             vscode.window.showErrorMessage(`leadArchitectGo Error: ${error}\n\nTry submitting again.`);
             output_log(`leadArchitectGo Error: ${error}`);
+            historyManager.addEntry("user", member_name, model, question, `Lead Architect Error: ${error}`, LookupTag.PROJECT_RESP, conversationId, undefined, project);
         }
     } else if (!llm.bindTools) {
         const msg = 'LLM does not support tools';
