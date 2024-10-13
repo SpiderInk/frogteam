@@ -109,25 +109,37 @@
     <script src="${jsUri}" nonce="${nonce}"></script>
     <script nonce="${nonce}">
         let prompt = {};
-
+    
         document.addEventListener('DOMContentLoaded', () => {
             restoreState();
             setupEventListeners();
         });
-
-
+    
         function setupEventListeners() {
             setClickListener(document.getElementById("delete"), delete_prompt);
-            // document.getElementById("delete").addEventListener('click', delete_prompt);
             setClickListener(document.getElementById("duplicate"), duplicate_prompt);
-            // document.getElementById("duplicate").addEventListener('click', duplicate_prompt);
             setClickListener(document.getElementById("experiment"), start_mlflow_experiment);
-            // document.getElementById("experiment").addEventListener('click', start_mlflow_experiment);
             setClickListener(document.getElementById("clear_experiment"), end_mlflow_experiment);
-
-            document.getElementById('edit-prompt').addEventListener('input', savePrompt);
+    
+            // Attach 'change' event listeners to all input and select elements
+            const inputsAndSelects = document.querySelectorAll('#edit-prompt input, #edit-prompt select');
+            inputsAndSelects.forEach(element => {
+                element.addEventListener('change', savePrompt);
+            });
+    
+            // Attach 'input' event listeners to text inputs and textarea
+            const textInputsAndTextareas = document.querySelectorAll('#edit-prompt input[type="text"], #edit-prompt textarea');
+            textInputsAndTextareas.forEach(element => {
+                element.addEventListener('input', savePrompt);
+            });
+    
+            // Attach 'change' event listener to checkboxes
+            const checkboxes = document.querySelectorAll('#edit-prompt input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', savePrompt);
+            });
         }
-
+    
         window.addEventListener('message', event => {
             const message = event.data;
             switch (message.command) {
@@ -145,7 +157,7 @@
                     break;
             }
         });
-
+    
         function restoreState() {
             const state = vscode.getState();
             prompt = state;
@@ -160,7 +172,7 @@
                 document.getElementById('experiment_id').value = state.ml_experiment_id;
             }
         };
-
+    
         function saveState() {
             const state = {
                 content: prompt.content,
@@ -174,38 +186,38 @@
             };
             vscode.setState(state);
         };
-
+    
         function savePrompt() {
-                prompt.content = document.getElementById('content').value;
-                prompt.category = document.getElementById('category').value;
-                prompt.role = document.getElementById('role').value;
-                prompt.models = document.getElementById('models').value;
-                prompt.active = document.getElementById('active').checked;
-                prompt.tag = document.getElementById('tag').value;
-                prompt.id = document.getElementById('id').value;
-                prompt.ml_experiment_id = document.getElementById('experiment_id').value;
-                saveState(); // before we post the message!
-                vscode.postMessage({ command: 'savePrompt', prompt });
-            }
-
+            prompt.content = document.getElementById('content').value;
+            prompt.category = document.getElementById('category').value;
+            prompt.role = document.getElementById('role').value;
+            prompt.models = document.getElementById('models').value;
+            prompt.active = document.getElementById('active').checked;
+            prompt.tag = document.getElementById('tag').value;
+            prompt.id = document.getElementById('id').value;
+            prompt.ml_experiment_id = document.getElementById('experiment_id').value;
+            saveState(); // Save state before posting the message
+            vscode.postMessage({ command: 'savePrompt', prompt });
+        }
+    
         function end_mlflow_experiment() {
             document.getElementById('experiment_id').value = "";
             savePrompt();
         }
-
+    
         function start_mlflow_experiment(event) {
             console.log("Button clicked, posting message...");
             event.preventDefault(); // Prevent any default action
             event.stopPropagation(); // Stop event from bubbling up
             vscode.postMessage({ command: 'createExperiment', prompt });
         }
-
+    
         function delete_prompt(event) {
             event.preventDefault(); // Prevent any default action
             event.stopPropagation(); // Stop event from bubbling up
             vscode.postMessage({ command: 'deletePrompt', prompt });
         };
-
+    
         function duplicate_prompt(event) {
             event.preventDefault(); // Prevent any default action
             event.stopPropagation(); // Stop event from bubbling up

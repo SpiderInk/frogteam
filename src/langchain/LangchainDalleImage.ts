@@ -71,9 +71,13 @@ export async function generateLangchainDalleImage(caller: string, apikey: string
         apiKey: apikey, // Default
     });
 
-    // const prompt = `I NEED to test how the tool works with extremely simple prompts. DO NOT add any detail, just use it AS-IS: ${question}`;
-    const prompt = `${question}`;
-    const image_url = await tool.invoke(prompt);
+    let graphic_artist_prompt = question;
+    const graphic_artist_prompt_obj = fetchPrompts('graphics', 'graphic-artist', member_object?.model);
+    if(graphic_artist_prompt_obj.length > 0) {
+        graphic_artist_prompt = graphic_artist_prompt_obj[0].content;
+        graphic_artist_prompt = personalizePrompt(graphic_artist_prompt, { question: question });
+    }
+    const image_url = await tool.invoke(graphic_artist_prompt);
     let dir = getProjectDirectory(project);
     if(dir?.length === 0) {
         dir = member_object?.name ?? "no-data";
@@ -90,7 +94,7 @@ export async function generateLangchainDalleImage(caller: string, apikey: string
     // const engineer_prompt_experiment_id = await promptExperiment.startRunAndLogPrompt(engineer_prompt_obj[0]);
     // console.log(imagedata);
     // await promptExperiment.endRunAndLogPromptResult(engineer_prompt_experiment_id, JSON.stringify(messages), duration);
-    const parent_id = historyManager.addEntry(caller, member_object?.name ?? "no-data", member_object?.model ?? "no-model", prompt, "", LookupTag.MEMBER_TASK, conversationId, parentId, project);
+    const parent_id = historyManager.addEntry(caller, member_object?.name ?? "no-data", member_object?.model ?? "no-model", graphic_artist_prompt, "", LookupTag.MEMBER_TASK, conversationId, parentId, project);
 
     return file;
 }

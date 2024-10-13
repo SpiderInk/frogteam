@@ -1,5 +1,12 @@
 # <img src="https://frogteam.ai/logo.png" alt="frogteam icon" width="32" height="32"> - <a href="https://marketplace.visualstudio.com/items?itemName=SpiderInk.frogteam">FrogTeam.ai</a> 
-
+Update v0.1.6: 10-13-2024<br>
+<ul>
+    <li>Better event handling for saving prompts and setups</li>
+    <li>>Wrapper prompt for dall-e-3</li>
+    <li>Additional lead-architect prompt</li>
+</ul>
+<br>
+<br>
 Update v0.1.5: 10-01-2024<br>
 <ul>
     <li>Add a new Team Member and make them a Graphic Artist</li>

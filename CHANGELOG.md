@@ -6,6 +6,11 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## 0.1.6
+- Better event handling for saving prompts and setups
+- Wrapper prompt for dall-e-3
+- Additional lead-architect prompt
+
 ## 0.1.5
 - Enable using dall-e-3 to define a graphic artist
 

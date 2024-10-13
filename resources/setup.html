@@ -138,6 +138,13 @@
             document.getElementById("delete").onclick = delete_setup;
             document.getElementById("duplicate").onclick = duplicate_setup;
             document.getElementById("team-setup-form").oninput = autoSaveSetup;
+            const inputs = document.querySelectorAll('#team-setup-form input, #team-setup-form select');
+            inputs.forEach(input => {
+                input.addEventListener('change', updateSetupAndPostMessage);
+            });
+            
+            // If you still want to keep 'oninput' for immediate feedback, you can do so
+            document.getElementById('team-setup-form').oninput = updateSetupAndPostMessage;
         };
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -251,6 +258,24 @@
             const id = generateUniqueId(), name = "", purpose = "", model = "", endpoint = "", apiKey = "", color = "#CCAA99", icon = "", az_deployment = ""
             setup = { id, name, purpose, model, endpoint, apiKey, color, icon, az_deployment };
         };
+
+        // Function to update setup and send message
+        function updateSetupAndPostMessage() {
+            setup = {
+                id: document.getElementById('id').value,
+                name: document.getElementById('name').value,
+                purpose: document.getElementById('purpose').value,
+                model: document.getElementById('model').value,
+                endpoint: document.getElementById('model-endpoint').value,
+                apiKey: document.getElementById('api-key').value,
+                color: document.getElementById('color').value,
+                icon: setup.icon,
+                aws_region: document.getElementById('aws_region').value,
+                az_deployment: document.getElementById('az-deployment').value
+            };
+            vscode.postMessage({ command: 'saveSetup', setup });
+            saveState();
+        }
 
     </script>
 </body>

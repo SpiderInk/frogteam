@@ -1,0 +1,15 @@
+
+
+I'm excited to finally share my personal project, https://frogteam.ai 🐸🤖
+
+This has been in the works for a while, and I've been eager to show it off once it reached a point I felt proud of. While I'm slightly reducing my development time on this for now, I wanted to give you all a glimpse into what I've been building.
+
+FrogTeam.ai is my take on a virtual GenAI development team. The idea is to let you register different large language models (LLMs) as "team members," each with their own specialties. You can then assign tasks to your team, just like you would in a real development project...and it's more than that already listen to hear the vision.
+
+Sticking to the theme of using GenAI I generated this audio clip using https://notebooklm.google.com what an amazing tool. I uploaded the readme and the changelog from FrogTeam's repo and I got this back. What a cool way to share my project with you.
+
+https://notebooklm.google.com/notebook/40503281-f678-4e03-b7a9-2a05413ed1f8/audio
+
+Learn more about https://frogteam.ai at the website or install the extension directly: https://marketplace.visualstudio.com/items?itemName=SpiderInk.frogteam
+
+#generativeai #ai #development #sideproject #innovation
