@@ -6,6 +6,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## 0.1.8
+- webpack update
+
 ## 0.1.7
 - Message processing loop and extra passes
 - Latest prompt slightly refined
