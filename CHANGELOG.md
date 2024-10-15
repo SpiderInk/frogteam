@@ -6,6 +6,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## 0.1.7
+- Message processing loop and extra passes
+- Latest prompt slightly refined
+
 ## 0.1.6
 - Better event handling for saving prompts and setups
 - Wrapper prompt for dall-e-3
