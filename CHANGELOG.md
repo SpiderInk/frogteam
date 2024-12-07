@@ -6,6 +6,12 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## 0.2.0
+- fixes
+
+## 0.1.9
+- fixes
+
 ## 0.1.8
 - webpack update
 
