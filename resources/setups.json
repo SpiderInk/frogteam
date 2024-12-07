@@ -1,0 +1,62 @@
+[
+    {
+      "id": "1ed8-8130-4d8e-a836-e95a-86e4-4934",
+      "name": "jess",
+      "purpose": "lead-architect",
+      "model": "anthropic.claude-3-5-sonnet-20240620-v1:0",
+      "endpoint": "",
+      "apiKey": "",
+      "color": "#dd612c",
+      "icon": "/Users/tpiazza/git/Zorblam/.vscode/frogteam/icons/jess-#dd612c.svg",
+      "aws_region": "us-west-2",
+      "az_deployment": ""
+    },
+    {
+      "id": "3a10-823a-4e2a-8271-7925-6bdb-48c4",
+      "name": "Martin",
+      "purpose": "lead-engineer",
+      "model": "anthropic.claude-3-5-sonnet-20240620-v1:0",
+      "endpoint": "",
+      "apiKey": "",
+      "color": "#268bc9",
+      "icon": "/Users/tpiazza/git/Zorblam/.vscode/frogteam/icons/Martin-#268bc9.svg",
+      "aws_region": "us-west-2",
+      "az_deployment": ""
+    },
+    {
+      "id": "d535-95fd-4573-bf8a-5e37-db58-3c4c",
+      "name": "Jan",
+      "purpose": "graphic-artist",
+      "model": "stability.stable-image-core-v1:0",
+      "endpoint": "",
+      "apiKey": "",
+      "color": "#77cc0f",
+      "icon": "/Users/tpiazza/git/Zorblam/.vscode/frogteam/icons/Jan-#77cc0f.svg",
+      "aws_region": "us-east-1",
+      "az_deployment": ""
+    },
+    {
+      "id": "f914-43da-46b3-8de4-4a4e-681c-189d",
+      "name": "Willum",
+      "purpose": "developer",
+      "model": "anthropic.claude-3-5-sonnet-20240620-v1:0",
+      "endpoint": "",
+      "apiKey": "",
+      "color": "#7f8f05",
+      "icon": "/Users/tpiazza/git/Zorblam/.vscode/frogteam/icons/Willum-#7f8f05.svg",
+      "aws_region": "us-west-2",
+      "az_deployment": ""
+    },
+    {
+      "id": "bb65-4383-4060-8bb4-86e1-2fe3-6a60",
+      "name": "Wino",
+      "purpose": "developer",
+      "model": "anthropic.claude-3-5-sonnet-20240620-v1:0",
+      "endpoint": "",
+      "apiKey": "",
+      "color": "#5d0a8a",
+      "icon": "/Users/tpiazza/git/Zorblam/.vscode/frogteam/icons/Wino-#5d0a8a.svg",
+      "aws_region": "us-west-2",
+      "az_deployment": ""
+    }
+  ]

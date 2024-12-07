@@ -3,7 +3,7 @@
   "displayName": "FrogTeam",
   "publisher": "SpiderInk",
   "description": "Your GenAI Team Workspace",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "homepage": "https://frogteam.ai",
   "engines": {
     "vscode": "^1.91.0"
@@ -124,6 +124,8 @@
   "devDependencies": {
     "@types/mocha": "^10.0.6",
     "@types/node": "20.x",
+    "@types/proper-lockfile": "^4.1.4",
+    "@types/retry": "^0.12.5",
     "@types/vscode": "^1.90.0",
     "@typescript-eslint/eslint-plugin": "^7.11.0",
     "@typescript-eslint/parser": "^7.11.0",
@@ -138,6 +140,7 @@
   },
   "dependencies": {
     "@aws-crypto/sha256-js": "^5.2.0",
+    "@aws-sdk/client-bedrock-runtime": "^3.706.0",
     "@aws-sdk/credential-provider-node": "^3.616.0",
     "@aws-sdk/types": "^3.609.0",
     "@langchain/community": "^0.2.22",
@@ -146,6 +149,7 @@
     "axios": "^1.7.4",
     "marked": "^13.0.2",
     "openai": "^4.52.2",
+    "proper-lockfile": "^4.1.2",
     "uuid": "^10.0.0"
   },
   "files": [

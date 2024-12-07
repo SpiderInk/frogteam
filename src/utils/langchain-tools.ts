@@ -46,7 +46,7 @@ const saveContentToFileApiSchema = z.object({
 export const saveContentToFileApiTool = tool(
     async ({ content, fileName }: { content: string; fileName: string }) => {
         output_log(`Saving content to file: ${fileName}`);
-        save(content, fileName);
+        await save(content, fileName);
         return `Content written to ${fileName}`;
     },
     {

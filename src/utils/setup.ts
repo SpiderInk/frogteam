@@ -1,3 +1,4 @@
+import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import { MEMBER_ICON_FOLDER } from "../extension";
@@ -20,6 +21,13 @@ export interface Setup {
 }
 
 export function load_setups(context: any): Setup[] {
+
+    if (!fs.existsSync(SETUPS_FILE)) {
+        const defaultSetupsFilePath = context.asAbsolutePath(path.join('resources', 'setups.json'));
+        fs.copyFileSync(defaultSetupsFilePath, SETUPS_FILE);
+        vscode.window.showInformationMessage('Default setups.json has been created in the .vscode/frogteam directory.');
+    }
+
     const setups = loadJsonFromFileSync(SETUPS_FILE);
     return setups;
 }

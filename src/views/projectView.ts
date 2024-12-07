@@ -33,18 +33,22 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<vscode.TreeI
         this.global_context = context;
         this.historyManager = new HistoryManager(HISTORY_FILE, this);
         this.refresh();
-
+    
         // Register the command to toggle grouping mode
         context.subscriptions.push(
             vscode.commands.registerCommand('frogteam.toggleGroupingMode', () => this.toggleGroupingMode())
         );
-
+    
         const setups:Setup[] = load_setups(context);
         context.globalState.update('setups', setups);
+        
         if(!validate_fixMemberIcons(setups)) {
-            saveJsonToFile(SETUPS_FILE, setups).then(
-                () => this.refresh()
-            );
+            saveJsonToFile(SETUPS_FILE, setups)
+                .then(() => this.refresh())
+                .catch(error => {
+                    vscode.window.showErrorMessage(`Failed to save setups: ${error}`);
+                    console.error('Setups save error:', error);
+                });
         }
     }
 

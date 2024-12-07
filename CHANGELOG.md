@@ -6,6 +6,13 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## 0.2.1
+- Focus on Anthropic
+- Full config out of the box for Bedrock hosted models defaulting to us-west-2
+- Use stability.stable-image-core-v1:0 for graphic artist
+- File locking fix
+- Suppress useless error messages
+
 ## 0.2.0
 - fixes
 

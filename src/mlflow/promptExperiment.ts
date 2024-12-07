@@ -15,7 +15,7 @@ export class PromptExperiment {
       const response = await this.client.createExperiment(name);
       return response.experiment_id;
     } catch (error) {
-      vscode.window.showErrorMessage(`PromptExperiment.createExperiment: Error creating experiment: ${error}.`);
+      // vscode.window.showErrorMessage(`PromptExperiment.createExperiment: Error creating experiment: ${error}.`);
       output_log(`PromptExperiment.createExperiment: Error creating experiment: ${error}.`);
       return "-1";
     }
@@ -39,7 +39,7 @@ export class PromptExperiment {
         return "-1";
       }
     } catch (error) {
-      vscode.window.showErrorMessage(`PromptExperiment.startRunAndLogPrompt Error starting run and logging prompt: ${error}.`);
+      // vscode.window.showErrorMessage(`PromptExperiment.startRunAndLogPrompt Error starting run and logging prompt: ${error}.`);
       output_log(`PromptExperiment.startRunAndLogPrompt Error starting run and logging prompt: ${error}.`);
       return "-1";
     }
@@ -54,7 +54,7 @@ export class PromptExperiment {
         await this.client.updateRun(runId, 'FINISHED');
       }
     } catch (error) {
-      vscode.window.showErrorMessage(`PromptExperiment.endRunAndLogPromptResult Error logging prompt result: ${error}.`);
+      // vscode.window.showErrorMessage(`PromptExperiment.endRunAndLogPromptResult Error logging prompt result: ${error}.`);
       output_log(`PromptExperiment.endRunAndLogPromptResult Error logging prompt result: ${error}.`);
     }
   }

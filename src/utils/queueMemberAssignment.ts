@@ -5,6 +5,7 @@ import { BedrockChat } from "@langchain/community/chat_models/bedrock";
 import { ChatOpenAI, AzureChatOpenAI } from "@langchain/openai";
 import { fetchApiKey } from './common';
 import { generateLangchainDalleImage } from "../langchain/LangchainDalleImage";
+import { generateBedrockStabilityImage } from '../langchain/LangchainStabilityAICoreImage';
 
 export async function queueMemberAssignment(caller: string, member: string, question: string, setups: any, historyManager: HistoryManager, conversationId: string, parentId: string | undefined, project:string): Promise<string> {
 
@@ -12,6 +13,8 @@ export async function queueMemberAssignment(caller: string, member: string, ques
     switch(member_object?.model) {
         case 'dall-e-3':
             return await generateLangchainDalleImage(caller, member_object?.apiKey, member_object, question, historyManager, setups, conversationId, parentId, project);
+        case 'stability.stable-image-core-v1:0':
+            return await generateBedrockStabilityImage(caller, member_object?.aws_region, member_object, question, historyManager, setups, conversationId, parentId, project);
         case 'gpt-35-turbo':
         case 'gpt-4-turbo':
         case 'gpt-4o':

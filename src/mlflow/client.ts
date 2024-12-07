@@ -42,7 +42,7 @@ export class MLflowClient {
       }
       return await response.json();
     } catch (error) {
-      vscode.window.showErrorMessage(`MLflowClient.request: Error making request to MLflow API: ${error}.`);
+      // vscode.window.showErrorMessage(`MLflowClient.request: Error making request to MLflow API: ${error}.`);
       output_log(`MLflowClient.request: Error making request to MLflow API: ${error}.`);
     }
   }
