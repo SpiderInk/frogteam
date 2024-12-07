@@ -8,13 +8,13 @@ export function loadJsonFromFileSync(filePath: string): any[] {
                 return JSON.parse(data);
             } catch (jsonErr) {
                 console.error(`Error parsing JSON file: ${jsonErr}`);
-                return [];
+                throw jsonErr;
             }
         } else {
             return [];
         }
     } catch (err) {
         console.error(`Error reading JSON file: ${err}`);
-        return [];
+        throw err;
     }
 }

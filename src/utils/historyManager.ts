@@ -199,6 +199,55 @@ class HistoryManager {
     }
 
     public buildConversationThreads(parentId: string): { HumanMessage: string; AIMessage: string }[] {
+        const collectEntries = (id: string, levels: number): HistoryEntry[] => {
+            if (levels === 0) {
+                 return [];
+            }
+            
+            // Find children entries by parentId
+            let children = this.findChildrenById(id);
+            const entry = this.findEntryById(id);
+            if (entry.length > 0) {
+                children = children.concat(entry);
+            }
+        
+            // Recursive call for the parent of the current entry, reducing levels
+            if (entry.length > 0 && entry[0].parentId) {
+                const parentEntries = collectEntries(entry[0].parentId, levels - 1);
+                children = children.concat(parentEntries);
+            }
+        
+            return children;
+        };
+    
+        // Collect entries up to 2 levels
+        let children = collectEntries(parentId, 3);
+    
+        // Filter the entries based on the lookupTag
+        const responses = children.filter(entry => 
+            entry.lookupTag === LookupTag.PROJECT_RESP || entry.lookupTag === LookupTag.MEMBER_RESP
+        );
+    
+        // Separate ProjectResponse and MemberResponse
+        const memberResponses = responses.filter(entry => entry.lookupTag === LookupTag.MEMBER_RESP);
+        const projectResponses = responses.filter(entry => entry.lookupTag === LookupTag.PROJECT_RESP);
+    
+        // Combine them into a conversation array with ProjectResponse last
+        const conversation = [
+            ...memberResponses.map(entry => ({
+                HumanMessage: entry.ask,
+                AIMessage: entry.answer,
+            })),
+            ...projectResponses.map(entry => ({
+                HumanMessage: entry.ask,
+                AIMessage: entry.answer,
+            }))
+        ];
+    
+        return conversation;
+    }
+
+    public buildConversationThreads_XXX(parentId: string): { HumanMessage: string; AIMessage: string }[] {
         // Find children entries by parentId
         let children = this.findChildrenById(parentId);
         const entry = this.findEntryById(parentId);

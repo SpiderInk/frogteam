@@ -37,7 +37,7 @@ export function newPrompt(context: vscode.ExtensionContext): Prompt {
     savePrompt(new_prompt);
     const prompts: Prompt[] = context.globalState.get('prompts', []);
     prompts.push(new_prompt);
-    context.globalState.update('setups', new_prompt);
+    // context.globalState.update('setups', new_prompt);
     return new_prompt;
 }
 
@@ -84,9 +84,7 @@ export async function savePrompts(prompts: Prompt[]) {
 }
 
 export function savePrompt(prompt: Prompt) {
-    if(PROMPTS.length === 0) {
-        loadPrompts();
-    }
+    loadPrompts();
     const index = PROMPTS.findIndex(element => element.id === prompt.id);
     if (index === -1 && prompt.id.length > 0) {
         PROMPTS.push(prompt);

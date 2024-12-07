@@ -48,7 +48,8 @@ export async function queueLangchainMemberAssignment(caller: string, llm: BaseCh
         // ** parent_id should only be used here when this was a direct from user task **
         let messages: (SystemMessage | HumanMessage | ToolMessage | AIMessage)[] = [];
         messages.push(new SystemMessage(engineer_prompt));
-        if(parentId !== undefined && caller === 'user') {
+        // if(parentId !== undefined && caller === 'user') {
+        if(parentId !== undefined) {
             // Build the conversation threads
             const conversationThreads = historyManager.buildConversationThreads(parentId);
             // Map the conversation threads to the appropriate message types and add them to the messages array
@@ -59,14 +60,14 @@ export async function queueLangchainMemberAssignment(caller: string, llm: BaseCh
         }
         // Now add the final prompt and question to the end of the messages array
         messages.push(new HumanMessage(question));
-        let passes = 2;
+        // let passes = 2;
         let parent_id = "";
         try {
             // start the the mlflow run for the main prompt's conversation cycle
             const engineer_prompt_experiment_id = await promptExperiment.startRunAndLogPrompt(engineer_prompt_obj[0]);
             const startTime = Date.now();
-            do {
-                passes = passes  - 1;
+            // do {
+            //    passes = passes  - 1;
                 let llmOutput = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };
                 let answer_for_history = "";
                 if (llmOutput.content.toString().length > 0) {
@@ -82,7 +83,6 @@ export async function queueLangchainMemberAssignment(caller: string, llm: BaseCh
                 do {
                     messages.push(llmOutput as AIMessage);
                     if (llmOutput.tool_calls && llmOutput.tool_calls.length > 0) {
-                        calls = llmOutput.tool_calls.length;
                         for (const toolCall of llmOutput.tool_calls) {
                             let toolOutput;
                             try {
@@ -100,15 +100,18 @@ export async function queueLangchainMemberAssignment(caller: string, llm: BaseCh
                             historyManager.addEntry(member_object?.name ?? "no-data", `tool:${toolCall.name}`, member_object?.model ?? "no-model", `args: ${JSON.stringify(toolCall.args)}`, toolOutput, LookupTag.TOOL_RESP, conversationId, parent_id, project);
                         }
                         llmOutput = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };
-                        if (llmOutput.content.toString().length > 0) {
-                            messages.push(new AIMessage(llmOutput.content.toString()));
-                            messages.push(new HumanMessage("Continue polishing the solution with another pass on the current conversation."));
+                        // if (llmOutput.content.toString().length > 0) {
+                        //     messages.push(new AIMessage(llmOutput.content.toString()));
+                        //     messages.push(new HumanMessage("Continue polishing the solution with another pass on the current conversation."));
+                        // }
+                        calls = 0;
+                        if (llmOutput.tool_calls && llmOutput.tool_calls.length > 0) {
+                            calls = llmOutput.tool_calls.length;
                         }
                     }
-                    calls = calls - 1;
                 } while (calls > 0);
                 // the second pass may result in error if the last response had no content...
-            } while( passes > 0 && (Date.now() - startTime) < 180000); // but after 3 minutes we need to stop
+            // } while( passes > 0 && (Date.now() - startTime) < 180000); // but after 3 minutes we need to stop
 
             const endTime = Date.now();
             duration = endTime - startTime;

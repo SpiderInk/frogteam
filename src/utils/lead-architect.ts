@@ -6,7 +6,7 @@ import { Setup, fetchSetupByPurpose, get_member_purposes_for_prompt } from './se
 import { HistoryManager, LookupTag } from './historyManager';
 import { HumanMessage, ToolMessage, AIMessageChunk, AIMessage, SystemMessage } from "@langchain/core/messages";
 import { BaseChatModel } from "@langchain/core/language_models/chat_models";
-import { getQueueMemberAssignmentApiTool, fetchHistoryApiTool, codeSearchApiTool } from "./langchain-tools";
+import { getQueueMemberAssignmentApiTool, fetchHistoryApiTool, codeSearchApiTool, getFileContentApiTool } from "./langchain-tools";
 import { queueMemberAssignment } from "./queueMemberAssignment";
 import { ToolCall } from "@langchain/core/messages/tool";
 import { output_log } from './outputChannelManager';
@@ -73,13 +73,18 @@ export async function leadArchitectGo(llm: BaseChatModel, question: string, setu
         run = false;
     }
     if (run && llm.bindTools) {
+        // getQueueMemberAssignmentApiTool declaration a bit confusing
+        // Setups and HistoryManager are too complex so we have to inject them more directly
+        // the LLM can't pass them along for us, see below when we call tools for the rest
         const llmWithTools = llm.bindTools([
             getQueueMemberAssignmentApiTool,
-            codeSearchApiTool
+            codeSearchApiTool,
+            getFileContentApiTool
         ]);
         let toolMapping: { [key: string]: any } = {
             "getQueueMemberAssignmentApi": queueMemberAssignment,
-            "codeSearchApiTool": codeSearchApiTool
+            "codeSearchApiTool": codeSearchApiTool,
+            "getFileContentApi": getFileContentApiTool
         };
         const prompt = personalizePrompt(system_prompt_obj[0].content, { members: get_member_purposes_for_prompt(setups) });
         const lead_prompt_experiment_id = await promptExperiment.startRunAndLogPrompt(system_prompt_obj[0]);
@@ -99,7 +104,6 @@ export async function leadArchitectGo(llm: BaseChatModel, question: string, setu
         }
         // Now add the final prompt and question to the end of the messages array
         messages.push(new HumanMessage(question));
-
         try {
             const startTime = Date.now();
             let llmOutput = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };

@@ -209,12 +209,18 @@ Very basic prompt and duration logging right now. I want to collect a set of sol
         - Is there a standard way I can do this. This is a research task for me.
 
 ## Tasks - On Deck
+- Use structured output for the member assignment prompts or more parameters
+  - We could output the list of skills needed and amend the system prompt
+- You should be able to right click a file and choose "refactor with frogteam"
+- Switch to pure Anthropic Claude and use the meta prompt
 - Make a tool for the llm that does a code search, like just use vscode's search to find things in files enabling LLM find/replace **done**
 - mlflow
     - experiment setup
       - You can start a new experiment and the experiment id will be saved with the prompt object **done**
       - places where the prompt is used runs will be created and the prompt, duration are logged **done**`
       - You can stop an experiment by clearing the experiment id **done**
+
+- Enable hyper params (temp..)
 
 **SYSTEM PROMPT** Sometimes a large file will just have a comment that says the rest remains unchanged leaving the user with git commands to fix it
     This next sentence need to be added to System Prompts.
