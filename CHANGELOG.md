@@ -6,6 +6,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## 0.2.3
+- Change to anthropic.claude-3-5-haiku-20241022-v1:0
+
 ## 0.2.1
 - Focus on Anthropic
 - Full config out of the box for Bedrock hosted models defaulting to us-west-2

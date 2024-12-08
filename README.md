@@ -1,4 +1,8 @@
 # <img src="https://frogteam.ai/logo.png" alt="frogteam icon" width="32" height="32"> - <a href="https://marketplace.visualstudio.com/items?itemName=SpiderInk.frogteam">FrogTeam.ai</a> 
+Update v0.2.3: 12-08-2024<br>
+<ul>
+    <li>Change to anthropic.claude-3-5-haiku-20241022-v1:0</li>
+</ul>
 Update v0.2.1: 12-07-2024<br>
 <ul>
     <li>Focus on Anthropic</li>

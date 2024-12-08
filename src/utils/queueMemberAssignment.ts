@@ -41,7 +41,7 @@ export async function queueMemberAssignment(caller: string, member: string, ques
                 return await queueLangchainMemberAssignment(caller, openai_llm, member_object, question, historyManager, setups, conversationId, parentId, project);
             }
         case 'anthropic.claude-3-5-sonnet-20240620-v1:0':
-        case 'anthropic.claude-3-haiku-20240307-v1:0':
+        case 'anthropic.claude-3-5-haiku-20241022-v1:0':
             const bedrock_llm = new BedrockChat({
                 region: member_object?.aws_region,
                 model: member_object?.model ?? "no-model",

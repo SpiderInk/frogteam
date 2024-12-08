@@ -42,7 +42,7 @@ export async function projectGo(question: string, setups: Setup[], historyManage
                 return await leadArchitectGo(openai_llm, question, setups, historyManager, member_object?.model, member_object?.name, conversationId, parentId, project);
             }
         case 'anthropic.claude-3-5-sonnet-20240620-v1:0':
-        case 'anthropic.claude-3-haiku-20240307-v1:0':
+        case 'anthropic.claude-3-5-haiku-20241022-v1:0':
             const bedrock_llm = new BedrockChat({
                 region: member_object?.aws_region ?? "us-east-1",
                 model: member_object?.model ?? "no-model",
