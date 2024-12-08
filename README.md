@@ -1,4 +1,9 @@
 # <img src="https://frogteam.ai/logo.png" alt="frogteam icon" width="32" height="32"> - <a href="https://marketplace.visualstudio.com/items?itemName=SpiderInk.frogteam">FrogTeam.ai</a> 
+Update v0.2.4: 12-08-2024<br>
+<ul>
+    <li>Properly queue requests (inside the extension) and throttle (goal: make configurable)</li>
+    <li>Finish making default configuration use anthropic.claude-3-5-haiku-20241022-v1:0 for team member roles</li>
+</ul>
 Update v0.2.3: 12-08-2024<br>
 <ul>
     <li>Change to anthropic.claude-3-5-haiku-20241022-v1:0</li>

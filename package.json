@@ -3,7 +3,7 @@
   "displayName": "FrogTeam",
   "publisher": "SpiderInk",
   "description": "Your GenAI Team Workspace",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "homepage": "https://frogteam.ai",
   "engines": {
     "vscode": "^1.91.0"
@@ -149,6 +149,7 @@
     "axios": "^1.7.4",
     "marked": "^13.0.2",
     "openai": "^4.52.2",
+    "p-queue": "^7.3.0",
     "proper-lockfile": "^4.1.2",
     "uuid": "^10.0.0"
   },

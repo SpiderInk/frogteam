@@ -14,7 +14,7 @@ import { getSetupDocContent } from './webview/getSetupDocContent';
 import { getAnswerTabContent } from './webview/getAnswerTabContent';
 import { generateShortUniqueId } from './utils/common';
 import { projectGo } from './utils/lead-architect';
-import { queueMemberAssignment } from './utils/queueMemberAssignment';
+import { queueMemberAssignment, ServiceContainer } from './utils/queueMemberAssignment';
 import * as path from 'path';
 import * as fs from 'fs';
 import { output_log } from './utils/outputChannelManager';
@@ -42,6 +42,12 @@ let projectViewProvider: ProjectViewProvider | undefined;
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
+    const services = ServiceContainer.initialize(context);
+    const queueManager = services.getQueueManager();
+    context.subscriptions.push({
+        dispose: () => queueManager.shutdown()
+    });
+
 	const fileManager = new FileManager();
 	await fileManager.initializeFiles();
 

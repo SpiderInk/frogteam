@@ -11,11 +11,14 @@ class FileOperationManager {
     private static instance: FileOperationManager;
     private lockOptions = { 
         retries: {
-            retries: 5,
-            factor: 2,
-            minTimeout: 100,
-            maxTimeout: 1000
-        }
+            retries: 10,        // Increased from 5
+            factor: 1.5,        // Decreased from 2
+            minTimeout: 50,     // Decreased from 100
+            maxTimeout: 1000,
+            randomize: true     // Added randomization
+        },
+        stale: 10000,          // Added stale lock timeout
+        realpath: false        // Added to prevent realpath resolution issues
     };
 
     private constructor() {}
@@ -35,7 +38,6 @@ class FileOperationManager {
         }
     }
 
-    // Create and open file with locking
     public async createAndOpenFile(fileName: string, fileContent: string): Promise<string> {
         try {
             let filePath: string;
@@ -48,20 +50,29 @@ class FileOperationManager {
                 const tempDir = os.tmpdir();
                 filePath = path.join(tempDir, fileName);
             }
-
+    
             // Ensure directory exists
             await this.ensureDirectoryExists(filePath);
-
+    
+            // Create an empty file if it doesn't exist
+            if (!fs.existsSync(filePath)) {
+                fs.writeFileSync(filePath, '');  // Create empty file for locking
+            }
+    
             // Acquire file lock
             const release = await lockfile.lock(filePath, this.lockOptions);
             
             try {
                 const fileUri = vscode.Uri.file(filePath);
                 await vscode.workspace.fs.writeFile(fileUri, Buffer.from(fileContent, 'utf8'));
-
+    
+                // Log the path and file existence for debugging
+                output_log(`File path: ${filePath}`);
+                output_log(`File exists after write: ${fs.existsSync(filePath)}`);
+    
                 const document = await vscode.workspace.openTextDocument(fileUri);
                 await vscode.window.showTextDocument(document);
-
+    
                 output_log(`File ${fileName} created and opened successfully.`);
                 return `${fileName} written successfully.`;
             } finally {
@@ -70,8 +81,13 @@ class FileOperationManager {
             }
         } catch (err) {
             const error = err as Error;
-            vscode.window.showErrorMessage(`Failed to create and open file: ${error.message}`);
+            // More detailed error logging
             output_log(`Failed to create and open file: ${error.message}`);
+            output_log(`Error stack: ${error.stack}`);
+            if (error instanceof Error && 'code' in error) {
+                output_log(`Error code: ${(error as any).code}`);
+            }
+            vscode.window.showErrorMessage(`Failed to create and open file: ${error.message}`);
             return `${fileName} operation failed.`;
         }
     }

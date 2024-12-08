@@ -6,6 +6,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## 0.2.4
+- Properly queue requests (inside the extension) and throttle (goal: make configurable)
+- Finish making default configuration use anthropic.claude-3-5-haiku-20241022-v1:0 for team member roles
+
 ## 0.2.3
 - Change to anthropic.claude-3-5-haiku-20241022-v1:0
 
