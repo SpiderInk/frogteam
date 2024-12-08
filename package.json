@@ -3,7 +3,7 @@
   "displayName": "FrogTeam",
   "publisher": "SpiderInk",
   "description": "Your GenAI Team Workspace",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "homepage": "https://frogteam.ai",
   "engines": {
     "vscode": "^1.91.0"

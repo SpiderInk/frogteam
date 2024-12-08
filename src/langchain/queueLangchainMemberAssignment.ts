@@ -81,9 +81,7 @@ export async function queueLangchainMemberAssignment(caller: string, llm: BaseCh
                 parent_id = historyManager.addEntry(caller, member_object?.name ?? "no-data", member_object?.model ?? "no-model", question, answer_for_history, LookupTag.MEMBER_TASK, conversationId, parentId, project);
                 let calls = 0;
                 do {
-                    if(llmOutput.content.length > 0) {
-                        messages.push(llmOutput as AIMessage);
-                    }
+                    messages.push(llmOutput as AIMessage);
                     if (llmOutput.tool_calls && llmOutput.tool_calls.length > 0) {
                         for (const toolCall of llmOutput.tool_calls) {
                             let toolOutput;
