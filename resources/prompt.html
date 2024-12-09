@@ -46,6 +46,7 @@
     <div class="cmd">
         <button id="delete" title="Delete"><img class="icon" src="${local_resources}/resources/trash.svg" width="16" height="16" /></button>
         <button id="duplicate" title="Duplicate"><img class="icon" src="${local_resources}/resources/clone.svg" width="16" height="16" /></button>
+        <button id="save" title="Save"><img class="icon" src="${local_resources}/resources/content-save.svg" width="16" height="16" /></button>
     </div>
     <h3>Prompt Editor</h3>
     You need a minimum of three prompts: lead-architect, lead-engineer, and developer. There must be a team member with a "purpose" to match the "category" and "model" of each prompt. The project editor will show you the team roster and status telling what purposes and categories are missing or displaying healthy.
@@ -117,6 +118,7 @@
         });
     
         function setupEventListeners() {
+            setClickListener(document.getElementById("save"), savePrompt);
             setClickListener(document.getElementById("delete"), delete_prompt);
             setClickListener(document.getElementById("duplicate"), duplicate_prompt);
             setClickListener(document.getElementById("experiment"), start_mlflow_experiment);

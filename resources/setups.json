@@ -1,7 +1,7 @@
 [
     {
       "id": "1ed8-8130-4d8e-a836-e95a-86e4-4934",
-      "name": "jess",
+      "name": "Antelope",
       "purpose": "lead-architect",
       "model": "anthropic.claude-3-5-sonnet-20240620-v1:0",
       "endpoint": "",
@@ -13,7 +13,7 @@
     },
     {
       "id": "3a10-823a-4e2a-8271-7925-6bdb-48c4",
-      "name": "Martin",
+      "name": "Egret",
       "purpose": "lead-engineer",
       "model": "anthropic.claude-3-5-haiku-20241022-v1:0",
       "endpoint": "",
@@ -25,7 +25,7 @@
     },
     {
       "id": "d535-95fd-4573-bf8a-5e37-db58-3c4c",
-      "name": "Jan",
+      "name": "Elephant",
       "purpose": "graphic-artist",
       "model": "stability.stable-image-core-v1:0",
       "endpoint": "",
@@ -37,7 +37,7 @@
     },
     {
       "id": "f914-43da-46b3-8de4-4a4e-681c-189d",
-      "name": "Willum",
+      "name": "Walrus",
       "purpose": "developer",
       "model": "anthropic.claude-3-5-haiku-20241022-v1:0",
       "endpoint": "",
@@ -49,7 +49,7 @@
     },
     {
       "id": "bb65-4383-4060-8bb4-86e1-2fe3-6a60",
-      "name": "Wino",
+      "name": "Crane",
       "purpose": "developer",
       "model": "anthropic.claude-3-5-haiku-20241022-v1:0",
       "endpoint": "",

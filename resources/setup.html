@@ -52,7 +52,10 @@
                 src="${local_resources}/resources/trash.svg" width="16" height="16" /></button>
         <button id="duplicate" title="Duplicate"><img class="icon"
                 src="${local_resources}/resources/clone.svg" width="16" height="16" /></button>
-    </div>
+        <button id="save" title="Save"><img class="icon"
+            src="${local_resources}/resources/content-save.svg" width="16" height="16" /></button>
+    
+        </div>
     <br>
     <div id="issues" class="issues">
         &nbsp;
@@ -136,6 +139,7 @@
             createFormElements(null, "query_div", 'queryMember');
             document.getElementById('formElements').style.display = 'none';
             setMemberDropDown();
+            document.getElementById("save").onclick = updateSetupAndPostMessage;
             document.getElementById("delete").onclick = delete_setup;
             document.getElementById("duplicate").onclick = duplicate_setup;
             document.getElementById("team-setup-form").oninput = autoSaveSetup;

@@ -1,4 +1,9 @@
 # <img src="https://frogteam.ai/logo.png" alt="frogteam icon" width="32" height="32"> - <a href="https://marketplace.visualstudio.com/items?itemName=SpiderInk.frogteam">FrogTeam.ai</a> 
+Update v0.2.5: 12-08-2024<br>
+<ul>
+    <li>Add save button for prompt and member panel (sometimes they get out of sync)</li>
+    <li>Team member names are now animals</li>
+</ul>
 Update v0.2.4: 12-08-2024<br>
 <ul>
     <li>Properly queue requests (inside the extension) and throttle (goal: make configurable)</li>
