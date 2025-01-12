@@ -1,4 +1,9 @@
 # <img src="https://frogteam.ai/logo.png" alt="frogteam icon" width="32" height="32"> - <a href="https://marketplace.visualstudio.com/items?itemName=SpiderInk.frogteam">FrogTeam.ai</a> 
+Update v0.2.7: 1-12-2025<br>
+<ul>
+    <li>lead-engineer tool error fix - the reason for this release</li>
+    <li> mlflow integration needs work but there are changes to start making this useful for tracking experiments</li>
+</ul>
 Update v0.2.5: 12-08-2024<br>
 <ul>
     <li>Add save button for prompt and member panel (sometimes they get out of sync)</li>
@@ -231,6 +236,12 @@ Very basic prompt and duration logging right now. I want to collect a set of sol
         - Is there a standard way I can do this. This is a research task for me.
 
 ## Tasks - On Deck
+
+** the only place requests are cached are on the builder tab if you move out of a response window before submitting user input is lost
+** sometimes file output is incomplete telling the user to use what was there before...but its lost
+** This error: leadArchitectGo Error: TypeError: Cannot read properties of undefined (reading 'invoke') Try submitting again. Is this an error with tool:codeSearchApiTool?
+** Make data for using Open Tofu, API Gateway and OpenAI json style API setup for API Gateway
+
 - Use structured output for the member assignment prompts or more parameters
   - We could output the list of skills needed and amend the system prompt
 - You should be able to right click a file and choose "refactor with frogteam"
@@ -239,7 +250,7 @@ Very basic prompt and duration logging right now. I want to collect a set of sol
 - mlflow
     - experiment setup
       - You can start a new experiment and the experiment id will be saved with the prompt object **done**
-      - places where the prompt is used runs will be created and the prompt, duration are logged **done**`
+      - places where the prompt is used runs will be created and the prompt, duration are logged **done**
       - You can stop an experiment by clearing the experiment id **done**
 
 - Enable hyper params (temp..)

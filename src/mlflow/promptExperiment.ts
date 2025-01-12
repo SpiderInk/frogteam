@@ -2,12 +2,17 @@ import * as vscode from 'vscode';
 import { output_log } from '../utils/outputChannelManager';
 import { MLflowClient } from './client';
 import { Prompt } from '../utils/prompts';
+import { ContentEvaluator } from './promptMetrics';
+
+
 
 export class PromptExperiment {
   private client: MLflowClient;
+  private evaluator: ContentEvaluator;
 
   constructor(mlflowServerUrl: string) {
     this.client = new MLflowClient(mlflowServerUrl);
+    this.evaluator = new ContentEvaluator();
   }
 
   async createExperiment(name: string): Promise<string> {
@@ -45,17 +50,59 @@ export class PromptExperiment {
     }
   }
 
-  async endRunAndLogPromptResult(runId: string, result: string, duration: number): Promise<void> {
+  // async endRunAndLogPromptResult(runId: string, result: string, duration: number): Promise<void> {
+  //   try {
+  //     if(runId !== "-1") {
+  //       await this.client.logMetric(runId, 'result_length', result.length);
+  //       await this.client.logParam(runId, 'result', result);
+  //       await this.client.logMetric(runId, 'duration', duration);
+  //       await this.client.updateRun(runId, 'FINISHED');
+  //     }
+  //   } catch (error) {
+  //     // vscode.window.showErrorMessage(`PromptExperiment.endRunAndLogPromptResult Error logging prompt result: ${error}.`);
+  //     output_log(`PromptExperiment.endRunAndLogPromptResult Error logging prompt result: ${error}.`);
+  //   }
+  // }
+
+  async endRunAndLogPromptResult(
+    runId: string,
+    result: string,
+    duration: number,
+    originalContext?: string,
+    referenceText?: string
+  ): Promise<void> {
     try {
-      if(runId !== "-1") {
+      if (runId !== "-1") {
+        // Log basic metrics
         await this.client.logMetric(runId, 'result_length', result.length);
         await this.client.logParam(runId, 'result', result);
         await this.client.logMetric(runId, 'duration', duration);
+
+        // Calculate and log all evaluation metrics
+        const metrics = await this.evaluator.evaluateContent(
+          result,
+          originalContext,
+          referenceText
+        );
+
+        // Log all metrics to MLflow
+        await this.client.logMetric(runId, 'readability_score', metrics.readabilityScore);
+        await this.client.logMetric(runId, 'grade_level', metrics.gradeLevel);
+        
+        if (referenceText) {
+          await this.client.logMetric(runId, 'accuracy_score', metrics.accuracyScore);
+        }
+        
+        if (originalContext) {
+          await this.client.logMetric(runId, 'hallucination_score', metrics.hallucinationScore);
+          await this.client.logMetric(runId, 'groundedness_score', metrics.groundednessScore);
+        }
+
         await this.client.updateRun(runId, 'FINISHED');
       }
     } catch (error) {
-      // vscode.window.showErrorMessage(`PromptExperiment.endRunAndLogPromptResult Error logging prompt result: ${error}.`);
-      output_log(`PromptExperiment.endRunAndLogPromptResult Error logging prompt result: ${error}.`);
+      output_log(`PromptExperiment.endRunAndLogPromptResult Error logging prompt result: ${error}`);
     }
   }
+
 }

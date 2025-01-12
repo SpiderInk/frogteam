@@ -131,14 +131,22 @@ export async function leadArchitectGo(llm: BaseChatModel, question: string, setu
                             messages.push(newTM);
                             historyManager.addEntry(member_name, `tool:${toolCall.name}`, model, `args: ${JSON.stringify(toolCall.args)}`, toolOutput, LookupTag.TOOL_RESP, conversationId, parent_id, project);
                         } else {
-                            let tool = toolMapping[toolCall.name];
-                            let toolOutput = await tool.invoke(toolCall.args);
-                            let newTM = new ToolMessage({
-                                tool_call_id: toolCall.id!,
-                                content: toolOutput
-                            });
-                            messages.push(newTM);
-                            historyManager.addEntry(member_name, `tool:${toolCall.name}`, model, `args: ${JSON.stringify(toolCall.args)}`, toolOutput, LookupTag.TOOL_RESP, conversationId, parent_id, project);
+                            try {
+                                // tool:codeSearchApiTool error
+                                let tool = toolMapping[toolCall.name];
+                                let toolOutput = await tool.invoke(toolCall.args);
+                                let newTM = new ToolMessage({
+                                    tool_call_id: toolCall.id!,
+                                    content: toolOutput
+                                });
+                                messages.push(newTM);
+                                historyManager.addEntry(member_name, `tool:${toolCall.name}`, model, `args: ${JSON.stringify(toolCall.args)}`, toolOutput, LookupTag.TOOL_RESP, conversationId, parent_id, project);
+                            } catch (error) {
+                                vscode.window.showErrorMessage(`leadArchitectGo Tool Error: ${error}\n\nMoving to next tool output.`);
+                                output_log(`leadArchitectGo Error: ${error}`);
+                                historyManager.addEntry("user", member_name, model, question, `Lead Architect Error: ${error}`, LookupTag.PROJECT_RESP, conversationId, parent_id, project);
+                                continue;
+                            }
                         }
                     }
                     llmOutput = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };
@@ -146,7 +154,7 @@ export async function leadArchitectGo(llm: BaseChatModel, question: string, setu
             } while (llmOutput.tool_calls && llmOutput.tool_calls.length > 0 && (Date.now() - startTime) < 120000);
             const endTime = Date.now();
             duration = endTime - startTime;
-            await promptExperiment.endRunAndLogPromptResult(lead_prompt_experiment_id, JSON.stringify(messages), duration);
+            await promptExperiment.endRunAndLogPromptResult(lead_prompt_experiment_id, JSON.stringify(messages), duration, question);
             messages.push(new HumanMessage(task_summary_prompt[0].content));
             const task_summary_prompt_experiment_id = await promptExperiment.startRunAndLogPrompt(task_summary_prompt[0]);
             const summary_StartTime = Date.now();
@@ -154,7 +162,7 @@ export async function leadArchitectGo(llm: BaseChatModel, question: string, setu
             const summary_EndTime = Date.now();
             duration = summary_EndTime - summary_StartTime;
             response = final_completion.content.toString();
-            await promptExperiment.endRunAndLogPromptResult(task_summary_prompt_experiment_id, response, duration);
+            await promptExperiment.endRunAndLogPromptResult(task_summary_prompt_experiment_id, response, duration, question);
             historyManager.addEntry("user", member_name, model, question, (response.length > 0 ? response : "no final response"), LookupTag.PROJECT_RESP, conversationId, parent_id, project);
         } catch (error) {
             vscode.window.showErrorMessage(`leadArchitectGo Error: ${error}\n\nTry submitting again.`);

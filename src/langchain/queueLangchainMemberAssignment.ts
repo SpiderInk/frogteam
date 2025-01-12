@@ -56,6 +56,7 @@ export async function queueLangchainMemberAssignment(caller: string, llm: BaseCh
             conversationThreads.forEach(thread => {
                 messages.push(new HumanMessage(thread.HumanMessage));
                 messages.push(new AIMessage(thread.AIMessage));
+                messages.push(new HumanMessage("Continue the development of the task we are working on."));
             });
         }
         // Now add the final prompt and question to the end of the messages array
@@ -115,7 +116,7 @@ export async function queueLangchainMemberAssignment(caller: string, llm: BaseCh
 
             const endTime = Date.now();
             duration = endTime - startTime;
-            await promptExperiment.endRunAndLogPromptResult(engineer_prompt_experiment_id, JSON.stringify(messages), duration);
+            await promptExperiment.endRunAndLogPromptResult(engineer_prompt_experiment_id, JSON.stringify(messages), duration, question);
             // we are using the "user" message space
             messages.push(new HumanMessage(task_summary_prompt[0].content));
             const task_summary_prompt_experiment_id = await promptExperiment.startRunAndLogPrompt(task_summary_prompt[0]);
@@ -124,7 +125,7 @@ export async function queueLangchainMemberAssignment(caller: string, llm: BaseCh
             const summary_EndTime = Date.now();
             duration = summary_EndTime - summary_StartTime;
             response = final_completion.content.toString();
-            await promptExperiment.endRunAndLogPromptResult(task_summary_prompt_experiment_id, response, duration);
+            await promptExperiment.endRunAndLogPromptResult(task_summary_prompt_experiment_id, response, duration, question);
             historyManager.addEntry(caller, member_object?.name ?? "no-data", member_object?.model ?? "no-model", question, (response.length > 0 ? response : "no final response"), LookupTag.MEMBER_RESP, conversationId, parent_id, project); //what parent id to use here?
         } catch (error) {
             vscode.window.showErrorMessage(`queueLangchainMemberAssignment Error: ${error}\n\nTry submitting again.`);
