@@ -121,17 +121,17 @@ export async function leadArchitectGo(llm: BaseChatModel, question: string, setu
                 messages.push(llmOutput as AIMessage);
                 if (llmOutput.tool_calls && llmOutput.tool_calls.length > 0) {
                     for (const toolCall of llmOutput.tool_calls) {
-                        if (toolCall.name === "getQueueMemberAssignmentApi") {
-                            // Setups and HistoryManager are too complex so we have to inject them more directly
-                            let toolOutput = await queueMemberAssignment('lead-architect', toolCall.args.member, toolCall.args.question, setups, historyManager, conversationId, parent_id, project);
-                            let newTM = new ToolMessage({
-                                tool_call_id: toolCall.id!,
-                                content: toolOutput
-                            });
-                            messages.push(newTM);
-                            historyManager.addEntry(member_name, `tool:${toolCall.name}`, model, `args: ${JSON.stringify(toolCall.args)}`, toolOutput, LookupTag.TOOL_RESP, conversationId, parent_id, project);
-                        } else {
-                            try {
+                        try {
+                            if (toolCall.name === "getQueueMemberAssignmentApi") {
+                                // Setups and HistoryManager are too complex so we have to inject them more directly
+                                let toolOutput = await queueMemberAssignment('lead-architect', toolCall.args.member, toolCall.args.question, setups, historyManager, conversationId, parent_id, project);
+                                let newTM = new ToolMessage({
+                                    tool_call_id: toolCall.id!,
+                                    content: toolOutput
+                                });
+                                messages.push(newTM);
+                                historyManager.addEntry(member_name, `tool:${toolCall.name}`, model, `args: ${JSON.stringify(toolCall.args)}`, toolOutput, LookupTag.TOOL_RESP, conversationId, parent_id, project);
+                            } else {
                                 // tool:codeSearchApiTool error
                                 let tool = toolMapping[toolCall.name];
                                 let toolOutput = await tool.invoke(toolCall.args);
@@ -141,12 +141,12 @@ export async function leadArchitectGo(llm: BaseChatModel, question: string, setu
                                 });
                                 messages.push(newTM);
                                 historyManager.addEntry(member_name, `tool:${toolCall.name}`, model, `args: ${JSON.stringify(toolCall.args)}`, toolOutput, LookupTag.TOOL_RESP, conversationId, parent_id, project);
-                            } catch (error) {
-                                vscode.window.showErrorMessage(`leadArchitectGo Tool Error: ${error}\n\nMoving to next tool output.`);
-                                output_log(`leadArchitectGo Error: ${error}`);
-                                historyManager.addEntry("user", member_name, model, question, `Lead Architect Error: ${error}`, LookupTag.PROJECT_RESP, conversationId, parent_id, project);
-                                continue;
                             }
+                        } catch (error) {
+                            vscode.window.showErrorMessage(`leadArchitectGo Tool Error: ${error}, tool: ${toolCall.name}\n\nMoving to next tool output.`);
+                            output_log(`leadArchitectGo Tool Error: ${error}, tool: ${toolCall.name}`);
+                            historyManager.addEntry("user", member_name, model, question, `Lead Architect Error: ${error}`, LookupTag.PROJECT_RESP, conversationId, parent_id, project);
+                            continue;
                         }
                     }
                     llmOutput = await llmWithTools.invoke(messages) as AIMessageChunk & { tool_calls?: ToolCall[] };
@@ -165,7 +165,7 @@ export async function leadArchitectGo(llm: BaseChatModel, question: string, setu
             await promptExperiment.endRunAndLogPromptResult(task_summary_prompt_experiment_id, response, duration, question);
             historyManager.addEntry("user", member_name, model, question, (response.length > 0 ? response : "no final response"), LookupTag.PROJECT_RESP, conversationId, parent_id, project);
         } catch (error) {
-            vscode.window.showErrorMessage(`leadArchitectGo Error: ${error}\n\nTry submitting again.`);
+            vscode.window.showErrorMessage(`leadArchitectGo Final Error: ${error}\n\nTry submitting again.`);
             output_log(`leadArchitectGo Error: ${error}`);
             historyManager.addEntry("user", member_name, model, question, `Lead Architect Error: ${error}`, LookupTag.PROJECT_RESP, conversationId, undefined, project);
         }
