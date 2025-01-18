@@ -4,6 +4,9 @@ All notable changes to the "frogteam" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## 0.2.9
+- lead-engineer tool error fix - the tool was misnamed in the prompt, a new prompt has been supplied.
+
 ## 0.2.7
 - lead-engineer tool error fix - the reason for this release
 - mlflow needs work but there are changes to start making this useful for tracking experiments
