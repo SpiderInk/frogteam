@@ -146,6 +146,7 @@ export async function leadArchitectGo(llm: BaseChatModel, question: string, setu
                             vscode.window.showErrorMessage(`leadArchitectGo Tool Error: ${error}, tool: ${toolCall.name}\n\nMoving to next tool output.`);
                             output_log(`leadArchitectGo Tool Error: ${error}, tool: ${toolCall.name}`);
                             historyManager.addEntry("user", member_name, model, question, `Lead Architect Error: ${error}`, LookupTag.PROJECT_RESP, conversationId, parent_id, project);
+                            messages.pop();
                             continue;
                         }
                     }
