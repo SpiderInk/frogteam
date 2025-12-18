@@ -6,7 +6,8 @@
   "version": "0.3.1",
   "homepage": "https://frogteam.ai",
   "engines": {
-    "vscode": "^1.91.0"
+    "vscode": "^1.91.0",
+    "node": ">=20.0.0"
   },
   "categories": [
     "AI"
@@ -131,7 +132,7 @@
     "@typescript-eslint/parser": "^7.11.0",
     "@vscode/test-cli": "^0.0.9",
     "@vscode/test-electron": "^2.4.0",
-    "esbuild": "^0.23.0",
+    "esbuild": "^0.27.2",
     "eslint": "^8.57.0",
     "ts-loader": "^9.5.1",
     "typescript": "^5.4.5",
@@ -144,7 +145,7 @@
     "@aws-sdk/credential-provider-node": "^3.616.0",
     "@aws-sdk/types": "^3.609.0",
     "@langchain/community": "^0.3.19",
-    "@langchain/core": "^0.2.19",
+    "@langchain/core": "^0.3.19",
     "@smithy/eventstream-codec": "^2.0.5",
     "axios": "^1.7.4",
     "marked": "^13.0.2",
